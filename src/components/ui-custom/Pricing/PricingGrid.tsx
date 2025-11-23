@@ -322,7 +322,7 @@ Proceed?`
   }
   const handlePlanClick = (plan: PlanInfo["plan"]) => {
     if (!dashboard && !isLoggedIn) {
-      window.location.href = "/auth/signup"
+      window.location.href = "/signup"
       return
     }
     handleBuyClick(plan)
