@@ -6,10 +6,7 @@ import { subscription } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment:
-    process.env.NODE_ENV === "production"
-      ? Environment.production
-      : Environment.sandbox,
+  environment: Environment.sandbox,
 })
 
 /**
