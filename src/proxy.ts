@@ -54,7 +54,7 @@ export async function proxy(req: NextRequest) {
   }
   const rewriteUrl = new URL(
     `/affiliate/${foundDomain.orgId}${req.nextUrl.pathname}${req.nextUrl.search}`,
-    BASE_URL
+    req.url
   )
 
   const response = NextResponse.rewrite(rewriteUrl)
