@@ -43,15 +43,15 @@ export function OrgHeader({
       <div
         className="flex items-center justify-center rounded-xl"
         style={{
-          width: "45px",
-          height: "45px",
+          width: "35px",
+          height: "35px",
           backgroundImage:
             "linear-gradient(to bottom right, #A5C8FF, #7B87FF, #6A4CFF)",
         }}
       >
         <MyCustomIcon
-          width={30}
-          height={30}
+          width={25}
+          height={25}
           className="main-dashboard-graphic"
           aria-label="Custom application graphic"
         />
