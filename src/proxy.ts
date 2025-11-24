@@ -5,6 +5,7 @@ import { and, eq } from "drizzle-orm"
 
 export async function proxy(req: NextRequest) {
   const host = req.headers.get("host")
+  const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://refearnapp.com"
   if (!host) return NextResponse.next()
   if (
     host.includes("localhost:3000") ||
@@ -53,7 +54,7 @@ export async function proxy(req: NextRequest) {
   }
   const rewriteUrl = new URL(
     `/affiliate/${foundDomain.orgId}${req.nextUrl.pathname}${req.nextUrl.search}`,
-    "http://localhost:3000"
+    BASE_URL
   )
 
   const response = NextResponse.rewrite(rewriteUrl)
