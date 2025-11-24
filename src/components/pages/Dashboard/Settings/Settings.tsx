@@ -251,7 +251,6 @@ export default function Settings({
       {/* Header */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <SidebarTrigger className="md:hidden" />
           <div>
             <h1 className="text-3xl font-bold">Organization Settings</h1>
             <p className="text-muted-foreground">

@@ -87,13 +87,19 @@ export function LogoUpload({
           <img
             src={value}
             alt="Company Logo"
-            className={`h-12 w-12 rounded-full object-contain bg-muted ${
+            className={`h-[35px] w-[35px] rounded-xl object-contain bg-muted ${
               mode === "avatar" ? "cursor-default" : "cursor-pointer"
             }`}
             onClick={mode === "default" ? handleButtonClick : undefined}
           />
         ) : (
-          <div className="h-12 w-12 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-bold text-white">
+          <div
+            className="h-[35px] w-[35px] rounded-xl flex items-center text-[25px] justify-center font-bold text-white"
+            style={{
+              backgroundImage:
+                "linear-gradient(to bottom right, #A5C8FF, #7B87FF, #6A4CFF)",
+            }}
+          >
             {orgName?.charAt(0).toUpperCase() ?? "?"}
           </div>
         )}

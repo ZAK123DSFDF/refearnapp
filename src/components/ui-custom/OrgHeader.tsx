@@ -91,11 +91,8 @@ export function OrgHeader({
       )
     }
 
-    const textSize = sidebar ? "text-lg" : "text-4xl"
-    const gap = sidebar ? "space-x-2" : "space-x-3"
-
     return (
-      <div className={`flex items-center justify-center ${gap}`}>
+      <div className="flex items-center justify-center space-x-2">
         <LogoUpload
           value={logoUrl}
           onChange={setLogoUrl}
@@ -106,7 +103,7 @@ export function OrgHeader({
         />
 
         <h1
-          className={`${textSize} font-bold`}
+          className={`${sidebar ? "text-lg" : "text-2xl"} font-bold`}
           style={{ color: (affiliate && headerColor) || undefined }}
         >
           {org?.name || "AffiliateX"}

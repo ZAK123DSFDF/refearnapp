@@ -13,7 +13,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -23,6 +22,7 @@ import { sidebarCustomizationAtom } from "@/store/DashboardCustomizationAtom"
 import { useAffiliatePath } from "@/hooks/useUrl"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { SidebarCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/SidebarCustomizationOptions"
+import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
 
 type Props = {
   orgId: string
@@ -42,6 +42,7 @@ const AffiliateDashboardSidebar = ({
   AffiliateData,
 }: Props) => {
   const pathname = usePathname()
+  useCloseSidebarOnNavigation()
   const { getPath } = useAffiliatePath(orgId)
   const items = [
     {
@@ -79,10 +80,8 @@ const AffiliateDashboardSidebar = ({
     sideBarActiveNavigationTextColor,
   } = useAtomValue(sidebarCustomizationAtom)
   const baseSidebarClass = isPreview ? "relative h-full" : "" // you can add full-screen layout styles here
-  const { setOpenMobile, isMobile } = useSidebar()
   const setProfile = () => {
     onSelectPage && onSelectPage("profile")
-    if (isMobile) setOpenMobile(false)
   }
   return (
     <Sidebar className={baseSidebarClass}>
@@ -146,7 +145,6 @@ const AffiliateDashboardSidebar = ({
                           type="button"
                           onClick={() => {
                             onSelectPage && onSelectPage(item.key)
-                            if (isMobile) setOpenMobile(false)
                           }}
                           onMouseEnter={() => setHoveredKey(item.key)}
                           onMouseLeave={() => setHoveredKey(null)}
@@ -172,12 +170,7 @@ const AffiliateDashboardSidebar = ({
                           </span>
                         </button>
                       ) : (
-                        <Link
-                          href={item.url}
-                          onClick={() => {
-                            if (isMobile) setOpenMobile(false)
-                          }}
-                        >
+                        <Link href={item.url}>
                           <item.icon className="w-5 h-5" />
                           <span className={isPreview ? "text-sm" : ""}>
                             {item.title}
@@ -240,12 +233,7 @@ const AffiliateDashboardSidebar = ({
             />
           </div>
         ) : (
-          <Link
-            href={getPath("dashboard/profile")}
-            onClick={() => {
-              if (isMobile) setOpenMobile(false)
-            }}
-          >
+          <Link href={getPath("dashboard/profile")}>
             <div className="flex items-center space-x-3 p-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors cursor-pointer">
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">

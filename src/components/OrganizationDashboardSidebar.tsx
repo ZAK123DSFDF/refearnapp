@@ -21,7 +21,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import CreateCompany from "@/components/pages/Create-Company"
@@ -34,6 +33,7 @@ import { Button } from "@/components/ui/button"
 import { usePaddlePortal } from "@/hooks/usePaddlePortal"
 import { handlePlanRedirect } from "@/util/HandlePlanRedirect"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
+import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
 
 // Menu items for the sidebar
 
@@ -50,6 +50,7 @@ const OrganizationDashboardSidebar = ({
   UserData,
 }: Props) => {
   const pathname = usePathname()
+  useCloseSidebarOnNavigation()
   const { mutate: switchOrg, isPending } = useSwitchOrg()
   const items = [
     {
@@ -97,7 +98,6 @@ const OrganizationDashboardSidebar = ({
   >("create")
   const router = useRouter()
   const { openPortal } = usePaddlePortal(orgId)
-  const { setOpenMobile, isMobile } = useSidebar()
   const handleClick = () => {
     setSelectOpen(false)
 
@@ -224,12 +224,7 @@ const OrganizationDashboardSidebar = ({
                     isActive={pathname === item.url}
                     tooltip={item.title}
                   >
-                    <Link
-                      href={item.url}
-                      onClick={() => {
-                        if (isMobile) setOpenMobile(false)
-                      }}
-                    >
+                    <Link href={item.url}>
                       <item.icon className="w-5 h-5" />
                       <span>{item.title}</span>
                     </Link>
@@ -248,9 +243,6 @@ const OrganizationDashboardSidebar = ({
             href={`/organization/${orgId}/dashboard/pricing`}
             scroll={false}
             className="block w-full"
-            onClick={() => {
-              if (isMobile) setOpenMobile(false)
-            }}
           >
             <Button className="w-full">Upgrade or Purchase</Button>
           </Link>
@@ -262,9 +254,6 @@ const OrganizationDashboardSidebar = ({
             href={`/organization/${orgId}/dashboard/pricing`}
             scroll={false}
             className="block w-full"
-            onClick={() => {
-              if (isMobile) setOpenMobile(false)
-            }}
           >
             <Button className="w-full">Purchase Ultimate Bundle</Button>
           </Link>
@@ -278,7 +267,6 @@ const OrganizationDashboardSidebar = ({
                 <Button
                   className="w-full"
                   onClick={() => {
-                    if (isMobile) setOpenMobile(false)
                     openPortal()
                   }}
                 >
@@ -290,9 +278,6 @@ const OrganizationDashboardSidebar = ({
                 href={`/organization/${orgId}/dashboard/pricing`}
                 scroll={false}
                 className="block w-full"
-                onClick={() => {
-                  if (isMobile) setOpenMobile(false)
-                }}
               >
                 <Button variant="outline" className="w-full">
                   {plan.hasPendingPurchase
@@ -303,12 +288,7 @@ const OrganizationDashboardSidebar = ({
             </>
           )}
 
-        <Link
-          href={`/organization/${orgId}/dashboard/profile`}
-          onClick={() => {
-            if (isMobile) setOpenMobile(false)
-          }}
-        >
+        <Link href={`/organization/${orgId}/dashboard/profile`}>
           <div className="flex items-center space-x-3 p-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors cursor-pointer">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{UserData?.name}</p>
