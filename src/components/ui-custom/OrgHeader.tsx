@@ -8,6 +8,7 @@ import { useAtomValue } from "jotai"
 import { themeCustomizationAtom } from "@/store/AuthCustomizationAtom"
 import { useOrgLogo } from "@/hooks/useOrgLogo"
 import { kpiCardCustomizationAtom } from "@/store/DashboardCustomizationAtom"
+import MyCustomIcon from "@/components/ui-custom/MyCustomIcon"
 
 interface OrgHeaderProps {
   orgId?: string
@@ -28,11 +29,46 @@ export function OrgHeader({
   const { logoUrl, setLogoUrl } = useOrgLogo(org?.logoUrl)
   const { headerColor } = useAtomValue(themeCustomizationAtom)
   const kpiCard = useAtomValue(kpiCardCustomizationAtom)
+
   if (affiliate && !orgId) {
     console.warn("Affiliate mode requires a valid orgId.")
     return null
   }
 
+  // -----------------------------
+  // ⭐ OPTION A LOGO (clean SVG)
+  // -----------------------------
+  const Logo = (
+    <div className="flex items-center justify-center">
+      <div
+        className="flex items-center justify-center rounded-xl"
+        style={{
+          width: "45px",
+          height: "45px",
+          backgroundImage:
+            "linear-gradient(to bottom right, #A5C8FF, #7B87FF, #6A4CFF)",
+        }}
+      >
+        <MyCustomIcon
+          width={30}
+          height={30}
+          className="main-dashboard-graphic"
+          aria-label="Custom application graphic"
+        />
+      </div>
+    </div>
+  )
+
+  const AppName = (
+    <h1 className={`${sidebar ? "text-lg" : "text-2xl"} font-bold`}>
+      <span style={{ color: headerColor }}>Refearn</span>
+      <span style={{ color: "#3B82F6" }}>App</span>
+    </h1>
+  )
+
+  // -----------------------------
+  // AFFILIATE AND PREVIEW MODE
+  // -----------------------------
   if (affiliate || isPreview) {
     if (orgLoading) {
       return (
@@ -55,12 +91,11 @@ export function OrgHeader({
       )
     }
 
-    // Adjust sizes automatically when isPreview = true
     const textSize = sidebar ? "text-lg" : "text-4xl"
     const gap = sidebar ? "space-x-2" : "space-x-3"
 
     return (
-      <div className={`flex items-center justify-center ${gap} cursor-pointer`}>
+      <div className={`flex items-center justify-center ${gap}`}>
         <LogoUpload
           value={logoUrl}
           onChange={setLogoUrl}
@@ -88,25 +123,28 @@ export function OrgHeader({
     )
   }
 
+  // -----------------------------
+  // NO REDIRECT MODE
+  // -----------------------------
   if (noRedirect) {
     return (
       <div className="inline-block">
         <div className="flex items-center justify-center space-x-2">
-          <div className="w-8 h-8 rounded-md bg-primary/90 flex items-center justify-center text-white font-bold">
-            A
-          </div>
-          <h1 className="text-2xl font-bold">AffiliateX</h1>
+          {Logo}
+          {AppName}
         </div>
       </div>
     )
   }
+
+  // -----------------------------
+  // NORMAL MODE
+  // -----------------------------
   return (
     <Link href="/" className="inline-block cursor-pointer">
       <div className="flex items-center justify-center space-x-2">
-        <div className="w-8 h-8 rounded-md bg-primary/90 flex items-center justify-center text-white font-bold">
-          A
-        </div>
-        <h1 className="text-2xl font-bold">AffiliateX</h1>
+        {Logo}
+        {AppName}
       </div>
     </Link>
   )
