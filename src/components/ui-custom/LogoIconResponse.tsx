@@ -1,0 +1,100 @@
+// components/server/LogoIconResponse.tsx
+import { ImageResponse } from "next/og"
+import React from "react"
+
+interface LogoIconResponseProps {
+  size?: {
+    width: number
+    height: number
+  }
+  iconSize?: {
+    width: number
+    height: number
+  }
+}
+
+export const contentType = "image/png"
+
+export function LogoIconResponse({
+  size = { width: 35, height: 35 },
+  iconSize = { width: 25, height: 25 },
+}: LogoIconResponseProps) {
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: "16px",
+          backgroundImage:
+            "linear-gradient(to bottom right, #A5C8FF, #7B87FF, #6A4CFF)",
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="809 351 400 388"
+          width={iconSize.width}
+          height={iconSize.height}
+        >
+          <defs></defs>
+          <path
+            fill="#FFFFFF"
+            d="M7308.07,7045.05l-52.08.56a100.35,100.35,0,0,0-19.7-6.43,101.51,101.51,0,0,0-55.14,3.6,99.71,99.71,0,0,0-26.18,14.15,93.14,93.14,0,0,1,76.55-40.94,107.94,107.94,0,0,1,76.55,29.06Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="none"
+            stroke="#000"
+            strokeMiterlimit={10}
+            d="M7308.07,7043.22"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7448.07,7126.88A355.31,355.31,0,0,0,7240.5,7281.1l-46.64-19a251.07,251.07,0,0,0-51.74-54.13,134.23,134.23,0,0,1,77.27,44.94c12.47-21.2,64.06-103.35,160.51-123.24A214.56,214.56,0,0,1,7448.07,7126.88Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7258.63,7282.63c10.51-3.1,38.8-13,60-41.11a114.36,114.36,0,0,0,20.68-46.47l28.59-17.87c-.06,6.15-1.41,54.16-41.36,84.51C7298.53,7283,7268.09,7283,7258.63,7282.63Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7323.9,7134V7010h51.92v107.24A238,238,0,0,0,7323.9,7134Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7249.69,7190.8q-.09-65.54-.17-131.07H7302v87.32c-7.58,5-15.6,10.85-23.83,17.54A308.05,308.05,0,0,0,7249.69,7190.8Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7059,7361.78l47-57.19a66.21,66.21,0,0,1,38,30.12l-47.49,57.7a42.39,42.39,0,0,0-37.53-30.63Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7248.58,7295.35c-51.65-5.65-83.78-39.31-91.68-47.84C7113.81,7201,7098.34,7124,7130.17,7066c14.42-26.29,34.84-42,47.18-50-14.41,2.49-45.81,10.06-71.49,36.42-43.12,44.28-35.13,105.6-33,121.64,5.49,42.18,27.35,81.73,58.14,108.91l-.16-.1-13.43,15.41a67.87,67.87,0,0,1,30,24.83l16.61-17.65-.15-.1a137.39,137.39,0,0,0,17,7.21c11.82,4.08,42,14.47,77.21,3.68a113.7,113.7,0,0,0,43.92-25.53A139.7,139.7,0,0,1,7248.58,7295.35Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7086,7397.78a28.71,28.71,0,0,0-7-16.51c-9-10.06-21.93-9.47-23.66-9.37a29.57,29.57,0,0,0,30.64,25.88Z"
+            transform="translate(-6239 -6659)"
+          />
+          <path
+            fill="#FFFFFF"
+            d="M7176.16,7203.24V7089.61h52.08v126.12s-10.46,14.13-10.46,14.21h0a218.9,218.9,0,0,0-19.92-14.45A216.11,216.11,0,0,0,7176.16,7203.24Z"
+            transform="translate(-6239 -6659)"
+          />
+        </svg>
+      </div>
+    ),
+    size
+  )
+}
