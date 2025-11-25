@@ -23,11 +23,20 @@ export const metadata: Metadata = {
     description: "Launch your affiliate program in minutes",
     url: "https://refearnapp.com",
     siteName: "Refearn App",
+    images: [
+      {
+        url: getOrgLogoOG(),
+        width: 35,
+        height: 35,
+        alt: "Refearn App Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Refearn App",
     description: "Launch your affiliate program in minutes",
+    images: [getOrgLogoOG()],
   },
 }
 export default function RootLayout({
