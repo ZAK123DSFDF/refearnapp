@@ -7,15 +7,6 @@ export async function proxy(req: NextRequest) {
   const host = req.headers.get("host")
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://refearnapp.com"
   if (!host) return NextResponse.next()
-  const path = req.nextUrl.pathname
-  if (
-    path === "/favicon.ico" ||
-    path.startsWith("/icon") ||
-    path === "/apple-icon.png" ||
-    path === "/manifest.json"
-  ) {
-    return NextResponse.next()
-  }
   if (
     host.includes("localhost:3000") ||
     host.includes("127.0.0.1:3000") ||
