@@ -17,6 +17,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "RefearnApp – Launch your affiliate program in minutes",
   description: "Launch your affiliate program in minutes",
+  icons: {
+    icon: {
+      url: "/refearnapp.svg",
+      type: "image/svg+xml",
+    },
+  },
   openGraph: {
     title: "RefearnApp – Launch your affiliate program in minutes",
     description: "Launch your affiliate program in minutes",

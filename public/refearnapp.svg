@@ -1,9 +1,10 @@
 <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="525"
-        height="525"
-        viewBox="0 0 525 525"
-        style="border-radius: 120px" >
+        width="35"
+        height="35"
+        viewBox="0 0 35 35"
+        style="border-radius: 12px"
+>
     <defs>
         <linearGradient
                 id="backgroundGradient"
@@ -23,15 +24,14 @@
                 width="100%"
                 height="100%"
                 fill="url(#backgroundGradient)"
-                rx="120" />
-    </defs>
+                rx="8" /> </defs>
 
     <use href="#backgroundRect" />
 
-    <g transform="translate(75, 75)"> <svg
+    <g transform="translate(5, 5)"> <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="809 351 400 388"
-            width="375" height="375" >
+            width="25" height="25" >
         <path
                 fill="#FFFFFF"
                 d="M7308.07,7045.05l-52.08.56a100.35,100.35,0,0,0-19.7-6.43,101.51,101.51,0,0,0-55.14,3.6,99.71,99.71,0,0,0-26.18,14.15,93.14,93.14,0,0,1,76.55-40.94,107.94,107.94,0,0,1,76.55,29.06Z"
