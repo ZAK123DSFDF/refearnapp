@@ -64,3 +64,7 @@ export async function proxy(req: NextRequest) {
   response.headers.set("x-current-host", host)
   return response
 }
+
+export const config = {
+  matcher: ["/((?!_next|api|.*\\..*).*)"],
+}
