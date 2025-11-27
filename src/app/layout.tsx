@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 })
 const unifiedDescription =
   "RefearnApp gives SaaS founders a simple, powerful way to run affiliate programs. Track referrals, understand performance, and grow revenue—without the technical overhead."
-
+const OG_IMAGE = "https://refearnapp.com/refearnapp-opengraph.png"
 export const metadata: Metadata = {
   title: "RefearnApp – Launch Your Affiliate Program in Minutes",
   description: unifiedDescription,
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     siteName: "RefearnApp",
     images: [
       {
-        url: "/refearnapp-opengraph.png",
+        url: OG_IMAGE,
         width: 1200,
         height: 630,
         alt: "RefearnApp – Affiliate Program Platform for SaaS",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RefearnApp – Launch Your Affiliate Program in Minutes",
     description: unifiedDescription,
-    images: ["/refearnapp-opengraph.png"],
+    images: [OG_IMAGE],
   },
 }
 
