@@ -28,11 +28,20 @@ export const metadata: Metadata = {
     description: "Launch your affiliate program in minutes",
     url: "https://refearnapp.com",
     siteName: "Refearn App",
+    images: [
+      {
+        url: "/refearnapp-opengraph.svg",
+        width: 1200,
+        height: 630,
+        alt: "RefearnApp: Launch your affiliate program in minutes",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Refearn App",
+    title: "RefearnApp – Launch your affiliate program in minutes",
     description: "Launch your affiliate program in minutes",
+    images: ["/refearnapp-opengraph.svg"],
   },
 }
 export default function RootLayout({
