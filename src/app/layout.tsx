@@ -27,28 +27,28 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "RefearnApp – Launch Your Affiliate Program in Minutes",
+    title: "RefearnApp | Launch Your Affiliate Program in Minutes",
     description: unifiedDescription,
     url: "https://refearnapp.com",
     siteName: "RefearnApp",
     images: [
       {
-        url: "/opengraph.png",
+        url: "/refearnapp-opengraph.svg",
         width: 1200,
         height: 630,
-        alt: "RefearnApp – Affiliate Program Platform for SaaS",
+        alt: "RefearnApp | Affiliate Program Platform for SaaS",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "RefearnApp – Launch Your Affiliate Program in Minutes",
+    title: "RefearnApp | Launch Your Affiliate Program in Minutes",
     description: unifiedDescription,
     images: [
       {
-        url: "/opengraph.png",
-        secureUrl: "/opengraph.png",
-        alt: "RefearnApp – Affiliate Program Platform for SaaS",
+        url: "/refearnapp-opengraph.svg",
+        secureUrl: "/refearnapp-opengraph.svg",
+        alt: "RefearnApp | Affiliate Program Platform for SaaS",
         type: "image/png",
         width: 1200,
         height: 630,
