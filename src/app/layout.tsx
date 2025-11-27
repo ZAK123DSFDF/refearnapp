@@ -33,8 +33,8 @@ export const metadata: Metadata = {
     siteName: "RefearnApp",
     images: [
       {
-        url: "/opengraph.png",
-        secureUrl: "/opengraph.png",
+        url: "https://refearnapp.com/opengraph.png",
+        secureUrl: "https://refearnapp.com/opengraph.png",
         type: "image/png",
         width: 1200,
         height: 630,
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
     description: unifiedDescription,
     images: [
       {
-        url: "/opengraph.png",
-        secureUrl: "/opengraph.png",
+        url: "https://refearnapp.com/opengraph.png",
+        secureUrl: "https://refearnapp.com/opengraph.png",
         alt: "RefearnApp | Affiliate Program Platform for SaaS",
         type: "image/png",
         width: 1200,
