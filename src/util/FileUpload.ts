@@ -5,11 +5,14 @@ interface ValidateAndUploadParams {
   uploadId: string
   path?: string
   endpoint?: string
+  field?: "logoUrl" | "openGraphUrl"
+  sharp?: boolean
   addFile: (
     uploadId: string,
     file: File,
     path?: string,
-    endpoint?: string
+    endpoint?: string,
+    sharp?: boolean
   ) => Promise<{ id: string; url: string }>
   triggerError: (msg: string) => void
   handleSuccess: (
@@ -28,6 +31,8 @@ export async function validateAndUploadFile({
   uploadId,
   path,
   endpoint,
+  sharp,
+  field,
   addFile,
   triggerError,
   handleSuccess,
@@ -41,8 +46,27 @@ export async function validateAndUploadFile({
   if (type === "csv" && !file.name.toLowerCase().endsWith(".csv")) {
     return triggerError(`"${file.name}" is not a CSV file.`)
   }
-  if (type === "image" && !file.type.startsWith("image/")) {
-    return triggerError(`"${file.name}" is not an image file.`)
+  if (type === "image") {
+    const mime = file.type
+
+    if (field === "logoUrl") {
+      // ONLY SVG allowed
+      if (mime !== "image/svg+xml") {
+        return triggerError(
+          `"${file.name}" is not valid. Logo must be an SVG file.`
+        )
+      }
+    }
+    if (field === "openGraphUrl") {
+      // SVG NOT allowed
+      const allowedMime = ["image/png", "image/jpeg", "image/jpg", "image/webp"]
+
+      if (!allowedMime.includes(mime)) {
+        return triggerError(
+          `"${file.name}" is not supported. OpenGraph Image must be PNG, JPG, or WebP.`
+        )
+      }
+    }
   }
 
   try {
@@ -50,7 +74,8 @@ export async function validateAndUploadFile({
       uploadId,
       file,
       path,
-      endpoint || `/api/upload/${type}`
+      endpoint || `/api/upload/${type}`,
+      sharp
     )
     handleSuccess(file, id, uploadId, url)
   } catch (err) {

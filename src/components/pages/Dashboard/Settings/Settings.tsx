@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card"
 import deepEqual from "fast-deep-equal"
 import { Button } from "@/components/ui/button"
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useForm } from "react-hook-form"
 import { Form } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -36,7 +35,7 @@ import {
 } from "@/app/(organization)/organization/[orgId]/dashboard/settings/action"
 import { orgSettingsSchema } from "@/lib/schema/orgSettingSchema"
 import React, { useEffect, useMemo, useState } from "react"
-import { InputField } from "@/components/Auth/FormFields"
+import { InputField, TextareaField } from "@/components/Auth/FormFields"
 import { SelectField } from "@/components/ui-custom/SelectFields"
 import { LogoUpload } from "@/components/ui-custom/LogoUpload"
 import { OrgData } from "@/lib/types/organization"
@@ -67,6 +66,8 @@ export default function Settings({
     name: orgData?.name ?? "",
     websiteUrl: orgData?.websiteUrl ?? "",
     logoUrl: orgData?.logoUrl ?? null,
+    description: orgData?.description ?? "",
+    openGraphUrl: orgData?.openGraphUrl ?? "",
     referralParam: (orgData?.referralParam as "ref" | "via" | "aff") ?? "ref",
     cookieLifetimeValue: String(orgData?.cookieLifetimeValue ?? "30"),
     cookieLifetimeUnit:
@@ -316,15 +317,41 @@ export default function Settings({
                   icon={Link2}
                   affiliate={false}
                 />
-                <div className="flex justify-start">
-                  <LogoUpload
-                    value={form.watch("logoUrl") || null}
-                    onChange={(url) => form.setValue("logoUrl", url || "")}
-                    affiliate={false}
-                    orgId={orgData.id}
-                    orgName={orgData.name}
-                  />
-                </div>
+              </div>
+              <div className="w-full">
+                <TextareaField
+                  control={form.control}
+                  name="description"
+                  label="Description"
+                  placeholder="Enter your company description"
+                  rows={5}
+                  affiliate={false}
+                />
+              </div>
+              <div className="flex justify-start">
+                <LogoUpload
+                  value={form.watch("openGraphUrl") || null}
+                  onChange={(url) => form.setValue("openGraphUrl", url || "")}
+                  affiliate={false}
+                  orgId={orgData.id}
+                  orgName={orgData.name}
+                  field="openGraphUrl"
+                  uploadId="Org-OpenGraph-Image"
+                  className="w-[200px] h-[105px] rounded-md"
+                  sharp={true}
+                  uploadButtonLabel="OpenGraph Image"
+                  dialogTitle="Uploading OG Image"
+                  dialogDescription="Converting & optimizing your image… Please wait."
+                />
+              </div>
+              <div className="flex justify-start">
+                <LogoUpload
+                  value={form.watch("logoUrl") || null}
+                  onChange={(url) => form.setValue("logoUrl", url || "")}
+                  affiliate={false}
+                  orgId={orgData.id}
+                  orgName={orgData.name}
+                />
               </div>
             </CardContent>
           </Card>
@@ -418,22 +445,23 @@ export default function Settings({
                   />
                 </div>
               </FormSection>
-
-              <SelectField
-                control={form.control}
-                name="currency"
-                label="Currency"
-                placeholder="Currency"
-                options={[
-                  { value: "USD", label: "USD" },
-                  { value: "EUR", label: "EUR" },
-                  { value: "GBP", label: "GBP" },
-                  { value: "CAD", label: "CAD" },
-                  { value: "AUD", label: "AUD" },
-                ]}
-                icon={BadgeDollarSign}
-                affiliate={false}
-              />
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <SelectField
+                  control={form.control}
+                  name="currency"
+                  label="Currency"
+                  placeholder="Currency"
+                  options={[
+                    { value: "USD", label: "USD" },
+                    { value: "EUR", label: "EUR" },
+                    { value: "GBP", label: "GBP" },
+                    { value: "CAD", label: "CAD" },
+                    { value: "AUD", label: "AUD" },
+                  ]}
+                  icon={BadgeDollarSign}
+                  affiliate={false}
+                />
+              </div>
 
               <div className="flex flex-col xl:grid xl:grid-cols-2 gap-4 xl:items-center">
                 <DomainInputField

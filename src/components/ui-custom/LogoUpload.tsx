@@ -14,13 +14,21 @@ import { uploadsAtom } from "@/store/UploadAtom"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
 import { SingleUploadProgress } from "@/components/ui-custom/SingleUploadProgress"
 import { AppResponse, useAppMutation } from "@/hooks/useAppMutation"
+import { cn } from "@/lib/utils"
 type LogoUploadProps = {
   value: string | null
   onChange: (url: string | null) => void
   affiliate: boolean
   orgId?: string
   orgName?: string
-  mode?: "default" | "avatar" // 👈 new
+  mode?: "default" | "avatar"
+  field?: "logoUrl" | "openGraphUrl"
+  className?: string
+  uploadId?: string
+  sharp?: boolean
+  uploadButtonLabel?: string
+  dialogTitle?: string
+  dialogDescription?: string
 }
 
 export function LogoUpload({
@@ -30,6 +38,13 @@ export function LogoUpload({
   orgId,
   orgName,
   mode = "default",
+  field = "logoUrl",
+  className,
+  uploadId = "company-logo",
+  sharp = false,
+  uploadButtonLabel,
+  dialogTitle = "Uploading Logo",
+  dialogDescription = "Please wait while your logo is uploading…",
 }: LogoUploadProps) {
   const fileUploadRef = useRef<FileUploadRef>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -39,7 +54,7 @@ export function LogoUpload({
     async () => {
       await deleteOrganizationLogo(value!)
       if (orgId) {
-        await updateOrganizationLogo({ orgId, logoUrl: null })
+        await updateOrganizationLogo({ orgId, field, value: null })
       }
       return {
         ok: true,
@@ -68,7 +83,7 @@ export function LogoUpload({
 
     if (orgId) {
       try {
-        await updateOrganizationLogo({ orgId, logoUrl: newUrl })
+        await updateOrganizationLogo({ orgId, field, value: newUrl })
       } catch (err) {
         console.error("Failed to save logo to DB:", err)
       }
@@ -76,23 +91,36 @@ export function LogoUpload({
     setTimeout(() => setDialogOpen(false), 600)
   }
 
-  const files = uploads["company-logo"]?.files ?? []
+  const files = uploads[uploadId]?.files ?? []
   const latestFile = files.length > 0 ? files[files.length - 1] : null
-  const errorMessage = uploads["company-logo"]?.errorMessage ?? null
+  const errorMessage = uploads[uploadId]?.errorMessage ?? null
 
   return (
     <div className="flex flex-col items-center space-y-2">
       <div className="relative">
         {value ? (
-          <img
-            src={value}
-            alt="Company Logo"
-            className={`h-[35px] w-[35px] rounded-xl object-contain bg-muted ${
-              mode === "avatar" ? "cursor-default" : "cursor-pointer"
-            }`}
-            onClick={mode === "default" ? handleButtonClick : undefined}
-          />
-        ) : (
+          field === "logoUrl" ? (
+            <img
+              src={value}
+              alt="Company Logo"
+              className={`h-[35px] w-[35px] rounded-xl object-contain bg-muted ${
+                mode === "avatar" ? "cursor-default" : "cursor-pointer"
+              }`}
+              onClick={mode === "default" ? handleButtonClick : undefined}
+            />
+          ) : (
+            <img
+              src={value}
+              alt="Company Logo"
+              className={cn(
+                className,
+                "object-contain bg-muted",
+                mode === "avatar" ? "cursor-default" : "cursor-pointer"
+              )}
+              onClick={mode === "default" ? handleButtonClick : undefined}
+            />
+          )
+        ) : field === "logoUrl" ? (
           <div
             className="h-[35px] w-[35px] rounded-xl flex items-center text-[25px] justify-center font-bold text-white"
             style={{
@@ -101,6 +129,15 @@ export function LogoUpload({
             }}
           >
             {orgName?.charAt(0).toUpperCase() ?? "?"}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "flex items-center justify-center border-2 border-dashed border-muted-foreground/40 text-muted-foreground text-sm",
+              className
+            )}
+          >
+            No image
           </div>
         )}
 
@@ -127,7 +164,13 @@ export function LogoUpload({
       {/* Upload/Change button only in default mode */}
       {mode === "default" && (
         <Button type="button" variant="outline" onClick={handleButtonClick}>
-          {value ? "Change Logo" : "Upload Logo"}
+          {uploadButtonLabel
+            ? value
+              ? `Change ${uploadButtonLabel}`
+              : `Upload ${uploadButtonLabel}`
+            : value
+              ? "Change Logo"
+              : "Upload Logo"}
         </Button>
       )}
 
@@ -135,10 +178,12 @@ export function LogoUpload({
       <div className="absolute w-0 h-0 overflow-hidden opacity-0 pointer-events-none">
         <FileUploadRef
           ref={fileUploadRef}
-          uploadId="company-logo"
+          uploadId={uploadId}
           type="image"
           affiliate={affiliate}
           maxFiles={1}
+          field={field}
+          sharp={sharp}
           onFileSelected={() => setDialogOpen(true)}
           onUploadSuccess={(_, __, ___, url) => {
             handleNewLogo(url).then(() =>
@@ -151,8 +196,8 @@ export function LogoUpload({
       <AppDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        title="Uploading Logo"
-        description="Please wait while your logo is uploading…"
+        title={dialogTitle}
+        description={dialogDescription}
         affiliate={affiliate}
         showFooter={false}
       >

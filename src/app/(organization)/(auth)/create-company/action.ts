@@ -176,17 +176,19 @@ export async function deleteOrganizationLogo(
 }
 export async function updateOrganizationLogo({
   orgId,
-  logoUrl,
+  field,
+  value,
 }: {
   orgId: string
-  logoUrl: string | null
+  field: "logoUrl" | "openGraphUrl"
+  value: string | null
 }): Promise<MutationData> {
   return handleAction("Update Organization Logo", async () => {
     if (!orgId) throw { status: 500, toast: "missing orgId" }
 
     await db
       .update(organization)
-      .set({ logoUrl })
+      .set({ [field]: value })
       .where(eq(organization.id, orgId))
 
     return { ok: true, toast: "Logo Updated Successfully" }

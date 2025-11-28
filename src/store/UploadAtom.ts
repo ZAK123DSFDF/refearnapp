@@ -74,7 +74,8 @@ export const addFileAtom = atom(
     uploadId: string,
     file: File,
     path?: string,
-    endpoint: string = "/api/upload"
+    endpoint: string = "/api/upload",
+    sharp?: boolean
   ) => {
     const newFile: UploadedFile = {
       id: crypto.randomUUID(),
@@ -97,7 +98,9 @@ export const addFileAtom = atom(
       const formData = new FormData()
       if (path) formData.append("path", path)
       formData.append("file", file)
-
+      if (sharp !== undefined) {
+        formData.append("sharp", sharp ? "true" : "false")
+      }
       const res = await fetch(endpoint, { method: "POST", body: formData })
       if (!res.ok) throw new Error("Upload failed")
       const { url } = await res.json()

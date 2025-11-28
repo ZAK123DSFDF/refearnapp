@@ -14,6 +14,13 @@ export async function updateSettings(
     ...(data.websiteUrl && {
       websiteUrl: data.websiteUrl.trim().replace(/^https?:\/\//, ""),
     }),
+    ...(data.description !== undefined && {
+      description:
+        typeof data.description === "string" ? data.description.trim() : "",
+    }),
+    ...(data.openGraphUrl !== undefined && {
+      openGraphUrl: data.openGraphUrl || null,
+    }),
     ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl || null }),
     ...(data.referralParam && { referralParam: data.referralParam }),
     ...(data.cookieLifetimeValue && {

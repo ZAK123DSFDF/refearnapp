@@ -15,15 +15,15 @@ export async function POST(request: Request) {
   try {
     const result = await getUploadFile(request)
     if (result instanceof NextResponse) return result
-    const { file, uploadPath } = result
+    const { buffer, type, uploadPath } = result
 
     // upload directly to R2
     await s3Client.send(
       new PutObjectCommand({
         Bucket: process.env.R2_BUCKET_NAME,
         Key: uploadPath,
-        Body: Buffer.from(await file.arrayBuffer()),
-        ContentType: file.type,
+        Body: buffer,
+        ContentType: type,
       })
     )
 

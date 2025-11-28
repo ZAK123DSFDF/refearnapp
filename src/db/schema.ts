@@ -177,6 +177,8 @@ export const organization = pgTable("organization", {
   name: text("name").notNull(),
   websiteUrl: text("website_name").notNull(),
   logoUrl: text("logo_url"),
+  openGraphUrl: text("open_graph_url"),
+  description: text("description"),
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),

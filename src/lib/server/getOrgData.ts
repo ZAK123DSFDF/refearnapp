@@ -56,8 +56,10 @@ export const getOrgData = async (
     data: {
       id: org.id,
       name: org.name,
+      description: org.description,
       websiteUrl: org.websiteUrl,
       logoUrl: org.logoUrl ?? "",
+      openGraphUrl: org.openGraphUrl ?? "",
       referralParam: org.referralParam as "ref" | "via" | "aff",
       cookieLifetimeValue: org.cookieLifetimeValue,
       cookieLifetimeUnit: org.cookieLifetimeUnit as

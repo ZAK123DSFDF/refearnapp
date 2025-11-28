@@ -27,6 +27,8 @@ export interface FileUploadProps {
   path?: string
   affiliate: boolean
   preview?: boolean
+  sharp?: boolean
+  field?: "logoUrl" | "openGraphUrl"
   onUploadSuccess?: (
     file: File,
     fileId: string,
@@ -46,6 +48,8 @@ export const FileUploadRef = forwardRef<FileUploadRef, FileUploadProps>(
       maxFiles = 100,
       maxSizeMB = 5,
       path,
+      sharp,
+      field,
       affiliate = false,
       onUploadSuccess,
       onUploadError,
@@ -119,10 +123,12 @@ export const FileUploadRef = forwardRef<FileUploadRef, FileUploadProps>(
           uploadId,
           path,
           endpoint,
+          field,
           addFile,
           triggerError,
           handleSuccess,
           handleFailure,
+          sharp,
         }).then(() => console.log("File processed"))
       })
     }
