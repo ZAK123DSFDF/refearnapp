@@ -1,5 +1,12 @@
 import React from "react"
-
+import type { Metadata } from "next"
+import { buildMetadata } from "@/util/BuildMetadata"
+export const metadata: Metadata = buildMetadata({
+  title: "RefearnApp | Terms of Service Page",
+  description: "Terms Of Service Page",
+  url: "https://refearnapp.com/terms",
+  indexable: true,
+})
 export default function TermsPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-20">

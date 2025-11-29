@@ -2,7 +2,14 @@ import React from "react"
 import { redirect } from "next/navigation"
 import { getOrganizationAuth } from "@/lib/server/getOrganizationAuth"
 import CreateCompany from "@/components/pages/Create-Company"
-
+import type { Metadata } from "next"
+import { buildMetadata } from "@/util/BuildMetadata"
+export const metadata: Metadata = buildMetadata({
+  title: "RefearnApp | Create Company Page",
+  description: "Create Your Company Page",
+  url: "https://refearnapp.com/create-company",
+  indexable: false,
+})
 const createCompanyPage = async () => {
   const decoded = await getOrganizationAuth()
 

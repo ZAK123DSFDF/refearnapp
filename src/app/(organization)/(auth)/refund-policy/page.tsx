@@ -1,6 +1,13 @@
 // components/Legal/RefundPolicy.tsx
 import React from "react"
-
+import type { Metadata } from "next"
+import { buildMetadata } from "@/util/BuildMetadata"
+export const metadata: Metadata = buildMetadata({
+  title: "RefearnApp | Refund Policy Page",
+  description: "Refund Policy Page",
+  url: "https://refearnapp.com/refund-policy",
+  indexable: true,
+})
 const RefundPolicy = () => {
   const currentYear = new Date().getFullYear()
 

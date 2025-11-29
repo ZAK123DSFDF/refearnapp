@@ -1,5 +1,8 @@
 import React from "react"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
+import { OrgIdProps } from "@/lib/types/orgId"
+import { Metadata } from "next"
+import { buildMetadata } from "@/util/BuildMetadata"
 
 interface AnalyticsLayoutProps {
   children: React.ReactNode
@@ -9,7 +12,18 @@ interface AnalyticsLayoutProps {
   referrers: React.ReactNode
   topAffiliates: React.ReactNode
 }
+export async function generateMetadata({
+  params,
+}: OrgIdProps): Promise<Metadata> {
+  const orgId = await getValidatedOrgFromParams({ params })
 
+  return buildMetadata({
+    title: "RefearnApp | Analytics Page",
+    description: "Analytics Page",
+    url: `https://refearnapp.com/organization/${orgId}/dashboard/analytics`,
+    indexable: false,
+  })
+}
 export default async function AnalyticsLayout({
   children,
   params,

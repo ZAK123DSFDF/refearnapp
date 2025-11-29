@@ -1,6 +1,13 @@
 // components/Legal/PrivacyPolicy.tsx
 import React from "react"
-
+import type { Metadata } from "next"
+import { buildMetadata } from "@/util/BuildMetadata"
+export const metadata: Metadata = buildMetadata({
+  title: "RefearnApp | Privacy Policy Page",
+  description: "Privacy Policy Page",
+  url: "https://refearnapp.com/privacy-policy",
+  indexable: true,
+})
 const PrivacyPolicy = () => {
   const currentYear = new Date().getFullYear()
 

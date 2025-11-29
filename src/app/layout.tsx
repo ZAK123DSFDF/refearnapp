@@ -4,6 +4,7 @@ import "./globals.css"
 import QueryProvider from "@/provider/Query"
 import { Toaster } from "@/components/ui/toaster"
 import React from "react"
+import { buildMetadata } from "@/util/BuildMetadata"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,50 +15,9 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 })
-const unifiedDescription =
-  "RefearnApp gives SaaS founders a simple, powerful way to run affiliate programs. Track referrals, understand performance, and grow revenue—without the technical overhead."
-
-export const metadata: Metadata = {
-  title: "RefearnApp | Launch Your Affiliate Program in Minutes",
-  description: unifiedDescription,
-  icons: {
-    icon: {
-      url: "/refearnapp.svg",
-      type: "image/svg+xml",
-    },
-  },
-  openGraph: {
-    title: "RefearnApp | Launch Your Affiliate Program in Minutes",
-    description: unifiedDescription,
-    url: "https://refearnapp.com",
-    siteName: "RefearnApp",
-    images: [
-      {
-        url: "/opengraph.png",
-        secureUrl: "/opengraph.png",
-        type: "image/png",
-        width: 1200,
-        height: 630,
-        alt: "RefearnApp | Affiliate Program Platform for SaaS",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "RefearnApp | Launch Your Affiliate Program in Minutes",
-    description: unifiedDescription,
-    images: [
-      {
-        url: "/opengraph.png",
-        secureUrl: "/opengraph.png",
-        alt: "RefearnApp | Affiliate Program Platform for SaaS",
-        type: "image/png",
-        width: 1200,
-        height: 630,
-      },
-    ],
-  },
-}
+export const metadata: Metadata = buildMetadata({
+  indexable: true,
+})
 
 export default function RootLayout({
   children,
