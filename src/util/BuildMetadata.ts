@@ -23,13 +23,6 @@ export function buildMetadata({
   icon = "/refearnapp.svg",
   siteName = "RefearnApp",
 }: MetadataOptions): Metadata {
-  const mimeType = image.endsWith(".webp")
-    ? "image/webp"
-    : image.endsWith(".png")
-      ? "image/png"
-      : image.endsWith(".jpg") || image.endsWith(".jpeg")
-        ? "image/jpeg"
-        : undefined
   return {
     title,
     description,
@@ -51,7 +44,7 @@ export function buildMetadata({
         {
           url: image,
           secureUrl: image,
-          type: mimeType,
+          type: "image/png",
           width: 1200,
           height: 630,
           alt: title,
@@ -67,7 +60,7 @@ export function buildMetadata({
         {
           url: image,
           secureUrl: image,
-          type: mimeType,
+          type: "image/png",
           width: 1200,
           height: 630,
           alt: title,
