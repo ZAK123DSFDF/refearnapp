@@ -27,12 +27,12 @@ export async function getUploadFile(
   const isSVG = file.type === "image/svg+xml"
   if (sharpFlag && !isSVG) {
     try {
-      // convert to webp
-      buffer = await sharp(buffer).webp({ quality: 40 }).toBuffer()
-      mime = "image/webp"
-
-      // update filename extension
-      uploadPath = uploadPath.replace(/\.[^.]+$/, ".webp")
+      if (mime === "image/jpeg" || mime === "image/jpg") {
+        buffer = await sharp(buffer).jpeg({ quality: 40 }).toBuffer()
+      } else if (mime === "image/png") {
+        buffer = await sharp(buffer).png({ quality: 40 }).toBuffer()
+      }
+      // ❗ Keep same extension & mime
     } catch (error) {
       console.error("Sharp processing failed:", error)
     }
