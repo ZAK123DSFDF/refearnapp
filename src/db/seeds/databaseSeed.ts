@@ -171,7 +171,7 @@ export const websiteDomain_seed = [
   {
     id: "4G7kH2B",
     orgId: "tp7JLBb5",
-    domainName: "shipfast.refearnapp.com", // updated column name
+    domainName: "xmm.refearnapp.com", // updated column name
     type: "DEFAULT" as const,
     isActive: true,
     isRedirect: false,
