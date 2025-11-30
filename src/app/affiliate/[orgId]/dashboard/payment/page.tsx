@@ -18,6 +18,9 @@ export async function generateMetadata({
     title: `${org.name} | Dashboard Payment Page`,
     description: org.description ?? `Dashboard Payment Page for ${org.name}`,
     url: `${orgBaseUrl}/dashboard/payment`,
+    icon: org.logoUrl ?? "/refearnapp.svg",
+    siteName: org.name,
+    image: org.openGraphUrl ?? "/opengraph.png",
     indexable: false,
   })
 }

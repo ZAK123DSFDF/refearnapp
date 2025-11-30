@@ -19,25 +19,6 @@ import { buildMetadata } from "@/util/BuildMetadata"
 interface AffiliateDashboardLayoutProps extends OrgIdProps {
   children: React.ReactNode
 }
-export async function generateMetadata({
-  params,
-}: OrgIdProps): Promise<Metadata> {
-  const orgId = await getValidatedOrgFromParams({ params })
-  const org = await getOrganization(orgId)
-
-  // fallback image if org has no custom OG image
-  const image = org.openGraphUrl ?? "/opengraph.png"
-  const orgBaseUrl = await getOrgBaseUrl(org.id)
-  return buildMetadata({
-    title: `${org.name} | Affiliate Dashboard Page`,
-    description: org.description ?? `Affiliate Dashboard Page for ${org.name}`,
-    image,
-    url: `${orgBaseUrl}/dashboard`,
-    icon: org.logoUrl ?? "/refearnapp.svg",
-    siteName: org.name,
-    indexable: false,
-  })
-}
 export default async function DashboardLayout({
   children,
   params,
