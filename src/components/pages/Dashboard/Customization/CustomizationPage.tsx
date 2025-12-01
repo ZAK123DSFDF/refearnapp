@@ -203,7 +203,7 @@ export default function CustomizationPage({
 
           <TabsContent value="sidebar">
             <SidebarProvider affiliate orgId={orgId}>
-              <div className="relative">
+              <div className="relative xl:w-full">
                 {mainTab === "sidebar" && (
                   <div className="md:hidden p-2">
                     <SidebarTrigger />
@@ -216,7 +216,7 @@ export default function CustomizationPage({
           </TabsContent>
           <TabsContent value="auth">
             <SidebarProvider affiliate orgId={orgId}>
-              <div className="relative">
+              <div className="relative xl:w-full">
                 {mainTab === "sidebar" && (
                   <div className="md:hidden p-2">
                     <SidebarTrigger />
