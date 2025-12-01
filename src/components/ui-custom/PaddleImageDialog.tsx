@@ -1,7 +1,6 @@
 import { AppDialog } from "@/components/ui-custom/AppDialog"
 import { usePaddleImage } from "@/provider/PaddleImageProvider"
 import Image from "next/image"
-
 export function PaddleImageDialog() {
   const { dialogOpen, selectedImage, setDialogOpen } = usePaddleImage()
 
@@ -14,21 +13,13 @@ export function PaddleImageDialog() {
       title="Preview"
     >
       {selectedImage && (
-        <div className="flex justify-center items-center w-full">
-          <Image
-            src={selectedImage}
-            alt="Preview"
-            width={1600}
-            height={1000}
-            className="
-              rounded-lg
-              w-full
-              max-w-3xl
-              max-h-[85vh]
-              object-contain
-            "
-          />
-        </div>
+        <Image
+          src={selectedImage}
+          alt="Preview"
+          width={3000}
+          height={2800}
+          className="rounded-lg w-full h-auto"
+        />
       )}
     </AppDialog>
   )
