@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React from "react"
 import AffiliateDashboardSidebar from "@/components/AffiliateDashboardSidebar"
 import Profile from "@/components/pages/Dashboard/Profile/Profile"
 import PaymentTable from "@/components/pages/AffiliateDashboard/Payment/Payment"
@@ -17,11 +17,14 @@ import { DomainHeader } from "@/components/ui-custom/DomainHeader"
 export function DashboardCustomization({
   orgId,
   domain,
+  selectedPage,
+  setSelectedPage,
 }: {
   orgId: string
   domain?: string
+  selectedPage: string
+  setSelectedPage: (selectedPage: string) => void
 }) {
-  const [selectedPage, setSelectedPage] = useState("dashboard")
   const { mainBackgroundColor } = useAtomValue(dashboardThemeCustomizationAtom)
   const showMissingPaypal = useAtomValue(showMissingPaypalAtom)
   if (!orgId) {
@@ -33,7 +36,11 @@ export function DashboardCustomization({
         {domain && (
           <DomainHeader
             domain={domain}
-            route={`/${selectedPage}`}
+            route={
+              selectedPage === "dashboard"
+                ? `/${selectedPage}`
+                : `/dashboard/${selectedPage}`
+            }
             className="mb-4"
           />
         )}

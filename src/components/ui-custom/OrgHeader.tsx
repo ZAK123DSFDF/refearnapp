@@ -106,7 +106,7 @@ export function OrgHeader({
           className={`${sidebar ? "text-lg" : "text-2xl"} font-bold`}
           style={{ color: (affiliate && headerColor) || undefined }}
         >
-          {org?.name || "AffiliateX"}
+          {org?.name || "RefearnApp"}
         </h1>
 
         {isPreview && (

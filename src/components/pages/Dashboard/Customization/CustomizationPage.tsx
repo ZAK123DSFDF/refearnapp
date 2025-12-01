@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils"
 import { saveTeamCustomizationsAction } from "@/app/(organization)/organization/[orgId]/teams/dashboard/customization/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SimulationInfoCard } from "@/components/ui-custom/SimulationInfoCard"
 
 export default function CustomizationPage({
   orgId,
@@ -31,6 +32,8 @@ export default function CustomizationPage({
   isTeam?: boolean
 }) {
   const [mainTab, setMainTab] = useState("sidebar")
+  const [selectedPage, setSelectedPage] = useState("dashboard")
+  const [tab, setTab] = useState("login")
   const { domain } = useActiveDomain(orgId)
   useVerifyTeamSession(orgId, isTeam)
   const authHasChanges = useAtomValue(authHasChangesAtom)
@@ -200,6 +203,112 @@ export default function CustomizationPage({
               </div>
             )}
           </div>
+          {mainTab === "auth" && tab === "login" && (
+            <SimulationInfoCard
+              className="mt-4"
+              errorMessage={
+                <>
+                  <strong>Error State:</strong> enter password{" "}
+                  <code className="px-1 py-0.5 rounded bg-muted text-xs">
+                    incorrect123
+                  </code>{" "}
+                  to simulate an error.
+                </>
+              }
+              successMessage={
+                <>
+                  <strong>Success State:</strong> enter any other password to
+                  simulate success state.
+                </>
+              }
+            />
+          )}
+          {mainTab === "auth" && tab === "signup" && (
+            <SimulationInfoCard
+              className="mt-4"
+              errorMessage={
+                <>
+                  <strong>Error State:</strong> enter email{" "}
+                  <code className="px-1 py-0.5 rounded bg-muted text-xs">
+                    already@used.com
+                  </code>{" "}
+                  to simulate an error.
+                </>
+              }
+              successMessage={
+                <>
+                  <strong>Success State:</strong> enter any other email to
+                  simulate success state.
+                </>
+              }
+            />
+          )}
+          {mainTab === "auth" && tab === "forgot-password" && (
+            <SimulationInfoCard
+              className="mt-4"
+              errorMessage={
+                <>
+                  <strong>Error State:</strong> enter email{" "}
+                  <code className="px-1 py-0.5 rounded bg-muted text-xs">
+                    notfound@gmail.com
+                  </code>{" "}
+                  to simulate an error.
+                </>
+              }
+              successMessage={
+                <>
+                  <strong>Success State:</strong> enter any other email to
+                  simulate success state.
+                </>
+              }
+            />
+          )}
+          {mainTab === "auth" && tab === "reset-password" && (
+            <SimulationInfoCard
+              className="mt-4"
+              errorMessage={
+                <>
+                  <strong>Error State:</strong> set your password to{" "}
+                  <code className="px-1 py-0.5 rounded bg-muted text-xs">
+                    notcorrect123
+                  </code>{" "}
+                  to simulate an error.
+                </>
+              }
+              successMessage={
+                <>
+                  <strong>Success State:</strong> enter any other password to
+                  simulate a successful password reset.
+                </>
+              }
+            />
+          )}
+          {mainTab === "sidebar" && selectedPage === "profile" && (
+            <>
+              <SimulationInfoCard
+                className="mb-4"
+                errorMessage={
+                  <>
+                    <strong>Error State:</strong> enter any password{" "}
+                    <em>except</em>{" "}
+                    <code className="px-1 py-0.5 rounded bg-muted text-xs">
+                      correct123
+                    </code>{" "}
+                    to simulate an incorrect password error.
+                  </>
+                }
+                successMessage={
+                  <>
+                    <strong>Success State:</strong> enter{" "}
+                    <code className="px-1 py-0.5 rounded bg-muted text-xs">
+                      correct123
+                    </code>{" "}
+                    to simulate a successful password update.
+                  </>
+                }
+              />
+            </>
+          )}
 
           <TabsContent value="sidebar">
             <SidebarProvider affiliate orgId={orgId}>
@@ -210,7 +319,12 @@ export default function CustomizationPage({
                   </div>
                 )}
 
-                <DashboardCustomization orgId={orgId} domain={domain} />
+                <DashboardCustomization
+                  orgId={orgId}
+                  domain={domain}
+                  selectedPage={selectedPage}
+                  setSelectedPage={setSelectedPage}
+                />
               </div>
             </SidebarProvider>
           </TabsContent>
@@ -227,6 +341,8 @@ export default function CustomizationPage({
                   orgId={orgId}
                   setMainTab={setMainTab}
                   domain={domain}
+                  tab={tab}
+                  setTab={setTab}
                 />
               </div>
             </SidebarProvider>

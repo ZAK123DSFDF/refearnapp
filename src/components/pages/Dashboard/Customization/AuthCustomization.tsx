@@ -18,14 +18,16 @@ interface AuthCustomizationProps {
   setMainTab?: (tab: string) => void
   orgId: string
   domain?: string
+  tab: string
+  setTab: (tab: string) => void
 }
 export const AuthCustomization = ({
   setMainTab,
   orgId,
   domain,
+  tab,
+  setTab,
 }: AuthCustomizationProps) => {
-  const [tab, setTab] = useState("login")
-
   const routeMap: Record<string, string> = {
     login: "/login",
     signup: "/signup",
