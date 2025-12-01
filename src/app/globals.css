@@ -214,3 +214,20 @@
   font-size: 1.25rem;
   font-weight: normal;
 }
+@keyframes slideDown {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.25s ease-out forwards;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.2s ease-in forwards;
+}

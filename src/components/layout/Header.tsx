@@ -96,9 +96,13 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {menuOpen && (
-        <div className="lg:hidden bg-white/90 backdrop-blur-md shadow-md px-6 py-6 space-y-4 animate-fade-in">
+        <div
+          className={cn(
+            "lg:hidden bg-white/90 backdrop-blur-md shadow-md px-6 py-6 space-y-4 rounded-xl mt-3",
+            "animate-slide-down"
+          )}
+        >
           <a
             href="#features"
             className="mobile-link"
