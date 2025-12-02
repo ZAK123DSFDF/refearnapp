@@ -92,7 +92,7 @@ export const LoginServer = async ({
 
     const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-login?organizationToken=${token}`
     if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(existingUser.email, verifyUrl)
+      await sendVerificationEmail(existingUser.email, verifyUrl, "login")
       return {
         ok: true,
         toast: "Verification email sent",

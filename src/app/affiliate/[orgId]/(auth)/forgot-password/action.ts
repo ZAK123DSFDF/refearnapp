@@ -54,9 +54,19 @@ export const ForgotPasswordAffiliateServer = async ({
       token,
       baseUrl,
     })
+    const redirectUrl = buildAffiliateUrl({
+      path: "checkEmail",
+      organizationId,
+      baseUrl,
+      partial: true,
+    })
     if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(existingAffiliate.email, resetUrl)
-      return { ok: true, toast: "Reset link sent to your email" }
+      await sendVerificationEmail(
+        existingAffiliate.email,
+        resetUrl,
+        "reset-password"
+      )
+      return { ok: true, toast: "Reset link sent to your email", redirectUrl }
     }
     return { ok: true, redirectUrl: resetUrl }
   })

@@ -95,7 +95,11 @@ export const SignupAffiliateServer = async ({
         baseUrl,
       })
       if (process.env.NODE_ENV === "development") {
-        await sendVerificationEmail(existingAffiliate.email, verifyUrl)
+        await sendVerificationEmail(
+          existingAffiliate.email,
+          verifyUrl,
+          "signup"
+        )
         return {
           ok: true,
           toast: "Verification email sent",
@@ -155,7 +159,7 @@ export const SignupAffiliateServer = async ({
       partial: true,
     })
     if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(newAffiliate.email, verifyUrl)
+      await sendVerificationEmail(newAffiliate.email, verifyUrl, "signup")
       return {
         ok: true,
         toast: "Verification email sent",

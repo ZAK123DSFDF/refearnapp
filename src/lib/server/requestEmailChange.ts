@@ -124,7 +124,7 @@ export async function requestEmailChange({
 
     // 🧠 Step 3: send email or return redirect
     if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(newEmail, verifyUrl)
+      await sendVerificationEmail(newEmail, verifyUrl, "email-change")
       return { ok: true, message: "Verification link sent to new email" }
     }
 

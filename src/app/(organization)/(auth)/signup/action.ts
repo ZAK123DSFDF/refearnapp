@@ -89,7 +89,7 @@ export const SignupServer = async ({
       const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-signup?organizationToken=${token}`
 
       if (process.env.NODE_ENV === "development") {
-        await sendVerificationEmail(existingUser.email, verifyUrl)
+        await sendVerificationEmail(existingUser.email, verifyUrl, "signup")
         return {
           ok: true,
           toast: "Verification email sent",
@@ -138,7 +138,7 @@ export const SignupServer = async ({
 
     const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-signup?organizationToken=${token}`
     if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(newUser.email, verifyUrl)
+      await sendVerificationEmail(newUser.email, verifyUrl, "signup")
       return {
         ok: true,
         toast: "Verification email sent",

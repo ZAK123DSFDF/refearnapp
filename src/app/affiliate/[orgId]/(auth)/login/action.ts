@@ -96,7 +96,7 @@ export const LoginAffiliateServer = async ({
       baseUrl,
     })
     if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(existingAffiliate.email, verifyUrl)
+      await sendVerificationEmail(existingAffiliate.email, verifyUrl, "login")
       return {
         ok: true,
         toast: "Verification email sent",
