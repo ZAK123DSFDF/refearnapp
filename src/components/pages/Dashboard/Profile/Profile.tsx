@@ -50,6 +50,9 @@ import {
   validateCurrentTeamPassword,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/profile/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
+import { openEmailApp } from "@/util/OpenEmailApp"
+import { Button } from "@/components/ui/button"
+import { AppDialog } from "@/components/ui-custom/AppDialog"
 
 export default function Profile({
   AffiliateData,
@@ -125,6 +128,7 @@ export default function Profile({
   }, [currentValues, safeDefaults])
   const dashboardCardStyle = useDashboardCard(affiliate)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showEmailSentModal, setShowEmailSentModal] = useState(false)
   const [showEmailDialog, setShowEmailDialog] = useState(false)
   const [step, setStep] = useState<"current" | "new">("current")
   const { showCustomToast } = useCustomToast()
@@ -291,10 +295,16 @@ export default function Profile({
     async (values: { newEmail: string }) => {
       if (isPreview) {
         return new Promise((resolve) =>
-          setTimeout(() => resolve({ ok: true }), 1000)
+          setTimeout(
+            () =>
+              resolve({
+                ok: true,
+                message: "Preview email change simulated.",
+              }),
+            500
+          )
         )
       }
-
       return requestEmailChange({
         orgId,
         id: affiliate
@@ -309,10 +319,13 @@ export default function Profile({
     },
     {
       affiliate,
+      disableSuccessToast: true,
       onSuccess: (res: any) => {
         if (!res.ok) {
           emailCache.addFailedValue(res.data)
+          return
         }
+        setShowEmailSentModal(true)
       },
     }
   )
@@ -423,6 +436,18 @@ export default function Profile({
         onSubmit={handleEmailSubmit}
         loading={emailChangeMutation.isPending}
       />
+      <AppDialog
+        open={showEmailSentModal}
+        onOpenChange={setShowEmailSentModal}
+        title="Check your email"
+        affiliate={affiliate}
+        description="We sent a verification link to your new email address. Please open your email app to continue."
+        showFooter={false}
+      >
+        <Button className="w-full" onClick={() => openEmailApp(isPreview)}>
+          Open Email App
+        </Button>
+      </AppDialog>
     </div>
   )
 }

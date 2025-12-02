@@ -12,6 +12,7 @@ import {
 } from "@/store/AuthCustomizationAtom"
 import { Button } from "@/components/ui/button"
 import { ButtonCustomizationOptions } from "@/components/ui-custom/Customization/AuthCustomization/ButtonCustomizationOptions"
+import { openEmailApp } from "@/util/OpenEmailApp"
 
 type Props = {
   orgId?: string
@@ -26,18 +27,6 @@ const CheckEmail = ({ isPreview, affiliate }: Props) => {
     buttonCustomizationAtom
   )
   const authCardStyle = useAuthCard(affiliate)
-  const handleClick = () => {
-    if (isPreview) {
-      window.open("https://mail.google.com", "_blank")
-      return
-    }
-    const isDev = process.env.NODE_ENV === "development"
-    if (isDev) {
-      window.open("http://localhost:8025", "_blank")
-      return
-    }
-    console.log("Production mode: open the user's email app.")
-  }
 
   return (
     <div
@@ -108,7 +97,7 @@ const CheckEmail = ({ isPreview, affiliate }: Props) => {
             <Button
               className="w-full mb-6 mt-2"
               size="lg"
-              onClick={handleClick}
+              onClick={() => openEmailApp(isPreview)}
               style={{
                 backgroundColor:
                   (affiliate && buttonBackgroundColor) || undefined,

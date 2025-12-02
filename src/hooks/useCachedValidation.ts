@@ -1,7 +1,7 @@
 import { useAtom } from "jotai"
 import { getCacheAtom } from "@/store/CacheAtom"
 import { buildCacheScope } from "@/util/CacheUtils"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 
 export function useCachedValidation({
   id,
@@ -22,6 +22,24 @@ export function useCachedValidation({
   const atom = useMemo(() => getCacheAtom(id, cacheScope), [id, cacheScope])
   const [cache, setCache] = useAtom(atom)
 
+  const EXPIRY_MS = 5 * 60 * 1000 // 300,000 ms
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCache((prev) => {
+        if (Date.now() - prev.timestamp > EXPIRY_MS) {
+          return {
+            failedValues: [],
+            errorMessage: null,
+            maxCacheSize,
+            timestamp: Date.now(),
+          }
+        }
+        return prev
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [maxCacheSize, setCache])
   function shouldSkip(value: string, customMessage?: string): boolean {
     const trimmed = value.trim()
     if (cache.failedValues.includes(trimmed)) {
