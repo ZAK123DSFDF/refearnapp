@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
+import { useAtomValue } from "jotai"
+import { buttonCustomizationAtom } from "@/store/AuthCustomizationAtom"
 
 interface AppDialogProps {
   open: boolean
@@ -42,6 +44,12 @@ export function AppDialog({
   showFooter = true,
   hideCloseIcon = false,
 }: AppDialogProps) {
+  const {
+    buttonDisabledTextColor,
+    buttonBackgroundColor,
+    buttonDisabledBackgroundColor,
+    buttonTextColor,
+  } = useAtomValue(buttonCustomizationAtom)
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -73,9 +81,23 @@ export function AppDialog({
                   onConfirm?.()
                 }}
                 disabled={confirmLoading}
+                style={{
+                  backgroundColor: confirmLoading
+                    ? (affiliate && buttonDisabledBackgroundColor) || undefined
+                    : (affiliate && buttonBackgroundColor) || undefined,
+                  color: confirmLoading
+                    ? (affiliate && buttonDisabledTextColor) || undefined
+                    : (affiliate && buttonTextColor) || undefined,
+                }}
               >
                 {confirmLoading && (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2
+                    style={{
+                      color:
+                        (affiliate && buttonDisabledTextColor) || undefined,
+                    }}
+                    className="w-4 h-4 mr-2 animate-spin"
+                  />
                 )}
                 {confirmText}
               </Button>

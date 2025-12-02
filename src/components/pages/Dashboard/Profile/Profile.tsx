@@ -442,12 +442,9 @@ export default function Profile({
         title="Check your email"
         affiliate={affiliate}
         description="We sent a verification link to your new email address. Please open your email app to continue."
-        showFooter={false}
-      >
-        <Button className="w-full" onClick={() => openEmailApp(isPreview)}>
-          Open Email App
-        </Button>
-      </AppDialog>
+        confirmText="Open Email App"
+        onConfirm={() => openEmailApp(isPreview)}
+      />
     </div>
   )
 }
