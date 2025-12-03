@@ -133,6 +133,7 @@ export const SignupServer = async ({
     )
 
     const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-signup?organizationToken=${token}`
+
     await sendVerificationEmail(newUser.email, verifyUrl, "signup")
     return {
       ok: true,
