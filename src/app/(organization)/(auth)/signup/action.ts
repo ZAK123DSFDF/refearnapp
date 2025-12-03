@@ -91,7 +91,7 @@ export const SignupServer = async ({
       return {
         ok: true,
         toast: "Verification email sent",
-        redirectUrl: "/checkEmail",
+        redirectUrl: `/checkEmail?email=${encodeURIComponent(existingUser.email)}`,
       }
     }
 
@@ -137,7 +137,7 @@ export const SignupServer = async ({
     return {
       ok: true,
       toast: "Verification email sent",
-      redirectUrl: "/checkEmail",
+      redirectUrl: `/checkEmail?email=${encodeURIComponent(newUser.email)}`,
     }
   })
 }

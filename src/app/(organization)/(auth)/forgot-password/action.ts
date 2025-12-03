@@ -57,7 +57,7 @@ export const ForgotPasswordServer = async ({
     return {
       ok: true,
       toast: "Reset link sent to your email",
-      redirectUrl: "/checkEmail",
+      redirectUrl: `/checkEmail?email=${encodeURIComponent(existingUser.email)}`,
     }
   })
 }

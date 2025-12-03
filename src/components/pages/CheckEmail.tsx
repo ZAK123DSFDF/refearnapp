@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { ButtonCustomizationOptions } from "@/components/ui-custom/Customization/AuthCustomization/ButtonCustomizationOptions"
 import { openEmailApp } from "@/util/OpenEmailApp"
+import { useSearchParams } from "next/navigation"
 
 type Props = {
   orgId?: string
@@ -21,6 +22,9 @@ type Props = {
 }
 
 const CheckEmail = ({ isPreview, affiliate }: Props) => {
+  const searchParams = useSearchParams()
+  const encodedEmail = searchParams.get("email") || ""
+  const email = decodeURIComponent(encodedEmail)
   const { backgroundColor, checkEmailPrimaryColor, checkEmailSecondaryColor } =
     useAtomValue(themeCustomizationAtom)
   const { buttonBackgroundColor, buttonTextColor } = useAtomValue(
@@ -97,7 +101,7 @@ const CheckEmail = ({ isPreview, affiliate }: Props) => {
             <Button
               className="w-full mb-6 mt-2"
               size="lg"
-              onClick={() => openEmailApp(isPreview)}
+              onClick={() => openEmailApp(email, isPreview)}
               style={{
                 backgroundColor:
                   (affiliate && buttonBackgroundColor) || undefined,

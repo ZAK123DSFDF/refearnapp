@@ -55,7 +55,7 @@ export const ForgotPasswordAffiliateServer = async ({
       baseUrl,
     })
     const redirectUrl = buildAffiliateUrl({
-      path: "checkEmail",
+      path: `checkEmail?email=${encodeURIComponent(existingAffiliate.email)}`,
       organizationId,
       baseUrl,
       partial: true,

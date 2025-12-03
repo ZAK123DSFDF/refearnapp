@@ -53,7 +53,7 @@ export const ForgotPasswordTeamServer = async ({
     return {
       ok: true,
       toast: "Reset link sent to your email",
-      redirectUrl: `/organization/${organizationId}/teams/checkEmail`,
+      redirectUrl: `/organization/${organizationId}/teams/checkEmail?email=${encodeURIComponent(existingTeam.email)}`,
     }
   })
 }

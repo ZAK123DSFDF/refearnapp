@@ -51,7 +51,6 @@ import {
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/profile/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { openEmailApp } from "@/util/OpenEmailApp"
-import { Button } from "@/components/ui/button"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
 
 export default function Profile({
@@ -128,6 +127,7 @@ export default function Profile({
   }, [currentValues, safeDefaults])
   const dashboardCardStyle = useDashboardCard(affiliate)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null)
   const [showEmailSentModal, setShowEmailSentModal] = useState(false)
   const [showEmailDialog, setShowEmailDialog] = useState(false)
   const [step, setStep] = useState<"current" | "new">("current")
@@ -291,8 +291,8 @@ export default function Profile({
     }
   )
 
-  const emailChangeMutation = useAppMutation(
-    async (values: { newEmail: string }) => {
+  const emailChangeMutation = useAppMutation<AppResponse, { newEmail: string }>(
+    async (values) => {
       if (isPreview) {
         return new Promise((resolve) =>
           setTimeout(
@@ -320,11 +320,12 @@ export default function Profile({
     {
       affiliate,
       disableSuccessToast: true,
-      onSuccess: (res: any) => {
+      onSuccess: (res, values) => {
         if (!res.ok) {
           emailCache.addFailedValue(res.data)
           return
         }
+        setPendingEmail(values.newEmail)
         setShowEmailSentModal(true)
       },
     }
@@ -443,7 +444,7 @@ export default function Profile({
         affiliate={affiliate}
         description="We sent a verification link to your new email address. Please open your email app to continue."
         confirmText="Open Email App"
-        onConfirm={() => openEmailApp(isPreview)}
+        onConfirm={() => openEmailApp(pendingEmail ?? "", isPreview)}
       />
     </div>
   )

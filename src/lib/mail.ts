@@ -1,7 +1,12 @@
 import nodemailer from "nodemailer"
 import { SendMailClient } from "zeptomail"
 
-export type EmailType = "login" | "signup" | "email-change" | "reset-password"
+export type EmailType =
+  | "login"
+  | "signup"
+  | "email-change"
+  | "reset-password"
+  | "team-invite"
 
 const EMAIL_CONTENT = {
   login: {
@@ -23,6 +28,11 @@ const EMAIL_CONTENT = {
     subject: "Reset Your Password",
     heading: "Reset Your Password",
     button: "Reset Password",
+  },
+  "team-invite": {
+    subject: "You're Invited to Join a Team",
+    heading: "Team Invitation",
+    button: "Accept Invitation",
   },
 } as const
 

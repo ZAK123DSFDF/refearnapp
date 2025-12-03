@@ -95,7 +95,7 @@ export const LoginServer = async ({
     return {
       ok: true,
       toast: "Verification email sent",
-      redirectUrl: "/checkEmail",
+      redirectUrl: `/checkEmail?email=${encodeURIComponent(existingUser.email)}`,
     }
   })
 }

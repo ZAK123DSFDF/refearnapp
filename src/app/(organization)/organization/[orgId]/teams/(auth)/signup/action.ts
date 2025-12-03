@@ -83,7 +83,7 @@ export const SignupTeamServer = async ({
       return {
         ok: true,
         toast: "Verification email sent",
-        redirectUrl: `/organization/${organizationId}/teams/checkEmail`,
+        redirectUrl: `/organization/${organizationId}/teams/checkEmail?email=${encodeURIComponent(existingTeam.email)}`,
       }
     }
 
@@ -131,7 +131,7 @@ export const SignupTeamServer = async ({
       return {
         ok: true,
         toast: "Verification email sent",
-        redirectUrl: `/organization/${organizationId}/teams/checkEmail`,
+        redirectUrl: `/organization/${organizationId}/teams/checkEmail?email=${encodeURIComponent(newTeam.email)}`,
       }
     }
     return { ok: true, redirectUrl: verifyUrl }

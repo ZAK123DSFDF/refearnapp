@@ -3,11 +3,11 @@
 import { db } from "@/db/drizzle"
 import { invitation, team } from "@/db/schema"
 import { and, eq, ilike } from "drizzle-orm"
-import { sendEmail } from "@/lib/email"
 import { handleAction } from "@/lib/handleAction"
 import { MutationData, ResponseData } from "@/lib/types/response"
 import { getUserPlan } from "@/lib/server/getUserPlan"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
+import { sendVerificationEmail } from "@/lib/mail"
 
 export const inviteTeamMember = async ({
   email,
@@ -84,31 +84,7 @@ export const inviteTeamMember = async ({
 
     // Construct invite link using the generated token
     const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/organization/${orgId}/teams/signup?teamToken=${invite.token}`
-    const subject = `Team Invitation: ${title}`
-    const text = `${description}\n\nJoin your team here:\n${inviteLink}`
-
-    if (process.env.NODE_ENV === "development") {
-      const sent = await sendEmail({
-        to: email,
-        subject,
-        text,
-      })
-
-      if (!sent.success) {
-        throw {
-          status: 500,
-          error: "Failed to send invitation email (dev).",
-          toast: sent.message || "Could not send the invitation email.",
-        }
-      }
-    } else {
-      throw {
-        status: 500,
-        error: "Email sending not configured for production.",
-        toast: "Email sending is not set up for production environment.",
-      }
-    }
-
+    await sendVerificationEmail(email, inviteLink, "team-invite")
     return {
       ok: true,
       toast: "Invitation sent successfully.",
