@@ -52,19 +52,12 @@ export const ForgotPasswordServer = async ({
     })
 
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/reset-password?organizationToken=${token}`
-    if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(
-        existingUser.email,
-        resetUrl,
-        "reset-password"
-      )
 
-      return {
-        ok: true,
-        toast: "Reset link sent to your email",
-        redirectUrl: "/checkEmail",
-      }
+    await sendVerificationEmail(existingUser.email, resetUrl, "reset-password")
+    return {
+      ok: true,
+      toast: "Reset link sent to your email",
+      redirectUrl: "/checkEmail",
     }
-    return { ok: true, redirectUrl: resetUrl }
   })
 }

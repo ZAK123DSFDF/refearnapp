@@ -87,16 +87,12 @@ export const SignupServer = async ({
       )
 
       const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-signup?organizationToken=${token}`
-
-      if (process.env.NODE_ENV === "development") {
-        await sendVerificationEmail(existingUser.email, verifyUrl, "signup")
-        return {
-          ok: true,
-          toast: "Verification email sent",
-          redirectUrl: "/checkEmail",
-        }
+      await sendVerificationEmail(existingUser.email, verifyUrl, "signup")
+      return {
+        ok: true,
+        toast: "Verification email sent",
+        redirectUrl: "/checkEmail",
       }
-      return { ok: true, redirectUrl: verifyUrl }
     }
 
     // Create new user + credentials account
@@ -137,14 +133,11 @@ export const SignupServer = async ({
     )
 
     const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-signup?organizationToken=${token}`
-    if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(newUser.email, verifyUrl, "signup")
-      return {
-        ok: true,
-        toast: "Verification email sent",
-        redirectUrl: "/checkEmail",
-      }
+    await sendVerificationEmail(newUser.email, verifyUrl, "signup")
+    return {
+      ok: true,
+      toast: "Verification email sent",
+      redirectUrl: "/checkEmail",
     }
-    return { ok: true, redirectUrl: verifyUrl }
   })
 }

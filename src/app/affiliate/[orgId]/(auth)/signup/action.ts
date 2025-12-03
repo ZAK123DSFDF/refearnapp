@@ -94,19 +94,12 @@ export const SignupAffiliateServer = async ({
         organizationId,
         baseUrl,
       })
-      if (process.env.NODE_ENV === "development") {
-        await sendVerificationEmail(
-          existingAffiliate.email,
-          verifyUrl,
-          "signup"
-        )
-        return {
-          ok: true,
-          toast: "Verification email sent",
-          redirectUrl,
-        }
+      await sendVerificationEmail(existingAffiliate.email, verifyUrl, "signup")
+      return {
+        ok: true,
+        toast: "Verification email sent",
+        redirectUrl,
       }
-      return { ok: true, redirectUrl: verifyUrl }
     }
 
     // Create new affiliate + credentials account
@@ -158,14 +151,11 @@ export const SignupAffiliateServer = async ({
       baseUrl,
       partial: true,
     })
-    if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(newAffiliate.email, verifyUrl, "signup")
-      return {
-        ok: true,
-        toast: "Verification email sent",
-        redirectUrl,
-      }
+    await sendVerificationEmail(newAffiliate.email, verifyUrl, "signup")
+    return {
+      ok: true,
+      toast: "Verification email sent",
+      redirectUrl,
     }
-    return { ok: true, redirectUrl: verifyUrl }
   })
 }

@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer"
+import { SendMailClient } from "zeptomail"
 
 export type EmailType = "login" | "signup" | "email-change" | "reset-password"
 
-// Centralized config (no repetition)
 const EMAIL_CONTENT = {
   login: {
     subject: "Verify Your Login",
@@ -26,7 +26,6 @@ const EMAIL_CONTENT = {
   },
 } as const
 
-// Reusable email template
 function buildEmailTemplate(heading: string, button: string, link: string) {
   return `
     <div style="font-family:Arial, sans-serif; max-width:600px; padding:20px;">
@@ -50,12 +49,6 @@ function buildEmailTemplate(heading: string, button: string, link: string) {
 
       <p>If the button doesn't work, click the link below:</p>
       <p><a href="${link}" style="color:#1a73e8;">${link}</a></p>
-
-      <hr style="margin-top:32px;" />
-
-      <p style="font-size:12px; color:#777;">
-        If you didn’t request this, you can safely ignore this email.
-      </p>
     </div>
   `
 }
@@ -65,18 +58,41 @@ export const sendVerificationEmail = async (
   link: string,
   type: EmailType
 ) => {
-  const transporter = nodemailer.createTransport({
-    host: "localhost",
-    port: 1025, // MailDev or similar
-    secure: false,
-  })
-
   const content = EMAIL_CONTENT[type]
 
-  await transporter.sendMail({
-    from: '"Your App" <noreply@refearnapp.com>',
-    to,
+  // 📌 DEV MODE → MailDev
+  if (process.env.NODE_ENV === "development") {
+    const transporter = nodemailer.createTransport({
+      host: "localhost",
+      port: 1025,
+      secure: false,
+    })
+
+    return transporter.sendMail({
+      from: '"Your App" <noreply@refearnapp.com>',
+      to,
+      subject: content.subject,
+      html: buildEmailTemplate(content.heading, content.button, link),
+    })
+  }
+
+  // 📌 PROD MODE → ZOHO ZEPTOMAIL
+  const client = new SendMailClient({
+    url: "https://api.zeptomail.com/v1.1/email",
+    token: process.env.ZEPTO_TOKEN!,
+  })
+
+  return client.sendMail({
+    from: {
+      address: "noreply@refearnapp.com",
+      name: "RefearnApp",
+    },
+    to: [
+      {
+        email_address: { address: to },
+      },
+    ],
     subject: content.subject,
-    html: buildEmailTemplate(content.heading, content.button, link),
+    htmlbody: buildEmailTemplate(content.heading, content.button, link),
   })
 }

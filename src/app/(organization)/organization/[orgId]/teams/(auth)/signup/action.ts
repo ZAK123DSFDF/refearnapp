@@ -79,15 +79,12 @@ export const SignupTeamServer = async ({
         { expiresIn: "15m" }
       )
       const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/organization/${organizationId}/teams/verify-signup?teamToken=${token}`
-      if (process.env.NODE_ENV === "development") {
-        await sendVerificationEmail(existingTeam.email, verifyUrl, "signup")
-        return {
-          ok: true,
-          toast: "Verification email sent",
-          redirectUrl: `/organization/${organizationId}/teams/checkEmail`,
-        }
+      await sendVerificationEmail(existingTeam.email, verifyUrl, "signup")
+      return {
+        ok: true,
+        toast: "Verification email sent",
+        redirectUrl: `/organization/${organizationId}/teams/checkEmail`,
       }
-      return { ok: true, redirectUrl: verifyUrl }
     }
 
     // Create new affiliate + credentials account

@@ -92,6 +92,7 @@
     "tldts": "^7.0.17",
     "ua-parser-js": "^2.0.6",
     "util": "^0.12.5",
+    "zeptomail": "^7.0.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {

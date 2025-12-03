@@ -49,18 +49,11 @@ export const ForgotPasswordTeamServer = async ({
       expiresIn: "15m",
     })
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/organization/${organizationId}/teams/reset-password?teamToken=${token}`
-    if (process.env.NODE_ENV === "development") {
-      await sendVerificationEmail(
-        existingTeam.email,
-        resetUrl,
-        "reset-password"
-      )
-      return {
-        ok: true,
-        toast: "Reset link sent to your email",
-        redirectUrl: `/organization/${organizationId}/teams/checkEmail`,
-      }
+    await sendVerificationEmail(existingTeam.email, resetUrl, "reset-password")
+    return {
+      ok: true,
+      toast: "Reset link sent to your email",
+      redirectUrl: `/organization/${organizationId}/teams/checkEmail`,
     }
-    return { ok: true, redirectUrl: resetUrl }
   })
 }
