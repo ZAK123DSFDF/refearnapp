@@ -12,9 +12,7 @@ export async function proxy(req: NextRequest) {
     host.includes("127.0.0.1:3000") ||
     host === "refearnapp.com" ||
     host === "www.refearnapp.com" ||
-    host === "affiliate-marketing-hazel.vercel.app" ||
-    host ===
-      "affiliate-marketing-git-email-service-zak123dsfdfs-projects.vercel.app"
+    host.endsWith(".vercel.app")
   ) {
     return NextResponse.next()
   }
