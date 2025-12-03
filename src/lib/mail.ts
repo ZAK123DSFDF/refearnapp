@@ -85,7 +85,6 @@ export const sendVerificationEmail = async (
       html: buildEmailTemplate(content.heading, content.button, link),
     })
   }
-
   // 📌 PROD MODE → ZOHO ZEPTOMAIL
   const client = new SendMailClient({
     url: "https://api.zeptomail.com/v1.1/email",
