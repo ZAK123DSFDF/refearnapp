@@ -36,11 +36,17 @@ const EMAIL_CONTENT = {
   },
 } as const
 
-function buildEmailTemplate(heading: string, button: string, link: string) {
+function buildEmailTemplate(
+  heading: string,
+  description: string | null,
+  button: string,
+  link: string
+) {
   return `
     <div style="font-family:Arial, sans-serif; max-width:600px; padding:20px;">
       <h2 style="color:#333;">${heading}</h2>
-      <p>Please click the button below:</p>
+
+      ${description ? `<p style="color:#555; margin-bottom:12px;">${description}</p>` : ""}
 
       <a href="${link}" 
         style="
@@ -57,7 +63,7 @@ function buildEmailTemplate(heading: string, button: string, link: string) {
         ${button}
       </a>
 
-      <p>If the button doesn't work, click the link below:</p>
+      <p>If the button doesn't work, use the link below:</p>
       <p><a href="${link}" style="color:#1a73e8;">${link}</a></p>
     </div>
   `
@@ -66,9 +72,21 @@ function buildEmailTemplate(heading: string, button: string, link: string) {
 export const sendVerificationEmail = async (
   to: string,
   link: string,
-  type: EmailType
+  type: EmailType,
+  extra?: { title?: string; description?: string }
 ) => {
-  const content = EMAIL_CONTENT[type]
+  const base = EMAIL_CONTENT[type]
+
+  // If not team invite → use defaults (NO CHANGE)
+  const subject =
+    type === "team-invite" && extra?.title ? extra.title : base.subject
+
+  const heading =
+    type === "team-invite" && extra?.title ? extra.title : base.heading
+
+  const description = type === "team-invite" ? (extra?.description ?? "") : null
+
+  const html = buildEmailTemplate(heading, description, base.button, link)
 
   // 📌 DEV MODE → MailDev
   if (process.env.NODE_ENV === "development") {
@@ -81,8 +99,8 @@ export const sendVerificationEmail = async (
     return transporter.sendMail({
       from: '"Your App" <noreply@refearnapp.com>',
       to,
-      subject: content.subject,
-      html: buildEmailTemplate(content.heading, content.button, link),
+      subject,
+      html,
     })
   }
   // 📌 PROD MODE → ZOHO ZEPTOMAIL
@@ -101,7 +119,7 @@ export const sendVerificationEmail = async (
         email_address: { address: to },
       },
     ],
-    subject: content.subject,
-    htmlbody: buildEmailTemplate(content.heading, content.button, link),
+    subject,
+    htmlbody: html,
   })
 }

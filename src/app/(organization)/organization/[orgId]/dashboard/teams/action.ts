@@ -82,7 +82,10 @@ export const inviteTeamMember = async ({
       })
       .returning()
     const inviteLink = `${process.env.NEXT_PUBLIC_BASE_URL}/organization/${orgId}/teams/signup?teamToken=${invite.token}`
-    await sendVerificationEmail(email, inviteLink, "team-invite")
+    await sendVerificationEmail(email, inviteLink, "team-invite", {
+      title,
+      description,
+    })
     return {
       ok: true,
       toast: "Invitation sent successfully.",
