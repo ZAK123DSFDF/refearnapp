@@ -79,7 +79,9 @@ export const resetOrganizationPasswordServer = async ({
 
     return {
       ok: true,
-      redirectUrl: `/organization/${activeOrgId}/dashboard/analytics`,
+      redirectUrl: activeOrgId
+        ? `/organization/${activeOrgId}/dashboard/analytics`
+        : `/create-company`,
     }
   })
 }

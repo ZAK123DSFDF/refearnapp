@@ -47,7 +47,10 @@ export default function VerifyClient({
         }
       : {
           signup: "Email verified. You can now create your company.",
-          login: "Email verified. Go to your dashboard.",
+          login:
+            data?.activeOrgId === undefined
+              ? "Email verified. You can now create your company."
+              : "Email verified. Go to your dashboard.",
           changeEmail: "Email changed successfully. Go to your dashboard.",
         }
 

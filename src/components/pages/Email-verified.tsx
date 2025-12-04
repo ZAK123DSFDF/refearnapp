@@ -62,7 +62,7 @@ const EmailVerified = ({
       } else if (isTeam) {
         router.push(`/organization/${orgId}/teams/dashboard/analytics`)
       } else {
-        if (mode === "signup" && !orgId) {
+        if ((mode === "signup" || mode === "login") && !orgId) {
           router.push("/create-company")
         } else {
           router.push(`/organization/${orgId}/dashboard/analytics`)
