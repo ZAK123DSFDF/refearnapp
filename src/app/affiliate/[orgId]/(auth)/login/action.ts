@@ -1,6 +1,4 @@
 "use server"
-
-import { db } from "@/db/drizzle"
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
@@ -8,6 +6,7 @@ import { buildAffiliateUrl } from "@/util/Url"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 export const LoginAffiliateServer = async ({
   email,
   password,
@@ -27,7 +26,7 @@ export const LoginAffiliateServer = async ({
         toast: "Please enter your login credentials.",
       }
     }
-
+    const db = await getDB()
     // Find the affiliate by organization and email
     const existingAffiliate = await db.query.affiliate.findFirst({
       where: (a, { and, eq }) =>

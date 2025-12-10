@@ -1,13 +1,13 @@
 "use server"
 
 import { team, teamAccount } from "@/db/schema"
-import { db } from "@/db/drizzle"
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
 import { customAlphabet } from "nanoid"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 type CreateAffiliatePayload = {
   name: string
@@ -34,6 +34,7 @@ export const SignupTeamServer = async ({
       }
     }
     const normalizedEmail = email.trim().toLowerCase()
+    const db = await getDB()
     const existingTeam = await db.query.team.findFirst({
       where: (a, { and, eq }) =>
         and(eq(a.email, normalizedEmail), eq(a.organizationId, organizationId)),

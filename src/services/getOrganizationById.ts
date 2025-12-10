@@ -1,5 +1,7 @@
-import { db } from "@/db/drizzle"
+import { getDB } from "@/db/drizzle"
+
 export async function getOrganizationById(orgId: string) {
+  const db = await getDB()
   const organizationRecord = await db.query.organization.findFirst({
     where: (org, { eq }) => eq(org.id, orgId),
   })

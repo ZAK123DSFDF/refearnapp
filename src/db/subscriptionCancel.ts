@@ -1,8 +1,8 @@
 // scripts/simulate-cancel.ts
 import "dotenv/config"
-import { db } from "@/db/drizzle"
 import { subscription } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 const PADDLE_API = "https://sandbox-api.paddle.com"
 const API_KEY = process.env.PADDLE_SECRET_TOKEN!
@@ -10,6 +10,7 @@ const NOTIFICATION_SETTING_ID = process.env.PADDLE_NOTIFICATION_SETTING_ID!
 const DEV_USER_ID = "29022934-eb52-49af-aca4-b6ed553c89dd"
 
 async function getLocalSubscription(userId: string) {
+  const db = await getDB()
   const sub = await db.query.subscription.findFirst({
     where: eq(subscription.userId, userId),
   })

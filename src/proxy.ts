@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 export async function proxy(req: NextRequest) {
   const host = req.headers.get("host")
@@ -16,6 +16,7 @@ export async function proxy(req: NextRequest) {
   ) {
     return NextResponse.next()
   }
+  const db = await getDB()
   const [foundDomain] = await db
     .select({
       id: websiteDomain.id,

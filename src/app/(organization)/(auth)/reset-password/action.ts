@@ -1,7 +1,6 @@
 // app/(organization)/reset-password/action.ts
 "use server"
 
-import { db } from "@/db/drizzle"
 import { account } from "@/db/schema"
 import * as bcrypt from "bcrypt"
 import { eq, and } from "drizzle-orm"
@@ -9,6 +8,7 @@ import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 export const resetOrganizationPasswordServer = async ({
   userId,
@@ -19,7 +19,7 @@ export const resetOrganizationPasswordServer = async ({
 }): Promise<MutationData> => {
   return handleAction("reset Organization Password", async () => {
     const hashed = await bcrypt.hash(password, 10)
-
+    const db = await getDB()
     // 🔑 Update the organization's credentials account password
     const [updatedAccount] = await db
       .update(account)

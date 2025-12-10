@@ -1,6 +1,5 @@
 // app/actions/auth/getUser.ts
 "use server"
-import { db } from "@/db/drizzle"
 import { account, user } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import * as bcrypt from "bcrypt"
@@ -10,7 +9,7 @@ import { revalidatePath } from "next/cache"
 import { getUserAuthCapabilities } from "@/lib/server/getUserAuthCapabilities"
 import { getCurrentUser } from "@/lib/server/getCurrentUser"
 import { handleAction } from "@/lib/handleAction"
-import { getOrgAuth } from "@/lib/server/GetOrgAuth"
+import { getDB } from "@/db/drizzle"
 
 export const getUserData = async (): Promise<
   ResponseData<SafeUserWithCapabilities>
@@ -18,7 +17,7 @@ export const getUserData = async (): Promise<
   return handleAction("getUserData", async () => {
     const { userId, canChangePassword, canChangeEmail } =
       await getUserAuthCapabilities()
-
+    const db = await getDB()
     const userData = await db.query.user.findFirst({
       where: eq(user.id, userId),
     })
@@ -49,7 +48,7 @@ export async function updateUserProfile(
     const { id } = await getCurrentUser()
     if (!id) throw { status: 401, toast: "Unauthorized" }
     if (!data.name) return { ok: true }
-
+    const db = await getDB()
     await db.update(user).set({ name: data.name }).where(eq(user.id, id))
     revalidatePath(`/organization/${orgId}/dashboard/profile`)
     return { ok: true, toast: "Successfully Updated Profile" }
@@ -62,7 +61,7 @@ export async function validateCurrentOrganizationPassword(
   return handleAction("validating current Organization Password", async () => {
     const { id } = await getCurrentUser()
     if (!id) throw { status: 401, toast: "Unauthorized" }
-
+    const db = await getDB()
     // Get account by userId
     const record = await db.query.account.findFirst({
       where: eq(account.userId, id),
@@ -94,7 +93,7 @@ export async function updateUserPassword(
     }
 
     const hashed = await bcrypt.hash(newPassword, 10)
-
+    const db = await getDB()
     const result = await db
       .update(account)
       .set({ password: hashed })

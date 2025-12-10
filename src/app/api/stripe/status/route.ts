@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { organizationStripeAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { db } from "@/db/drizzle"
+import { getDB } from "@/db/drizzle"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
 })
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         error: "Missing orgId",
       })
     }
-
+    const db = await getDB()
     const accountId = await db.query.organizationStripeAccount.findFirst({
       where: eq(organizationStripeAccount.orgId, orgId),
     })

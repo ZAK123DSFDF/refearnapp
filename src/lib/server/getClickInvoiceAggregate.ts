@@ -1,8 +1,8 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { affiliateClick, affiliateInvoice } from "@/db/schema"
 import { inArray, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
+import { getDB } from "@/db/drizzle"
 
 export async function getClickInvoiceAggregate(
   linkIds: string[],
@@ -10,6 +10,7 @@ export async function getClickInvoiceAggregate(
   month?: number,
   months?: { month: number; year: number }[]
 ) {
+  const db = await getDB()
   const [clickAgg, invoiceAgg] = await Promise.all([
     db
       .select({

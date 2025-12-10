@@ -1,5 +1,4 @@
 "use server"
-import { db } from "@/db/drizzle"
 import {
   affiliate,
   affiliateClick,
@@ -9,6 +8,7 @@ import {
 } from "@/db/schema"
 import { and, eq, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
+import { getDB } from "@/db/drizzle"
 export async function getAffiliateLinksWithStatsAction(
   decoded: {
     id: string
@@ -17,6 +17,7 @@ export async function getAffiliateLinksWithStatsAction(
   year?: number,
   month?: number
 ) {
+  const db = await getDB()
   return db
     .select({
       id: affiliateLink.id,

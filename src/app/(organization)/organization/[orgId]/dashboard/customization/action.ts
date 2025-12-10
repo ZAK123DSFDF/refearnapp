@@ -1,22 +1,18 @@
 "use server"
 
-import { db } from "@/db/drizzle"
 import {
   organizationAuthCustomization,
   organizationDashboardCustomization,
 } from "@/db/schema"
 
 import { eq } from "drizzle-orm"
-import { defaultAuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
-import { defaultDashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
-import { deepMerge } from "@/util/DeepMerge"
+import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
+import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrganizationCustomization } from "@/lib/organizationAction/saveOrganizationCustomization"
-
-export type AuthCustomization = typeof defaultAuthCustomization
-export type DashboardCustomization = typeof defaultDashboardCustomization
+import { getDB } from "@/db/drizzle"
 
 export async function saveCustomizationsAction(
   orgId: string,
@@ -35,6 +31,7 @@ export async function saveCustomizationsAction(
 export async function getAuthCustomization(
   orgId: string
 ): Promise<AuthCustomization> {
+  const db = await getDB()
   const [authRow] = await db
     .select({ auth: organizationAuthCustomization.auth })
     .from(organizationAuthCustomization)
@@ -46,6 +43,7 @@ export async function getAuthCustomization(
 export async function getDashboardCustomization(
   orgId: string
 ): Promise<DashboardCustomization> {
+  const db = await getDB()
   const [dashboardRow] = await db
     .select({ dashboard: organizationDashboardCustomization.dashboard })
     .from(organizationDashboardCustomization)

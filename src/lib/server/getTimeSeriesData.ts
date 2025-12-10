@@ -1,8 +1,8 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { inArray, sql } from "drizzle-orm"
 import { affiliateClick, affiliateInvoice } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
+import { getDB } from "@/db/drizzle"
 export async function getTimeSeriesData<T>(
   linkIds: string[],
   year?: number,
@@ -10,7 +10,7 @@ export async function getTimeSeriesData<T>(
 ) {
   const clickDay = sql<string>`(${affiliateClick.createdAt}::date)`
   const invoiceDay = sql<string>`(${affiliateInvoice.createdAt}::date)`
-
+  const db = await getDB()
   const [clicksAgg, salesAgg] = await Promise.all([
     db
       .select({

@@ -1,6 +1,5 @@
 "use server"
 
-import { db } from "@/db/drizzle"
 import { organizationPaddleAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
@@ -8,6 +7,7 @@ import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrgPaddleWebhookKey } from "@/lib/organizationAction/saveOrgPaddleWebhookKey"
 import { getWebhookKey } from "@/lib/organizationAction/getWebhookKey"
+import { getDB } from "@/db/drizzle"
 
 export async function savePaddleWebhookKey({
   orgId,
@@ -46,7 +46,7 @@ export async function deleteOrgPaddleAccount(
 ): Promise<MutationData> {
   return handleAction("deletePaddleOrgAccount", async () => {
     await getOrgAuth(orgId)
-
+    const db = await getDB()
     await db
       .delete(organizationPaddleAccount)
       .where(eq(organizationPaddleAccount.orgId, orgId))

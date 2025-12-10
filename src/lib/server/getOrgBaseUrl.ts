@@ -1,7 +1,8 @@
-import { db } from "@/db/drizzle"
 import { and, eq } from "drizzle-orm"
 import { websiteDomain } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 export const getOrgBaseUrl = async (orgId: string) => {
+  const db = await getDB()
   const activeDomain = await db.query.websiteDomain.findFirst({
     where: and(
       eq(websiteDomain.orgId, orgId),

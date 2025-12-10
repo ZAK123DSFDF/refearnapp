@@ -1,11 +1,11 @@
-import { db } from "@/db/drizzle"
 import { and, eq, gt } from "drizzle-orm"
 import { invitation } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 
 export async function getTeamValidation(teamToken?: string) {
   if (!teamToken) return null
-
-  return await db.query.invitation.findFirst({
+  const db = await getDB()
+  return db.query.invitation.findFirst({
     where: and(
       eq(invitation.token, teamToken),
       eq(invitation.accepted, false),

@@ -7,7 +7,6 @@ import {
   organizationDashboardCustomization,
   websiteDomain,
 } from "@/db/schema"
-import { db } from "@/db/drizzle"
 import { CompanyFormValues } from "@/lib/schema/companySchema"
 import jwt from "jsonwebtoken"
 import { defaultAuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
@@ -18,6 +17,7 @@ import { sanitizeDomain } from "@/util/SanitizeDomain"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 import { getUserPlan } from "@/lib/server/getUserPlan"
+import { getDB } from "@/db/drizzle"
 
 const s3Client = new S3Client({
   region: "auto",
@@ -32,6 +32,7 @@ export const CreateOrganization = async (
   input: CompanyFormValues & { mode: "create" | "add" }
 ): Promise<MutationData> => {
   return handleAction("Organization Create", async () => {
+    const db = await getDB()
     const cookieStore = await cookies()
     const token = cookieStore.get("organizationToken")?.value
     if (!token) throw { status: 401, error: "Unauthorized" }
@@ -90,7 +91,7 @@ export const CreateOrganization = async (
       .values({
         ...input,
         websiteUrl: sanitizedWebsiteName,
-        commissionValue: input.commissionValue.toFixed(2),
+        commissionValue: Number(input.commissionValue.toFixed(2)),
         userId: decoded.id,
         logoUrl: input.logoUrl || null,
       })
@@ -185,7 +186,7 @@ export async function updateOrganizationLogo({
 }): Promise<MutationData> {
   return handleAction("Update Organization Logo", async () => {
     if (!orgId) throw { status: 500, toast: "missing orgId" }
-
+    const db = await getDB()
     await db
       .update(organization)
       .set({ [field]: value })

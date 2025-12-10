@@ -1,8 +1,8 @@
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
-import { db } from "@/db/drizzle"
 import { ResponseData } from "@/lib/types/response"
 import { OrgData } from "@/lib/types/organization"
+import { getDB } from "@/db/drizzle"
 
 export const getOrgData = async (
   orgId: string,
@@ -28,7 +28,7 @@ export const getOrgData = async (
       toast: "Session invalid or expired.",
     }
   }
-
+  const db = await getDB()
   // Fetch organization data
   const org = await db.query.organization.findFirst({
     where: (org, { eq }) => eq(org.id, orgId),

@@ -1,9 +1,9 @@
 import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk"
 import { NextResponse } from "next/server"
 import { purchase, subscription } from "@/db/schema"
-import { db } from "@/db/drizzle"
 import { eq } from "drizzle-orm"
 import { decodeOrgFromCustomData } from "@/util/DecodeOrgFromCustomData"
+import { getDB } from "@/db/drizzle"
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
   environment: Environment.sandbox,
 })
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const signature = req.headers.get("paddle-signature") || ""
   const rawBody = await req.text()
   const secretKey = process.env.WEBHOOK_SECRET_KEY || ""
-
+  const db = await getDB()
   try {
     if (!signature || !rawBody) {
       console.log("❌ Missing signature or body")
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
             await db.insert(purchase).values({
               userId: decodedOrg.id,
               tier: planType,
-              price: priceAmount.toString(),
+              price: priceAmount,
               currency,
               priceId,
               isActive: false,
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
         await db.insert(purchase).values({
           userId: decodedOrg.id,
           tier: planType,
-          price: priceAmount.toString(),
+          price: priceAmount,
           priceId,
           currency,
         })
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
             id: subscriptionId,
             plan: planType,
             billingInterval,
-            price: priceAmount.toString(),
+            price: priceAmount,
             priceId,
             updatedAt: new Date(),
             expiresAt: data.billingPeriod?.endsAt

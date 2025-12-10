@@ -1,13 +1,13 @@
 "use server"
 
 import { user, account } from "@/db/schema"
-import { db } from "@/db/drizzle"
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
 import { customAlphabet } from "nanoid"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 type CreateUserPayload = {
   name: string
@@ -36,7 +36,7 @@ export const SignupServer = async ({
         },
       }
     }
-
+    const db = await getDB()
     const normalizedEmail = email.trim().toLowerCase()
     const existingUser = await db.query.user.findFirst({
       where: (u, { eq }) => eq(u.email, normalizedEmail),

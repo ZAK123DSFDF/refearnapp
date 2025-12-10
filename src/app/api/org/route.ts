@@ -1,8 +1,8 @@
 // File: /app/api/org/route.ts
-import { db } from "@/db/drizzle"
 import { affiliateLink, organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { NextResponse } from "next/server"
+import { getDB } from "@/db/drizzle"
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -11,14 +11,13 @@ const corsHeaders = {
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const code = searchParams.get("code")
-
   if (!code) {
     return NextResponse.json(
       { error: "Missing referral code" },
       { status: 400 }
     )
   }
-
+  const db = await getDB()
   const [result] = await db
     .select({
       organizationId: affiliateLink.organizationId,

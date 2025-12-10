@@ -2,8 +2,9 @@
 import { affiliatePayoutMethod } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { decodedType } from "@/lib/types/decodedType"
-import { db } from "@/db/drizzle"
+import { getDB } from "@/db/drizzle"
 export const getPayoutEmailMethod = async (decoded: decodedType) => {
+  const db = await getDB()
   return db.query.affiliatePayoutMethod.findFirst({
     where: and(
       eq(affiliatePayoutMethod.affiliateId, decoded.id),

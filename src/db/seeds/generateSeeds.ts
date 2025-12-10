@@ -1,7 +1,6 @@
 // scripts/generateSeeds.ts
 import fs from "fs"
 import path from "path"
-import { db } from "@/db/drizzle"
 import {
   affiliate,
   affiliateClick,
@@ -12,6 +11,7 @@ import {
   organizationDashboardCustomization,
   user,
 } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 
 // ensure safe Date parsing
 function parseDate(value: any): string | Date {
@@ -55,6 +55,7 @@ function rowsToTs(table: string, rows: any[]) {
 }
 
 async function generateSeeds() {
+  const db = await getDB()
   const tables = {
     organization: await db.select().from(organization),
     user: await db.select().from(user),

@@ -1,8 +1,6 @@
 // app/api/stripe/webhook/route.ts
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
-
-import { db } from "@/db/drizzle"
 import { affiliateInvoice, subscriptionExpiration } from "@/db/schema"
 import { addDays } from "date-fns"
 import { eq } from "drizzle-orm"
@@ -15,6 +13,7 @@ import { calculateExpirationDate } from "@/util/CalculateExpiration"
 import { getAffiliateLinkRecord } from "@/services/getAffiliateLinkRecord"
 import { getOrganizationById } from "@/services/getOrganizationById"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
+import { getDB } from "@/db/drizzle"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
 })
@@ -67,6 +66,7 @@ export async function POST(req: NextRequest) {
       } else if (commissionType === "fixed") {
         commission = parseFloat(commissionValue)
       }
+      const db = await getDB()
       if (subscriptionId) {
         const subscriptionExpirationRecord =
           await getSubscriptionExpiration(subscriptionId)
@@ -135,7 +135,7 @@ export async function POST(req: NextRequest) {
     case "customer.subscription.created": {
       const subscription = event.data.object as Stripe.Subscription
       const subscriptionId = subscription.id
-
+      const db = await getDB()
       console.log("✅ Subscription created:", subscriptionId)
 
       if (
@@ -219,6 +219,7 @@ export async function POST(req: NextRequest) {
     case "invoice.paid": {
       const invoice = event.data.object as Stripe.Invoice
       const invoiceCreatedDate = new Date(invoice.created * 1000)
+      const db = await getDB()
       const subscriptionId = invoice.parent?.subscription_details?.subscription
       const customerId = invoice.customer as string
       if (!subscriptionId || typeof subscriptionId !== "string") {

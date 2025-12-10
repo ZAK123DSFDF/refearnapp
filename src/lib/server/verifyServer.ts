@@ -11,10 +11,10 @@ import {
   user,
 } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { db } from "@/db/drizzle"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/assignFreeTrial"
+import { getDB } from "@/db/drizzle"
 
 type VerifyServerProps = {
   token: string
@@ -31,17 +31,14 @@ type SessionPayload = {
   activeOrgId?: string
   orgId?: string
 }
-export const VerifyServer = async ({
-  token,
-  mode,
-  redirectUrl,
-}: VerifyServerProps) => {
+export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
   let tokenType: "organization" | "affiliate" = "organization"
   let tokenRole: "owner" | "team" | null = null
   let orgIds: string[] = []
   let activeOrgId: string | undefined
   let orgId: string | undefined
   const baseUrl = await getBaseUrl()
+  const db = await getDB()
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY!) as any
 

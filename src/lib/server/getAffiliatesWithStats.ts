@@ -1,5 +1,4 @@
 "use server"
-import { db } from "@/db/drizzle"
 import {
   affiliate,
   affiliateLink,
@@ -15,6 +14,7 @@ import {
   buildAffiliateStatsSelect,
   ExcludableFields,
 } from "@/util/BuildAffiliateStatsSelect"
+import { getDB } from "@/db/drizzle"
 
 type OrderableFields =
   | "conversionRate"
@@ -96,6 +96,7 @@ export async function getAffiliatesWithStatsAction(
     const base = orderByMap[opts.orderBy] ?? emailSql
     return opts.orderDir === "asc" ? base : desc(base)
   })()
+  const db = await getDB()
   const chained = db
     .select(selectedFields)
     .from(affiliate)

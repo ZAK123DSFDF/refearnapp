@@ -1,4 +1,3 @@
-import { db } from "@/db/drizzle"
 import { eq, sql } from "drizzle-orm"
 import {
   affiliate,
@@ -7,12 +6,14 @@ import {
   affiliateLink,
 } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
+import { getDB } from "@/db/drizzle"
 
 export async function getOrganizationKpiStatsAction(
   orgId: string,
   year?: number,
   month?: number
 ) {
+  const db = await getDB()
   return db
     .select({
       totalAffiliates: sql<number>`COUNT(DISTINCT ${affiliate.id})`.mapWith(

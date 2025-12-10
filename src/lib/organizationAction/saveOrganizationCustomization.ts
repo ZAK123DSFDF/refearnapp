@@ -1,16 +1,18 @@
 import {
-  AuthCustomization,
-  DashboardCustomization,
-} from "@/app/(organization)/organization/[orgId]/dashboard/customization/action"
-import { db } from "@/db/drizzle"
-import {
   organizationAuthCustomization,
   organizationDashboardCustomization,
 } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { deepMerge } from "@/util/DeepMerge"
-import { defaultAuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
-import { defaultDashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
+import {
+  AuthCustomization,
+  defaultAuthCustomization,
+} from "@/customization/Auth/defaultAuthCustomization"
+import {
+  DashboardCustomization,
+  defaultDashboardCustomization,
+} from "@/customization/Dashboard/defaultDashboardCustomization"
+import { getDB } from "@/db/drizzle"
 
 export async function saveOrganizationCustomization(
   orgId: string,
@@ -25,7 +27,7 @@ export async function saveOrganizationCustomization(
   ) {
     throw { status: 400, toast: "No customization data provided" }
   }
-
+  const db = await getDB()
   // ---- AUTH ----
   if (data.auth && Object.keys(data.auth).length > 0) {
     // fetch existing auth row (if any)

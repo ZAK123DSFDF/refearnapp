@@ -1,12 +1,9 @@
 "use server"
-
-import { db } from "@/db/drizzle"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
-import { getBaseUrl } from "@/lib/server/getBaseUrl"
-import { buildAffiliateUrl } from "@/util/Url"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 export const ForgotPasswordTeamServer = async ({
   email,
@@ -23,7 +20,7 @@ export const ForgotPasswordTeamServer = async ({
         toast: "Please enter your email.",
       }
     }
-
+    const db = await getDB()
     const existingTeam = await db.query.team.findFirst({
       where: (a, { and, eq }) =>
         and(eq(a.email, email), eq(a.organizationId, organizationId)),

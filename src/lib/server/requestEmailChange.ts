@@ -2,7 +2,6 @@
 "use server"
 
 import jwt from "jsonwebtoken"
-import { db } from "@/db/drizzle"
 import { user, team, affiliate } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { sendVerificationEmail } from "@/lib/mail"
@@ -11,6 +10,7 @@ import { getOrganizationContext } from "@/lib/server/getOrganizationContext"
 import { getTeamContext } from "@/lib/server/getTeamContext"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
+import { getDB } from "@/db/drizzle"
 
 type BaseResponse = { ok: boolean; message?: string; redirectUrl?: string }
 
@@ -29,7 +29,7 @@ export async function requestEmailChange({
 }): Promise<BaseResponse> {
   try {
     if (!newEmail) throw { status: 400, toast: "New email required" }
-
+    const db = await getDB()
     // 🧠 Step 1: check for existing record
     if (isAffiliate && orgId) {
       const existingAffiliate = await db.query.affiliate.findFirst({

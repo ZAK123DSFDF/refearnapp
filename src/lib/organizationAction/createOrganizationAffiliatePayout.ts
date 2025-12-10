@@ -1,6 +1,6 @@
-import { db } from "@/db/drizzle"
 import { payoutReference, payoutReferencePeriods } from "@/db/schema"
 import { customAlphabet } from "nanoid"
+import { getDB } from "@/db/drizzle"
 const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 const generateRefId = customAlphabet(alphabet, 8)
 export interface CreatePayoutInput {
@@ -21,6 +21,7 @@ export async function createOrganizationAffiliatePayout({
       affiliateId,
       refId: generateRefId(),
     }))
+  const db = await getDB()
   await db.insert(payoutReference).values(
     insertedRefs.map((r) => ({
       refId: r.refId,

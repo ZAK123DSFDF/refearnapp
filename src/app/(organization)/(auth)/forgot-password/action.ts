@@ -1,10 +1,10 @@
 "use server"
 
-import { db } from "@/db/drizzle"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 export const ForgotPasswordServer = async ({
   email,
@@ -20,7 +20,7 @@ export const ForgotPasswordServer = async ({
         fields: { email: "Email is required" },
       }
     }
-
+    const db = await getDB()
     const existingUser = await db.query.user.findFirst({
       where: (u, { eq }) => eq(u.email, email),
     })

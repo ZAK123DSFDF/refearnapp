@@ -1,11 +1,11 @@
-import { db } from "@/db/drizzle"
+import { getDB } from "@/db/drizzle"
 
 export async function convertUsdToCurrency(
   amountUsd: number,
   targetCurrency: string
 ): Promise<number> {
   if (targetCurrency === "USD") return amountUsd
-
+  const db = await getDB()
   const rateRow = await db.query.exchangeRate.findFirst({
     where: (r, { eq, and }) =>
       and(eq(r.baseCurrency, "USD"), eq(r.targetCurrency, targetCurrency)),

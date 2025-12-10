@@ -1,3 +1,5 @@
+import { getDB } from "@/db/drizzle"
+
 const {
   affiliateClick_seed,
   affiliateInvoice_seed,
@@ -6,12 +8,9 @@ const {
   organizationAuthCustomization_seed,
   organizationDashboardCustomization_seed,
   organization_seed,
-  userOrganization_seed,
   user_seed,
   //@ts-ignore
 } = await import("@/db/seeds/databaseObjects")
-
-import { db } from "@/db/drizzle"
 import {
   user,
   organization,
@@ -24,6 +23,7 @@ import {
 } from "@/db/schema"
 
 async function seedFun() {
+  const db = await getDB()
   await db.insert(organization).values(organization_seed)
   await db.insert(user).values(user_seed)
   await db.insert(affiliate).values(affiliate_seed)

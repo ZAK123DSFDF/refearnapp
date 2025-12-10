@@ -1,7 +1,7 @@
 import prompts from "prompts"
-import { db } from "@/db/drizzle"
 import { subscription, purchase } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 const DEV_USER_ID = "29022934-eb52-49af-aca4-b6ed553c89dd"
 
@@ -15,6 +15,7 @@ async function devSetUserPlan({
   type: "FREE" | "SUBSCRIPTION" | "PURCHASE"
 }) {
   try {
+    const db = await getDB()
     // 🧹 Clear existing records
     await db.delete(subscription).where(eq(subscription.userId, userId))
     await db.delete(purchase).where(eq(purchase.userId, userId))

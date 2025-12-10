@@ -1,11 +1,10 @@
 "use server"
-
-import { db } from "@/db/drizzle"
 import { subscription } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 
 export async function assignFreeTrialSubscription(userId: string) {
   if (!userId) return
-
+  const db = await getDB()
   const existingSub = await db.query.subscription.findFirst({
     where: (s, { eq }) => eq(s.userId, userId),
   })

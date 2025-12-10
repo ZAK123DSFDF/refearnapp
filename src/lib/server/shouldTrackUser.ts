@@ -1,9 +1,10 @@
-import { db } from "@/db/drizzle"
 import { organization, subscription, purchase } from "@/db/schema"
 import { eq, desc } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 export async function shouldTrackUser(orgId: string) {
   // 1️⃣ Find the organization first
+  const db = await getDB()
   const org = await db.query.organization.findFirst({
     where: eq(organization.id, orgId),
   })

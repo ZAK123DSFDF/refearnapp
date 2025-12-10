@@ -1,15 +1,15 @@
 // scripts/seedExchangeRates.ts
 //@ts-ignore
 import currencyapi from "@everapi/currencyapi-js"
-import { db } from "@/db/drizzle"
 import { exchangeRate } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 
 const client = new currencyapi(process.env.CURRENCY_API_KEY!)
 
 async function fetchAndStoreExchangeRates() {
   const res = await client.latest({ base_currency: "USD", type: "fiat" })
   const now = new Date(res.meta.last_updated_at)
-
+  const db = await getDB()
   for (const [code, info] of Object.entries(res.data)) {
     const rate = (info as { value: any }).value.toString()
 

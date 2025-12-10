@@ -1,6 +1,5 @@
 // app/actions/auth/getUser.ts
 "use server"
-import { db } from "@/db/drizzle"
 import { team, teamAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import * as bcrypt from "bcrypt"
@@ -11,6 +10,7 @@ import { handleAction } from "@/lib/handleAction"
 import { getTeamAuthCapabilities } from "@/lib/server/getTeamAuthCapabilities"
 import { getCurrentTeam } from "@/lib/server/getCurrentTeam"
 import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+import { getDB } from "@/db/drizzle"
 
 export const getTeamData = async (
   orgId: string
@@ -19,7 +19,7 @@ export const getTeamData = async (
     await getTeamAuthAction(orgId)
     const { userId, canChangePassword, canChangeEmail } =
       await getTeamAuthCapabilities(orgId)
-
+    const db = await getDB()
     const teamData = await db.query.team.findFirst({
       where: eq(team.id, userId),
     })
@@ -51,7 +51,7 @@ export async function updateTeamProfile(
     const { id } = await getCurrentTeam(orgId)
     if (!id) throw { status: 401, toast: "Unauthorized" }
     if (!data.name) return { ok: true }
-
+    const db = await getDB()
     await db.update(team).set({ name: data.name }).where(eq(team.id, id))
     revalidatePath(`/organization/${orgId}/teams/dashboard/profile`)
     return { ok: true, toast: "Successfully Updated Profile" }
@@ -66,7 +66,7 @@ export async function validateCurrentTeamPassword(
     await getTeamAuthAction(orgId)
     const { id } = await getCurrentTeam(orgId)
     if (!id) throw { status: 401, toast: "Unauthorized" }
-
+    const db = await getDB()
     // Get account by userId
     const record = await db.query.teamAccount.findFirst({
       where: eq(teamAccount.teamId, id),
@@ -100,7 +100,7 @@ export async function updateTeamPassword(
     }
 
     const hashed = await bcrypt.hash(newPassword, 10)
-
+    const db = await getDB()
     const result = await db
       .update(teamAccount)
       .set({ password: hashed })

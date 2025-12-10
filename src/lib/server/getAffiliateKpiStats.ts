@@ -1,5 +1,4 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { and, eq, sql } from "drizzle-orm"
 import {
   affiliate,
@@ -8,12 +7,14 @@ import {
   affiliateLink,
 } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
+import { getDB } from "@/db/drizzle"
 export async function getAffiliateKpiStatsAction(
   orgId: string,
   affiliateId: string,
   year?: number,
   month?: number
 ) {
+  const db = await getDB()
   return db
     .select({
       totalLinks: sql<number>`COUNT(DISTINCT ${affiliateLink.id})`.mapWith(

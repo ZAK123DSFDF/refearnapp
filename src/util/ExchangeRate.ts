@@ -1,7 +1,9 @@
 "use server"
-import { db } from "@/db/drizzle"
+import { getDB } from "@/db/drizzle"
+
 export const ExchangeRate = async (targetCurrency: string) => {
   let rate = 1
+  const db = await getDB()
   if (targetCurrency !== "USD") {
     const record = await db.query.exchangeRate.findFirst({
       where: (r, { eq, and }) =>

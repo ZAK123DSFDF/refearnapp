@@ -1,13 +1,13 @@
 import { and, eq } from "drizzle-orm"
-import { db } from "@/db/drizzle"
 import { exchangeRate } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 export async function convertToUSD(
   amountSmallestUnit: number,
   currencyCode: string,
   decimals: number = 2
 ): Promise<{ amount: string; currency: string }> {
   const currency = currencyCode.toUpperCase()
-
+  const db = await getDB()
   const [rateRow] = await db
     .select()
     .from(exchangeRate)

@@ -140,3 +140,4 @@ export const defaultDashboardCustomization = {
     logoutButtonDisabledTextColor: "",
   },
 }
+export type DashboardCustomization = typeof defaultDashboardCustomization

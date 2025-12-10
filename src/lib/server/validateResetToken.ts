@@ -2,9 +2,9 @@
 "use server"
 
 import jwt from "jsonwebtoken"
-import { db } from "@/db/drizzle"
 import { user, affiliate, team } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 type ValidateResetTokenProps = {
   token: string
@@ -25,7 +25,7 @@ export const validateResetToken = async ({
       role: decoded.role,
       orgId: decoded.organizationId || decoded.orgId,
     }
-
+    const db = await getDB()
     // Make sure the account actually exists
     if (tokenType === "organization") {
       if (sessionPayload.role === "TEAM") {

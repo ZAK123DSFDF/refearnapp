@@ -1,18 +1,17 @@
 import "server-only"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
-import { db } from "@/db/drizzle"
 import { team, organization } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { OrgAuthResult } from "@/lib/types/orgAuth"
+import { getDB } from "@/db/drizzle"
 export async function getTeamAuthAction(orgId: string): Promise<OrgAuthResult> {
   const cookieStore = await cookies()
-  const cookieName = `teamToken-${orgId}`
   const token = cookieStore.get(`teamToken-${orgId}`)?.value
   if (!token) throw { status: 401, toast: "Unauthorized" }
 
   const { id: teamId } = jwt.decode(token) as { id: string }
-
+  const db = await getDB()
   // 🔹 Check if the team exists and is active
   const teamData = await db
     .select({

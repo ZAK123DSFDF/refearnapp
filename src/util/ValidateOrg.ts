@@ -1,8 +1,8 @@
 "use server"
-
-import { db } from "@/db/drizzle"
+import { getDB } from "@/db/drizzle"
 
 export async function validateOrg(orgId: string) {
+  const db = await getDB()
   const org = await db.query.organization.findFirst({
     where: (u, { eq }) => eq(u.id, orgId),
   })

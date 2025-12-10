@@ -8,6 +8,9 @@
     "build:embed": "rollup -c",
     "start": "next start",
     "lint": "next lint",
+    "wrangler:dev": "wrangler dev",
+    "opennext:build": "pnpm build && opennextjs-cloudflare build",
+    "deploy": "pnpm build && pnpm opennext:build && wrangler deploy",
     "db:reset": "bun src/db/reset.ts && npx drizzle-kit generate && npx drizzle-kit migrate && bun src/db/currencySeed.ts && bun src/db/seeds/seedFun1.ts",
     "plan:upgrade": "bun src/db/userPlanSeed.ts",
     "maildev": "maildev --smtp 1025 --web 1080",
@@ -96,7 +99,9 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251205.0",
     "@eslint/eslintrc": "^3.3.1",
+    "@opennextjs/cloudflare": "^1.14.4",
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",

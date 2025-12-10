@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import crypto from "crypto"
-import { db } from "@/db/drizzle"
 import {
   affiliateInvoice,
   organizationPaddleAccount,
@@ -17,6 +16,7 @@ import { getAffiliateLinkRecord } from "@/services/getAffiliateLinkRecord"
 import { getOrganizationById } from "@/services/getOrganizationById"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
 import { getPaddleAccount } from "@/lib/server/getPaddleAccount"
+import { getDB } from "@/db/drizzle"
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-
+      const db = await getDB()
       const existingInvoice = await db.query.affiliateInvoice.findFirst({
         where: eq(affiliateInvoice.subscriptionId, subscriptionId),
       })
@@ -158,6 +158,7 @@ export async function POST(request: NextRequest) {
         if (isSubscription) {
           const subscriptionExpirationRecord =
             await getSubscriptionExpiration(subscriptionId)
+          const db = await getDB()
           const existingInvoice = await db.query.affiliateInvoice.findFirst({
             where: eq(affiliateInvoice.subscriptionId, subscriptionId),
           })
@@ -203,6 +204,7 @@ export async function POST(request: NextRequest) {
           })
           console.log("✅ Inserted new affiliatePayment:", subscriptionId)
         } else {
+          const db = await getDB()
           // One-time purchase
           await db.insert(affiliateInvoice).values({
             paymentProvider: "paddle",
@@ -256,7 +258,7 @@ export async function POST(request: NextRequest) {
           const trialDays = calculateTrialDays(interval, frequency)
 
           expirationDate = addDays(new Date(), trialDays)
-
+          const db = await getDB()
           await db
             .update(subscriptionExpiration)
             .set({ expirationDate })
@@ -267,7 +269,7 @@ export async function POST(request: NextRequest) {
             organizationRecord.commissionDurationValue,
             organizationRecord.commissionDurationUnit
           )
-
+          const db = await getDB()
           await db.insert(subscriptionExpiration).values({
             subscriptionId,
             expirationDate,

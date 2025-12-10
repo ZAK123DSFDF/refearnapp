@@ -2,15 +2,15 @@
 "use server"
 
 import { eq } from "drizzle-orm"
-import { db } from "@/db/drizzle"
 
 import { affiliateAccount } from "@/db/schema"
 import { getCurrentAffiliateUser } from "@/lib/server/getCurrrentAffiliateUser"
+import { getDB } from "@/db/drizzle"
 
 export async function getAffiliateAuthCapabilities(orgId: string) {
   const { id } = await getCurrentAffiliateUser(orgId)
   if (!id) throw { status: 401, toast: "Unauthorized" }
-
+  const db = await getDB()
   const accounts = await db.query.affiliateAccount.findMany({
     where: eq(affiliateAccount.affiliateId, id),
   })

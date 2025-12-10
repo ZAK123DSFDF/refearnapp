@@ -3,7 +3,6 @@ import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { OAuth2Client } from "google-auth-library"
 import jwt from "jsonwebtoken"
-import { db } from "@/db/drizzle"
 import {
   user,
   account,
@@ -14,6 +13,7 @@ import {
 } from "@/db/schema"
 import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/assignFreeTrial"
+import { getDB } from "@/db/drizzle"
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     const code = url.searchParams.get("code")
     const stateRaw = url.searchParams.get("state") || ""
     const state = JSON.parse(decodeURIComponent(stateRaw || "{}"))
-
+    const db = await getDB()
     if (!code) throw new Error("Missing code from Google")
 
     const client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)

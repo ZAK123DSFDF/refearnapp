@@ -1,7 +1,7 @@
 import "dotenv/config"
-import { db } from "@/db/drizzle"
 import { payoutReference, payoutReferencePeriods } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 const refId = process.argv[2]
 
@@ -11,6 +11,7 @@ if (!refId) {
 }
 
 async function main() {
+  const db = await getDB()
   const rows = await db
     .select()
     .from(payoutReference)

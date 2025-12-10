@@ -6,8 +6,6 @@ import {
   getAuthCustomization,
   getDashboardCustomization,
   getCustomizations,
-  AuthCustomization,
-  DashboardCustomization,
 } from "@/app/(organization)/organization/[orgId]/dashboard/customization/action"
 import { useSetAtom } from "jotai"
 import {
@@ -56,6 +54,8 @@ import {
   initialPieChartColorCustomizationAtom,
   initialLogoutButtonCustomizationAtom,
 } from "@/store/DashboardChangesAtom"
+import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
+import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
 
 type CustomizationType = "auth" | "dashboard" | "both"
 

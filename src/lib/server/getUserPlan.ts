@@ -1,8 +1,8 @@
-import { db } from "@/db/drizzle"
 import { subscription, purchase } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { getOrgAuthForPlan } from "@/lib/server/getOrgAuthForPlan"
 import type { PlanInfo } from "@/lib/types/planInfo"
+import { getDB } from "@/db/drizzle"
 
 function isSubscriptionValid(sub: typeof subscription.$inferSelect | null) {
   if (!sub) return false
@@ -12,7 +12,7 @@ function isSubscriptionValid(sub: typeof subscription.$inferSelect | null) {
 
 export async function getUserPlan(): Promise<PlanInfo> {
   const { userId } = await getOrgAuthForPlan()
-
+  const db = await getDB()
   const [userSub, userPurchase] = await Promise.all([
     db.query.subscription.findFirst({ where: eq(subscription.userId, userId) }),
     db.query.purchase.findFirst({ where: eq(purchase.userId, userId) }),

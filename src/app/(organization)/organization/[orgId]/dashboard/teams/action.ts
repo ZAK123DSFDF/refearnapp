@@ -1,6 +1,4 @@
 "use server"
-
-import { db } from "@/db/drizzle"
 import { invitation, team } from "@/db/schema"
 import { and, eq, ilike } from "drizzle-orm"
 import { handleAction } from "@/lib/handleAction"
@@ -8,6 +6,7 @@ import { MutationData, ResponseData } from "@/lib/types/response"
 import { getUserPlan } from "@/lib/server/getUserPlan"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { sendVerificationEmail } from "@/lib/mail"
+import { getDB } from "@/db/drizzle"
 
 export const inviteTeamMember = async ({
   email,
@@ -37,7 +36,7 @@ export const inviteTeamMember = async ({
     }
     // 🟢 Enforce plan-based restrictions
     const plan = await getUserPlan()
-
+    const db = await getDB()
     // Fetch how many team members currently exist
     const teamCount = await db.query.team.findMany({
       where: eq(team.organizationId, orgId),
@@ -105,7 +104,7 @@ export async function getTeams(
     if (email) {
       whereClauses.push(ilike(team.email, `%${email}%`))
     }
-
+    const db = await getDB()
     const rows = await db
       .select({
         id: team.id,
@@ -141,6 +140,7 @@ export async function toggleTeamStatus({
         toast: "Free plan users cannot toggle team status",
       }
     }
+    const db = await getDB()
     await db
       .update(team)
       .set({ isActive: active })
@@ -169,6 +169,7 @@ export async function deleteTeamMember({
         toast: "Free plan users cannot delete teams.",
       }
     }
+    const db = await getDB()
     await db
       .delete(team)
       .where(and(eq(team.id, id), eq(team.organizationId, orgId)))

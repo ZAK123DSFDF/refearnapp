@@ -1,21 +1,22 @@
 import "dotenv/config"
 import prompts from "prompts"
-import { db } from "@/db/drizzle"
 import { subscription, subscriptionExpiration } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 const DEV_USER_ID = "29022934-eb52-49af-aca4-b6ed553c89dd"
 
 // ----------------------------- HELPERS -----------------------------
 
 async function clearUserPlans(userId: string) {
+  const db = await getDB()
   await db.delete(subscription).where(eq(subscription.userId, userId))
 }
 
 async function forceExpire(subscriptionId: string) {
   const expiredAt = new Date()
   expiredAt.setDate(expiredAt.getDate() - 1)
-
+  const db = await getDB()
   // main subscription table
   await db
     .update(subscription)
@@ -49,7 +50,7 @@ async function setSubscriptionPlan(
   plan: "FREE" | "PRO" | "ULTIMATE"
 ) {
   const price = plan === "FREE" ? "0" : plan === "ULTIMATE" ? "2000" : "1000"
-
+  const db = await getDB()
   const result = await db
     .insert(subscription)
     .values({

@@ -1,7 +1,5 @@
 // app/affiliate/[orgId]/reset-password/action.ts
 "use server"
-
-import { db } from "@/db/drizzle"
 import { affiliateAccount } from "@/db/schema"
 import * as bcrypt from "bcrypt"
 import { eq, and } from "drizzle-orm"
@@ -11,6 +9,7 @@ import { buildAffiliateUrl } from "@/util/Url"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 export const resetAffiliatePasswordServer = async ({
   affiliateId,
@@ -23,7 +22,7 @@ export const resetAffiliatePasswordServer = async ({
 }): Promise<MutationData> => {
   return handleAction("reset Affiliate Password", async () => {
     const hashed = await bcrypt.hash(password, 10)
-
+    const db = await getDB()
     // 🔑 Update the credentials account password (not affiliate directly)
     const [updatedAccount] = await db
       .update(affiliateAccount)

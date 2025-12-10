@@ -1,11 +1,11 @@
 "use server"
 
-import { db } from "@/db/drizzle"
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 export const LoginServer = async ({
   email,
@@ -28,7 +28,7 @@ export const LoginServer = async ({
         },
       }
     }
-
+    const db = await getDB()
     // Find the user by email
     const existingUser = await db.query.user.findFirst({
       where: (u, { eq }) => eq(u.email, email),

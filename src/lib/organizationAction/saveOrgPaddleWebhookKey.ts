@@ -1,6 +1,6 @@
-import { db } from "@/db/drizzle"
 import { organizationPaddleAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 export async function saveOrgPaddleWebhookKey({
   orgId,
@@ -12,7 +12,7 @@ export async function saveOrgPaddleWebhookKey({
   if (!orgId || !webhookPublicKey) {
     throw { status: 400, toast: "Missing orgId or webhookPublicKey" }
   }
-
+  const db = await getDB()
   // 🧩 Ensure webhook key is globally unique
   const existingKey = await db
     .select()

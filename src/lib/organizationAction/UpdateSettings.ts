@@ -1,8 +1,8 @@
-import { db } from "@/db/drizzle"
 import { organization, websiteDomain } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { OrgData } from "@/lib/types/organization"
+import { getDB } from "@/db/drizzle"
 
 export async function updateSettings(
   data: Partial<OrgData> & { id: string },
@@ -42,7 +42,7 @@ export async function updateSettings(
     ...(data.currency && { currency: data.currency }),
     ...(data.attributionModel && { attributionModel: data.attributionModel }),
   }
-
+  const db = await getDB()
   // ✅ Handle domain update
   if (data.defaultDomain) {
     const normalizedDomain = data.defaultDomain

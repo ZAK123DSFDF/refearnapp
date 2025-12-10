@@ -1,12 +1,13 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { affiliate, affiliateLink } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 export async function getAffiliateLinks(decoded: {
   orgId: string
   id: string
 }) {
+  const db = await getDB()
   const affiliates = await db
     .select({
       affiliateId: affiliate.id,

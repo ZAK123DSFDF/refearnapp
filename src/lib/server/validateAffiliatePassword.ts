@@ -1,16 +1,15 @@
 "use server"
-
-import { db } from "@/db/drizzle"
 import { eq, and } from "drizzle-orm"
 import { affiliateAccount } from "@/db/schema"
 import * as bcrypt from "bcrypt"
 import { decodedType } from "@/lib/types/decodedType"
-import { returnError } from "@/lib/errorHandler"
+import { getDB } from "@/db/drizzle"
 
 export const validateAffiliatePasswordAction = async (
   decoded: decodedType,
   currentPassword: string
 ) => {
+  const db = await getDB()
   const account = await db.query.affiliateAccount.findFirst({
     where: and(
       eq(affiliateAccount.affiliateId, decoded.id),

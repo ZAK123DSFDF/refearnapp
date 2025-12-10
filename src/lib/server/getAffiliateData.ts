@@ -1,11 +1,12 @@
 "use server"
-import { db } from "@/db/drizzle"
-import { eq, and } from "drizzle-orm"
-import { affiliate, affiliatePayoutMethod } from "@/db/schema"
+import { eq } from "drizzle-orm"
+import { affiliate } from "@/db/schema"
 import { decodedType } from "@/lib/types/decodedType"
 import { getPayoutEmailMethod } from "@/lib/server/getPayoutEmailMethod"
+import { getDB } from "@/db/drizzle"
 
 export const getAffiliateDataAction = async (decoded: decodedType) => {
+  const db = await getDB()
   const affiliateData = await db.query.affiliate.findFirst({
     where: eq(affiliate.id, decoded.id),
   })

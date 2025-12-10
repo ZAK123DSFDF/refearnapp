@@ -1,9 +1,9 @@
 // lib/server/updatePlan.ts
 import { paddleConfig } from "@/util/PaddleConfig"
 import { Paddle, Environment } from "@paddle/paddle-node-sdk"
-import { db } from "@/db/drizzle"
 import { subscription } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
   environment: Environment.sandbox,
@@ -101,7 +101,7 @@ export async function handleCancelSubscription({
   if (!priceId) {
     throw { status: 400, toast: `Missing one-time price for ${targetPlan}` }
   }
-
+  const db = await getDB()
   // 1️⃣ Load subscription
   const sub = await db.query.subscription.findFirst({
     where: eq(subscription.id, subscriptionId),

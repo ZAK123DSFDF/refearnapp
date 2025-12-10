@@ -1,13 +1,14 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { affiliate, affiliatePayoutMethod } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { decodedType } from "@/lib/types/decodedType"
+import { getDB } from "@/db/drizzle"
 
 export const updateAffiliateProfileAction = async (
   decoded: decodedType,
   data: { name?: string; paypalEmail?: string }
 ) => {
+  const db = await getDB()
   if (data.name) {
     await db
       .update(affiliate)

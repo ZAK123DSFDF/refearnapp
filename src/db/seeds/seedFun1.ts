@@ -1,4 +1,3 @@
-import { db } from "@/db/drizzle"
 import {
   user,
   organization,
@@ -31,8 +30,10 @@ import {
   user_seed,
   websiteDomain_seed,
 } from "@/db/seeds/databaseSeed"
+import { getDB } from "@/db/drizzle"
 
 async function seedFun() {
+  const db = await getDB()
   await db.insert(user).values(user_seed)
   await db.insert(account).values(account_seed)
   await db.insert(organization).values(organization_seed)

@@ -1,6 +1,5 @@
 // use server
 import { sql, inArray, eq, and, or, isNull } from "drizzle-orm"
-import { db } from "@/db/drizzle"
 import {
   affiliateInvoice,
   affiliateLink,
@@ -8,6 +7,7 @@ import {
   payoutReferencePeriods,
 } from "@/db/schema"
 import pLimit from "p-limit"
+import { getDB } from "@/db/drizzle"
 
 export interface Transaction {
   Unique_Identifier: string
@@ -19,7 +19,7 @@ export interface Transaction {
 // Bulk update invoices for given payout refs
 async function bulkUpdateInvoices(refIds: string[]) {
   if (refIds.length === 0) return { rowCount: 0 }
-
+  const db = await getDB()
   return db
     .update(affiliateInvoice)
     .set({

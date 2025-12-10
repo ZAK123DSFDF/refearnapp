@@ -1,8 +1,9 @@
-import { db } from "@/db/drizzle"
 import { and, eq, sql } from "drizzle-orm"
 import { affiliateInvoice, affiliateLink } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 
 export async function getUnpaidPayoutAction(orgId: string) {
+  const db = await getDB()
   return await db
     .select({
       month:

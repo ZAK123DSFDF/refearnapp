@@ -2,11 +2,11 @@
 
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
-import { db } from "@/db/drizzle"
 import { team } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { handleAction } from "@/lib/handleAction"
 import { ResponseData } from "@/lib/types/response"
+import { getDB } from "@/db/drizzle"
 
 export const verifyAndDeleteTeamSessionAction = async (
   orgId: string
@@ -21,7 +21,7 @@ export const verifyAndDeleteTeamSessionAction = async (
     }
 
     const { id: teamId } = jwt.decode(token) as { id: string }
-
+    const db = await getDB()
     const teamData = await db
       .select({
         id: team.id,

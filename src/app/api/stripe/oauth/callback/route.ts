@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { organizationStripeAccount } from "@/db/schema"
-import { db } from "@/db/drizzle"
 import { eq } from "drizzle-orm"
+import { getDB } from "@/db/drizzle"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
   const orgId = searchParams.get("orgId")
-
+  const db = await getDB()
   if (!code || !orgId) {
     return NextResponse.redirect(
       `${process.env.NEXT_PUBLIC_BASE_URL}/organization/${orgId || "unknown"}/stripeErrorPage?message=${encodeURIComponent("Missing params")}`

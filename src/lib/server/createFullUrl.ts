@@ -1,9 +1,10 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { generateAffiliateCode } from "@/util/idGenerators"
 import { affiliateLink } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 
 export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
+  const db = await getDB()
   const org = await db.query.organization.findFirst({
     where: (o, { eq }) => eq(o.id, decoded.orgId),
   })

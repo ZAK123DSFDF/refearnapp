@@ -1,8 +1,8 @@
-import { db } from "@/db/drizzle"
 import { affiliateClick, affiliateLink, organization } from "@/db/schema"
 import { NextRequest, NextResponse } from "next/server"
 import { eq } from "drizzle-orm"
 import { shouldTrackUser } from "@/lib/server/shouldTrackUser"
+import { getDB } from "@/db/drizzle"
 
 // CORS headers for all origins
 const corsHeaders = {
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     const data = await req.json()
 
     const { ref: refCode, host } = data
+    const db = await getDB()
     const [affiliateLinkRecord] = await db
       .select({
         linkId: affiliateLink.id,

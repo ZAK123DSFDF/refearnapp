@@ -1,7 +1,7 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { and, eq, sql } from "drizzle-orm"
 import { affiliateInvoice, affiliateLink } from "@/db/schema"
+import { getDB } from "@/db/drizzle"
 export async function getAffiliateCommissionByMonthAction(
   decoded: {
     id: string
@@ -9,6 +9,7 @@ export async function getAffiliateCommissionByMonthAction(
   },
   targetYear?: number
 ) {
+  const db = await getDB()
   return db
     .select({
       month: sql<string>`to_char(${affiliateInvoice.createdAt}, 'YYYY-MM')`,

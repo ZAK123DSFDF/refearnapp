@@ -1,7 +1,6 @@
 "use server"
 
 import { affiliate, affiliateAccount } from "@/db/schema"
-import { db } from "@/db/drizzle"
 import * as bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
@@ -10,6 +9,7 @@ import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
+import { getDB } from "@/db/drizzle"
 
 type CreateAffiliatePayload = {
   name: string
@@ -36,6 +36,7 @@ export const SignupAffiliateServer = async ({
       }
     }
     const normalizedEmail = email.trim().toLowerCase()
+    const db = await getDB()
     const existingAffiliate = await db.query.affiliate.findFirst({
       where: (a, { and, eq }) =>
         and(eq(a.email, normalizedEmail), eq(a.organizationId, organizationId)),

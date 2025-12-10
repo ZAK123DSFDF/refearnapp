@@ -1,13 +1,14 @@
 // scripts/seedOrgCustomizations.ts
-import { db } from "@/db/drizzle"
 import {
   organizationDashboardCustomization,
   organizationAuthCustomization,
 } from "@/db/schema"
 import { defaultAuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { defaultDashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
+import { getDB } from "@/db/drizzle"
 
 async function seedOrgCustomizations(orgId: string) {
+  const db = await getDB()
   await db.insert(organizationDashboardCustomization).values({
     id: orgId,
     dashboard: defaultDashboardCustomization,

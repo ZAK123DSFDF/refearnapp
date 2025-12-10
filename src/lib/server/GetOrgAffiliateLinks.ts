@@ -1,10 +1,11 @@
 "use server"
-import { db } from "@/db/drizzle"
 import { affiliate, affiliateLink } from "@/db/schema"
 import { and, eq, inArray } from "drizzle-orm"
 import { OrgAuthResult } from "@/lib/types/orgAuth"
+import { getDB } from "@/db/drizzle"
 
 export async function getOrgAffiliateLinks(org: OrgAuthResult, orgId: string) {
+  const db = await getDB()
   const affRows = await db
     .select({ id: affiliate.id, email: affiliate.email })
     .from(affiliate)

@@ -3,7 +3,7 @@ import { safeFormatAmount } from "@/util/SafeParse"
 import { getCurrencyDecimals } from "@/util/CurrencyDecimal"
 import { convertToUSD } from "@/util/CurrencyConvert"
 import { affiliateInvoice } from "@/db/schema"
-import { db } from "@/db/drizzle"
+import { getDB } from "@/db/drizzle"
 
 export const invoicePaidUpdate = async (
   total: string,
@@ -30,6 +30,7 @@ export const invoicePaidUpdate = async (
     addedCommission =
       parseFloat(invoiceAmount) < 0 ? 0 : parseFloat(commissionValue)
   }
+  const db = await getDB()
   await db.insert(affiliateInvoice).values({
     paymentProvider: "stripe",
     subscriptionId,

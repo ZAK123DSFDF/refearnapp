@@ -1,0 +1,10 @@
+name = "cloudflare-d1-worker"
+main = ".open-next/worker.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = [ "nodejs_compat" ]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "affiliate-database"
+database_id = "af513c28-4e8a-40cd-83eb-7b1a03f7ba57"
+migrations_dir = "./migrations"
