@@ -22,7 +22,7 @@ async function getLocalSubscription(userId: string) {
 async function expireSubscription(sub: any) {
   const expiredAt = new Date()
   expiredAt.setDate(expiredAt.getDate() - 1)
-
+  const db = await getDB()
   await db
     .update(subscription)
     .set({ expiresAt: expiredAt })

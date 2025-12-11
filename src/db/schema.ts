@@ -86,7 +86,7 @@ export const organization = sqliteTable("organization", {
   cookieLifetimeValue: integer("cookie_lifetime_value").default(30),
   cookieLifetimeUnit: text("cookie_lifetime_unit").default("day"),
   commissionType: text("commission_type").default("percentage"),
-  commissionValue: real("commission_value").default(0.0),
+  commissionValue: text("commission_value").default("0"),
   commissionDurationValue: integer("commission_duration_value").default(1),
   commissionDurationUnit: text("commission_duration_unit").default("day"),
   attributionModel: text("attribution_model", { enum: attributionModelValues })
@@ -174,7 +174,7 @@ export const subscription = sqliteTable("subscription", {
   plan: text("plan", { enum: planValues }).notNull().default("FREE"),
   billingInterval: text("billing_interval", { enum: billingIntervalValues }),
   currency: text("currency").default("USD"),
-  price: real("price"),
+  price: text("price").default("0"),
   priceId: text("price_id"),
   expiresAt: integer("expires_at", { mode: "timestamp" }),
   subscriptionChangeAt: integer("subscription_change_at", {
@@ -195,7 +195,7 @@ export const purchase = sqliteTable("purchase", {
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   tier: text("tier", { enum: purchaseTierValues }).notNull(),
-  price: real("price").notNull(),
+  price: text("price").notNull().default("0"),
   currency: text("currency").default("USD"),
   priceId: text("price_id"),
   isActive: integer("is_active", { mode: "boolean" }).default(true),
@@ -396,16 +396,16 @@ export const affiliateInvoice = sqliteTable("affiliate_invoice", {
   }).notNull(),
   subscriptionId: text("subscription_id"),
   customerId: text("customer_id").notNull(),
-  amount: real("amount").notNull(),
+  amount: text("amount").notNull(),
   currency: text("currency", { enum: currencyValues }).notNull(),
-  rawAmount: real("raw_amount").default(0),
+  rawAmount: text("raw_amount").default("0"),
   rawCurrency: text("raw_currency").default("USD"),
-  commission: real("commission").notNull(),
-  paidAmount: real("paid_amount").default(0).notNull(),
+  commission: text("commission").notNull(),
+  paidAmount: text("paid_amount").default("0").notNull(),
   affiliateLinkId: text("affiliate_link_id")
     .notNull()
     .references(() => affiliateLink.id, { onDelete: "cascade" }),
-  unpaidAmount: real("unpaid_amount").default(0).notNull(),
+  unpaidAmount: text("unpaid_amount").default("0").notNull(),
   reason: text("reason", { enum: affiliateInvoiceReasonValues })
     .notNull()
     .default("one_time"),

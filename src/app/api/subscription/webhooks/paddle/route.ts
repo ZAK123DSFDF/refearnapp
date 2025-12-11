@@ -90,7 +90,7 @@ export async function POST(req: Request) {
             await db.insert(purchase).values({
               userId: decodedOrg.id,
               tier: planType,
-              price: priceAmount,
+              price: priceAmount.toString(),
               currency,
               priceId,
               isActive: false,
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
         await db.insert(purchase).values({
           userId: decodedOrg.id,
           tier: planType,
-          price: priceAmount,
+          price: priceAmount.toString(),
           priceId,
           currency,
         })
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
             id: subscriptionId,
             plan: planType,
             billingInterval,
-            price: priceAmount,
+            price: priceAmount.toString(),
             priceId,
             updatedAt: new Date(),
             expiresAt: data.billingPeriod?.endsAt

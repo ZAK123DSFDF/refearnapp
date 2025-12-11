@@ -91,7 +91,7 @@ export const CreateOrganization = async (
       .values({
         ...input,
         websiteUrl: sanitizedWebsiteName,
-        commissionValue: Number(input.commissionValue.toFixed(2)),
+        commissionValue: input.commissionValue.toFixed(2),
         userId: decoded.id,
         logoUrl: input.logoUrl || null,
       })
