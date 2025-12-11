@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const customData = payload.data?.custom_data || {}
     let refDataRaw = customData.refearnapp_affiliate_code
     let secret: string | null = null
-
+    const db = await getDB()
     if (refDataRaw) {
       // ✅ Normal path with custom data
       const { code } = JSON.parse(refDataRaw)
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
-      const db = await getDB()
+
       const existingInvoice = await db.query.affiliateInvoice.findFirst({
         where: eq(affiliateInvoice.subscriptionId, subscriptionId),
       })
@@ -122,7 +122,6 @@ export async function POST(request: NextRequest) {
       case "transaction.completed": {
         const tx = payload.data
         const isSubscription = Boolean(tx.subscription_id)
-
         const customerId = tx.customer_id
         const subscriptionId = tx.subscription_id || null
         const rawCurrency = tx.details?.totals?.currency_code || "USD"
@@ -158,7 +157,7 @@ export async function POST(request: NextRequest) {
         if (isSubscription) {
           const subscriptionExpirationRecord =
             await getSubscriptionExpiration(subscriptionId)
-          const db = await getDB()
+
           const existingInvoice = await db.query.affiliateInvoice.findFirst({
             where: eq(affiliateInvoice.subscriptionId, subscriptionId),
           })
@@ -204,7 +203,6 @@ export async function POST(request: NextRequest) {
           })
           console.log("✅ Inserted new affiliatePayment:", subscriptionId)
         } else {
-          const db = await getDB()
           // One-time purchase
           await db.insert(affiliateInvoice).values({
             paymentProvider: "paddle",
@@ -239,7 +237,6 @@ export async function POST(request: NextRequest) {
         const customData = sub.custom_data || {}
         const refDataRaw = customData.refearnapp_affiliate_code
         if (!refDataRaw) break
-
         const { code } = JSON.parse(refDataRaw)
         const affiliateLinkRecord = await getAffiliateLinkRecord(code)
         if (!affiliateLinkRecord) break
@@ -256,9 +253,7 @@ export async function POST(request: NextRequest) {
           const interval = trialPeriod?.interval
           const frequency = Number(trialPeriod?.frequency || 0)
           const trialDays = calculateTrialDays(interval, frequency)
-
           expirationDate = addDays(new Date(), trialDays)
-          const db = await getDB()
           await db
             .update(subscriptionExpiration)
             .set({ expirationDate })
@@ -269,7 +264,6 @@ export async function POST(request: NextRequest) {
             organizationRecord.commissionDurationValue,
             organizationRecord.commissionDurationUnit
           )
-          const db = await getDB()
           await db.insert(subscriptionExpiration).values({
             subscriptionId,
             expirationDate,
