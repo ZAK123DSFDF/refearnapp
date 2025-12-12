@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "wrangler:dev": "wrangler dev",
-    "opennext:build": "pnpm build && opennextjs-cloudflare build",
+    "opennext:dev": "opennextjs-cloudflare dev",
+    "opennext:build": "opennextjs-cloudflare build",
     "deploy": "pnpm build && pnpm opennext:build && wrangler deploy",
     "db:reset": "bun src/db/reset.ts && npx drizzle-kit generate && npx drizzle-kit migrate && bun src/db/currencySeed.ts && bun src/db/seeds/seedFun1.ts",
     "plan:upgrade": "bun src/db/userPlanSeed.ts",
@@ -136,6 +137,6 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "wrangler": "^4.53.0"
+    "wrangler": "^4.54.0"
   }
 }

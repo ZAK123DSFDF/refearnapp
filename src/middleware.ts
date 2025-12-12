@@ -3,7 +3,7 @@ import { websiteDomain } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { getDB } from "@/db/drizzle"
 
-export async function proxy(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const host = req.headers.get("host")
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://refearnapp.com"
   if (!host) return NextResponse.next()
