@@ -61,10 +61,10 @@ export const user = sqliteTable("user", {
     .notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 
 export const organization = sqliteTable("organization", {
@@ -94,10 +94,10 @@ export const organization = sqliteTable("organization", {
   currency: text("currency", { enum: currencyValues }).notNull().default("USD"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 
 export const team = sqliteTable(
@@ -118,10 +118,10 @@ export const team = sqliteTable(
     isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
   },
   (table) => [
     unique("org_team_email_unique").on(table.email, table.organizationId),
@@ -140,10 +140,10 @@ export const teamAccount = sqliteTable("team_account", {
   password: text("password"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const account = sqliteTable("account", {
   id: text("id")
@@ -158,10 +158,10 @@ export const account = sqliteTable("account", {
   password: text("password"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const subscription = sqliteTable("subscription", {
   id: text("id")
@@ -179,11 +179,11 @@ export const subscription = sqliteTable("subscription", {
   subscriptionChangeAt: integer("subscription_change_at", {
     mode: "timestamp",
   }),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(
-    sql`unixepoch('now')`
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date()
   ),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(
-    sql`unixepoch('now')`
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date()
   ),
 })
 export const purchase = sqliteTable("purchase", {
@@ -199,8 +199,8 @@ export const purchase = sqliteTable("purchase", {
   priceId: text("price_id"),
   isActive: integer("is_active", { mode: "boolean" }).default(true),
   reason: text("reason", { enum: purchaseReasonValues }),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(
-    sql`unixepoch('now')`
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+    () => new Date()
   ),
 })
 export const affiliate = sqliteTable(
@@ -216,10 +216,10 @@ export const affiliate = sqliteTable(
       .notNull(),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -239,10 +239,10 @@ export const affiliateAccount = sqliteTable("affiliate_account", {
   password: text("password"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const websiteDomain = sqliteTable("website_domain", {
   id: text("id")
@@ -259,10 +259,10 @@ export const websiteDomain = sqliteTable("website_domain", {
     .default(false),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const organizationStripeAccount = sqliteTable(
   "organization_stripe_account",
@@ -274,10 +274,10 @@ export const organizationStripeAccount = sqliteTable(
     email: text("email"),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
   }
 )
 export const organizationPaddleAccount = sqliteTable(
@@ -289,10 +289,10 @@ export const organizationPaddleAccount = sqliteTable(
       .references(() => organization.id, { onDelete: "cascade" }),
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
   }
 )
 export const payoutReference = sqliteTable("payout_reference", {
@@ -306,7 +306,7 @@ export const payoutReference = sqliteTable("payout_reference", {
   isUnpaid: integer("is_unpaid", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const payoutReferencePeriods = sqliteTable(
   "payout_reference_periods",
@@ -334,10 +334,10 @@ export const affiliatePayoutMethod = sqliteTable("affiliate_payout_method", {
     .default(false),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const exchangeRate = sqliteTable(
   "exchange_rate",
@@ -356,10 +356,10 @@ export const affiliateLink = sqliteTable("affiliate_link", {
     .$defaultFn(() => generateAffiliateCode()),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   affiliateId: text("affiliate_id")
     .notNull()
     .references(() => affiliate.id, { onDelete: "cascade" }),
@@ -381,10 +381,10 @@ export const affiliateClick = sqliteTable("affiliate_click", {
   os: text("os"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const affiliateInvoice = sqliteTable("affiliate_invoice", {
   id: text("id")
@@ -410,10 +410,10 @@ export const affiliateInvoice = sqliteTable("affiliate_invoice", {
     .default("one_time"),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const subscriptionExpiration = sqliteTable("subscription_expiration", {
   id: text("id")
@@ -423,10 +423,10 @@ export const subscriptionExpiration = sqliteTable("subscription_expiration", {
   expirationDate: integer("expiration_date", { mode: "timestamp" }).notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const invitation = sqliteTable("invitation", {
   id: text("id")
@@ -446,10 +446,10 @@ export const invitation = sqliteTable("invitation", {
   expiresAt: integer("expires_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(sql`unixepoch('now')`),
+    .$defaultFn(() => new Date()),
 })
 export const organizationDashboardCustomization = sqliteTable(
   "organization_dashboard_customization",
@@ -462,10 +462,10 @@ export const organizationDashboardCustomization = sqliteTable(
 
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
   }
 )
 export const organizationAuthCustomization = sqliteTable(
@@ -479,9 +479,34 @@ export const organizationAuthCustomization = sqliteTable(
 
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
     updatedAt: integer("updated_at", { mode: "timestamp" })
       .notNull()
-      .default(sql`unixepoch('now')`),
+      .$defaultFn(() => new Date()),
   }
 )
+export const tables = {
+  user,
+  organization,
+  team,
+  teamAccount,
+  account,
+  subscription,
+  purchase,
+  affiliate,
+  affiliateAccount,
+  websiteDomain,
+  organizationStripeAccount,
+  organizationPaddleAccount,
+  payoutReference,
+  payoutReferencePeriods,
+  affiliatePayoutMethod,
+  exchangeRate,
+  affiliateLink,
+  affiliateClick,
+  affiliateInvoice,
+  subscriptionExpiration,
+  invitation,
+  organizationDashboardCustomization,
+  organizationAuthCustomization,
+}

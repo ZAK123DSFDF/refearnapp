@@ -1,0 +1,18 @@
+name = "affiliate-d1-admin"
+main = "src/db/seeds/admin.worker.ts"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "affiliate-database"
+database_id = "af513c28-4e8a-40cd-83eb-7b1a03f7ba57"
+[vars]
+SEED_SECRET = "super-secret-string-123"
+CURRENCY_API_KEY = "cur_live_C8ddcmKlBgXHCPArQE1rYQ54PbyM7kvRIlUm0XPG"
+
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true

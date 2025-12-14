@@ -30,10 +30,12 @@ import {
   user_seed,
   websiteDomain_seed,
 } from "@/db/seeds/databaseSeed"
-import { getDB } from "@/db/drizzle"
+import type { DrizzleD1Database } from "drizzle-orm/d1"
 
-async function seedFun() {
-  const db = await getDB()
+export async function runDatabaseSeed(
+  db: DrizzleD1Database<Record<string, never>>
+) {
+  console.log("🌱 Seeding database...")
   await db.insert(user).values(user_seed)
   await db.insert(account).values(account_seed)
   await db.insert(organization).values(organization_seed)
@@ -53,13 +55,3 @@ async function seedFun() {
     .insert(organizationDashboardCustomization)
     .values(organization_dashboard_customization_seed)
 }
-
-seedFun()
-  .then(() => {
-    console.log("✅ Auto-seed completed")
-    process.exit(0)
-  })
-  .catch((err) => {
-    console.error("❌ Auto-seed failed", err)
-    process.exit(1)
-  })
