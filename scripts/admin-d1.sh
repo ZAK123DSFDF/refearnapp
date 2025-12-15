@@ -8,6 +8,9 @@ HEADER="x-seed-secret: ${SEED_SECRET}"
 echo "🚨 Starting ADMIN D1 pipeline"
 echo "--------------------------------"
 
+echo "🚀 Deploying admin worker..."
+wrangler deploy --config wrangler.admin.toml
+
 echo "♻️ Resetting database..."
 curl -k -sS -H "${HEADER}" "${WORKER_URL}/reset"
 echo ""
