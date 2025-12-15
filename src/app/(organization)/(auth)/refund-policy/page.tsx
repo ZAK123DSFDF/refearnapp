@@ -2,12 +2,14 @@
 import React from "react"
 import type { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
+
 export const metadata: Metadata = buildMetadata({
-  title: "RefearnApp | Refund Policy Page",
-  description: "Refund Policy Page",
+  title: "RefearnApp | Refund Policy",
+  description: "Refund Policy for RefearnApp",
   url: "https://refearnapp.com/refund-policy",
   indexable: true,
 })
+
 const RefundPolicy = () => {
   const currentYear = new Date().getFullYear()
 
@@ -18,66 +20,76 @@ const RefundPolicy = () => {
       <p className="mb-6">Effective Date: {currentYear}-01-01</p>
 
       <p className="mb-6">
-        At RefearnApp, we aim to provide high-quality software and services that
-        meet your expectations. This Refund Policy outlines our approach to
-        refunds and subscription cancellations for our SaaS platform.
+        This Refund Policy explains how refunds and subscription cancellations
+        are handled for RefearnApp (“RefearnApp”, “we”, “our”, or “us”). By
+        purchasing a subscription, you agree to the terms outlined below.
       </p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">
-        1. Subscription Refunds
+        1. Subscription Payments
       </h2>
       <p className="mb-4">
-        All payments for subscriptions are processed through{" "}
-        <strong>Paddle</strong>. We offer refunds for purchases made within{" "}
-        <strong>14 days</strong> of the original payment date. Refunds requested
-        after the 14-day refund window will not be accepted.
+        All payments for RefearnApp subscriptions are processed by{" "}
+        <strong>Polar.sh</strong>, which acts as our{" "}
+        <strong>Merchant of Record</strong>. Polar is responsible for payment
+        processing, tax handling, and refunds in accordance with applicable
+        laws.
       </p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">
-        2. How to Request a Refund
+        2. Refund Eligibility
       </h2>
       <p className="mb-4">
-        To request a refund, please contact our support team at{" "}
-        <strong>support@refearnapp.com</strong> with the following information:
+        You may request a refund within <strong>14 days</strong> of your initial
+        subscription purchase, provided the request complies with applicable
+        consumer protection laws. Refund requests submitted after this period
+        are generally not eligible for approval.
+      </p>
+
+      <h2 className="text-2xl font-semibold mt-8 mb-4">
+        3. How to Request a Refund
+      </h2>
+      <p className="mb-4">
+        To request a refund, please contact us at{" "}
+        <strong>support@refearnapp.com</strong> and include:
       </p>
       <ul className="list-disc list-inside space-y-2">
-        <li>Your account email and subscription details.</li>
-        <li>The reason for your refund request.</li>
-        <li>Any relevant order or payment information.</li>
+        <li>The email address associated with your account</li>
+        <li>Your subscription or order details</li>
+        <li>A brief explanation of the refund request</li>
       </ul>
 
-      <h2 className="text-2xl font-semibold mt-8 mb-4">3. Paddle Refunds</h2>
+      <h2 className="text-2xl font-semibold mt-8 mb-4">4. Refund Processing</h2>
       <p className="mb-4">
-        If your refund is approved, it will be processed through{" "}
-        <strong>Paddle</strong> using the same payment method used for the
-        original purchase. Refund processing times may vary based on your bank
-        or payment provider, typically taking 5–10 business days.
+        If your refund request is approved, the refund will be processed by{" "}
+        <strong>Polar</strong> using the original payment method. Processing
+        times vary depending on your bank or payment provider and typically take
+        between 5 and 10 business days.
       </p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">
-        4. Cancellation of Subscription
+        5. Subscription Cancellation
       </h2>
       <p className="mb-4">
         You may cancel your subscription at any time through your account
-        settings. After cancellation, your subscription will remain active until
-        the end of your current billing cycle. No additional charges will be
-        applied after cancellation. Cancellation does not entitle you to a
-        refund outside the 14-day refund window.
+        settings. Upon cancellation, your access will remain active until the
+        end of the current billing period. Cancellation does not automatically
+        entitle you to a refund outside the 14-day refund window.
       </p>
 
       <h2 className="text-2xl font-semibold mt-8 mb-4">
-        5. No Refunds for Partial Use
+        6. Non-Refundable Cases
       </h2>
       <p className="mb-4">
-        We do not offer refunds for partially used subscription periods,
-        downgraded plans, or unused features outside the 14-day refund window.
+        Except where required by law, we do not provide refunds for partially
+        used billing periods, unused features, plan downgrades, or renewals
+        after the refund eligibility period has passed.
       </p>
 
-      <h2 className="text-2xl font-semibold mt-8 mb-4">6. Contact Us</h2>
+      <h2 className="text-2xl font-semibold mt-8 mb-4">7. Contact</h2>
       <p className="mb-4">
-        If you have any questions about this Refund Policy or need assistance
-        with a refund request, please contact our support team at{" "}
-        <strong>support@refearnapp.com</strong>.
+        If you have questions about this Refund Policy or need assistance,
+        please contact us at <strong>support@refearnapp.com</strong>.
       </p>
 
       <p className="text-sm mt-12">
