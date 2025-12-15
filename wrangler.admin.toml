@@ -5,10 +5,7 @@ compatibility_date = "2025-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "affiliate-database"
-database_id = "af513c28-4e8a-40cd-83eb-7b1a03f7ba57"
-[vars]
-SEED_SECRET = "super-secret-string-123"
-CURRENCY_API_KEY = "cur_live_C8ddcmKlBgXHCPArQE1rYQ54PbyM7kvRIlUm0XPG"
+database_id = "38902e0c-e08c-461f-a1f7-a5a6f9d50ae2"
 
 [observability]
 [observability.logs]

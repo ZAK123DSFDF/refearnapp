@@ -12,20 +12,19 @@ const allTableNames = tableObjects
 export async function runDatabaseReset(
   db: DrizzleD1Database<Record<string, never>>
 ) {
-  console.log("♻️ this is the start")
+  const tables = await db.all<{ name: string }>(sql`
+    SELECT name
+    FROM sqlite_master
+    WHERE type='table'
+      AND name NOT LIKE 'sqlite_%'
+      AND name != '__drizzle_migrations'
+  `)
 
-  const tablesToDrop = allTableNames.filter(
-    (name) => name !== "__drizzle_migrations"
-  )
-  console.log("table filtered")
   await db.run(sql`PRAGMA foreign_keys = OFF;`)
-  console.log("db run successful")
-  // reverse for FK safety
-  for (const tableName of [...tablesToDrop].reverse()) {
-    console.log(`Dropping table: ${tableName}`)
-    await db.run(sql`DROP TABLE IF EXISTS ${sql.identifier(tableName)};`)
+
+  for (const { name } of tables.reverse()) {
+    await db.run(sql.raw(`DROP TABLE IF EXISTS "${name}"`))
   }
-  console.log("for loop successful")
+
   await db.run(sql`PRAGMA foreign_keys = ON;`)
-  console.log("✅ Reset execution completed.")
 }

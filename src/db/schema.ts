@@ -5,7 +5,6 @@ import {
   unique,
   primaryKey,
 } from "drizzle-orm/sqlite-core"
-import { sql } from "drizzle-orm"
 import {
   generateAffiliateClickId,
   generateAffiliateCode,
@@ -458,7 +457,9 @@ export const organizationDashboardCustomization = sqliteTable(
       .primaryKey()
       .references(() => organization.id, { onDelete: "cascade" }),
 
-    dashboard: text("dashboard").$type<DashboardCustomization>(),
+    dashboard: text("dashboard", {
+      mode: "json",
+    }).$type<DashboardCustomization>(),
 
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
@@ -475,7 +476,7 @@ export const organizationAuthCustomization = sqliteTable(
       .primaryKey()
       .references(() => organization.id, { onDelete: "cascade" }),
 
-    auth: text("auth").$type<AuthCustomization>(),
+    auth: text("auth", { mode: "json" }).$type<AuthCustomization>(),
 
     createdAt: integer("created_at", { mode: "timestamp" })
       .notNull()
