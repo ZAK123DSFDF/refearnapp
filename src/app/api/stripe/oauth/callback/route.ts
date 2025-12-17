@@ -4,11 +4,10 @@ import { organizationStripeAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { getDB } from "@/db/drizzle"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-})
-
 export async function GET(request: Request) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-08-27.basil",
+  })
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
   const orgId = searchParams.get("orgId")

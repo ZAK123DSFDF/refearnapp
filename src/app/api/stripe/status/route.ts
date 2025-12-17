@@ -3,11 +3,11 @@ import Stripe from "stripe"
 import { organizationStripeAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { getDB } from "@/db/drizzle"
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-})
 
 export async function POST(req: Request) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-08-27.basil",
+  })
   try {
     const { orgId } = await req.json()
     if (!orgId) {
