@@ -2,7 +2,7 @@
 "use server"
 
 import { account } from "@/db/schema"
-import * as bcrypt from "bcrypt"
+import * as bcrypt from "bcryptjs"
 import { eq, and } from "drizzle-orm"
 import jwt from "jsonwebtoken"
 import { cookies } from "next/headers"

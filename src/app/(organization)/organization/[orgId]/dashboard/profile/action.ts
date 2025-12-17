@@ -2,7 +2,7 @@
 "use server"
 import { account, user } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import * as bcrypt from "bcrypt"
+import * as bcrypt from "bcryptjs"
 import { MutationData, ResponseData } from "@/lib/types/response"
 import { SafeUserWithCapabilities } from "@/lib/types/authUser"
 import { revalidatePath } from "next/cache"

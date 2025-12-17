@@ -1,7 +1,7 @@
 "use server"
 
 import { team, teamAccount } from "@/db/schema"
-import * as bcrypt from "bcrypt"
+import * as bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
 import { customAlphabet } from "nanoid"

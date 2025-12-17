@@ -1,7 +1,7 @@
 "use server"
 import { eq, and } from "drizzle-orm"
 import { affiliateAccount } from "@/db/schema"
-import * as bcrypt from "bcrypt"
+import * as bcrypt from "bcryptjs"
 import { decodedType } from "@/lib/types/decodedType"
 import { getDB } from "@/db/drizzle"
 

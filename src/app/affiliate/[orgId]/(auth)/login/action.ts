@@ -1,5 +1,5 @@
 "use server"
-import * as bcrypt from "bcrypt"
+import * as bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import { sendVerificationEmail } from "@/lib/mail"
 import { buildAffiliateUrl } from "@/util/Url"

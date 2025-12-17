@@ -47,9 +47,41 @@ export default {
       console.log("[ACTION] Executing CURRENCY update.")
       await runCurrencySeed(db, env.CURRENCY_API_KEY)
       return new Response("💵 Currency rates updated", { status: 200 })
-    }
+    } else if (url.pathname.endsWith("/query")) {
+      const { sql, params, method } = (await req.json()) as {
+        sql: string
+        params: any[]
+        method: "all" | "run" | "get" | "values"
+      }
 
-    // --- 4. FALLBACK ---
+      try {
+        const stmt = env.DB.prepare(sql).bind(...params)
+        let result: any
+        switch (method) {
+          case "get":
+            result = await stmt.first()
+            break
+          case "all":
+            const allRes = await stmt.all()
+            result = allRes.results
+            break
+          case "values":
+            result = await stmt.raw()
+            break
+          case "run":
+            result = await stmt.run()
+            break
+          default:
+            throw new Error(`Unsupported method: ${method}`)
+        }
+        const rows =
+          result === null ? [] : Array.isArray(result) ? result : [result]
+        return Response.json(rows)
+      } catch (e: any) {
+        console.error("D1 Query Error:", e.message)
+        return new Response(e.message, { status: 500 })
+      }
+    }
     console.log("[END] No matching action found.")
     return new Response("Admin Worker: Action Not Found", { status: 404 })
   },
