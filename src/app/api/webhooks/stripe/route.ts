@@ -14,13 +14,13 @@ import { getAffiliateLinkRecord } from "@/services/getAffiliateLinkRecord"
 import { getOrganizationById } from "@/services/getOrganizationById"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
 import { getDB } from "@/db/drizzle"
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-})
-
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-08-27.basil",
+  })
+
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
   console.log("incoming webhook request")
   const sig = req.headers.get("stripe-signature")!
   const body = await req.text()
