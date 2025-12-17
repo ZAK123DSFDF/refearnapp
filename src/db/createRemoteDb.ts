@@ -3,7 +3,6 @@ export async function createRemoteDb() {
   const adminUrl =
     "https://affiliate-d1-admin.zekariyasberihun8.workers.dev/query"
   const secret = process.env.SEED_SECRET ?? ""
-
   return fetch(adminUrl, {
     method: "POST",
     headers: {
