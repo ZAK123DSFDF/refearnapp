@@ -73,7 +73,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.484.0",
     "nanoid": "^5.1.6",
-    "next": "16.0.7",
+    "next": "16.0.10",
     "nodemailer": "^7.0.11",
     "p-limit": "^7.2.0",
     "papaparse": "^5.5.3",
