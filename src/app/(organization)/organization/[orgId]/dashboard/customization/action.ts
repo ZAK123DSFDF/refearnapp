@@ -7,16 +7,19 @@ import {
 } from "@/db/schema"
 
 import { eq } from "drizzle-orm"
-import { defaultAuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
-import { defaultDashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
+import {
+  AuthCustomization,
+  defaultAuthCustomization,
+} from "@/customization/Auth/defaultAuthCustomization"
+import {
+  DashboardCustomization,
+  defaultDashboardCustomization,
+} from "@/customization/Dashboard/defaultDashboardCustomization"
 import { deepMerge } from "@/util/DeepMerge"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 import { saveOrganizationCustomization } from "@/lib/organizationAction/saveOrganizationCustomization"
-
-export type AuthCustomization = typeof defaultAuthCustomization
-export type DashboardCustomization = typeof defaultDashboardCustomization
 
 export async function saveCustomizationsAction(
   orgId: string,

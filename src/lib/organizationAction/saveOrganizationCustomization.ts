@@ -1,7 +1,3 @@
-import {
-  AuthCustomization,
-  DashboardCustomization,
-} from "@/app/(organization)/organization/[orgId]/dashboard/customization/action"
 import { db } from "@/db/drizzle"
 import {
   organizationAuthCustomization,
@@ -9,8 +5,14 @@ import {
 } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { deepMerge } from "@/util/DeepMerge"
-import { defaultAuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
-import { defaultDashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
+import {
+  AuthCustomization,
+  defaultAuthCustomization,
+} from "@/customization/Auth/defaultAuthCustomization"
+import {
+  DashboardCustomization,
+  defaultDashboardCustomization,
+} from "@/customization/Dashboard/defaultDashboardCustomization"
 
 export async function saveOrganizationCustomization(
   orgId: string,
