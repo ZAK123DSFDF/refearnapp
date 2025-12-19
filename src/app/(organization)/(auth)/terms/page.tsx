@@ -51,7 +51,6 @@ export default function TermsPage() {
           Merchant of Record. By making a purchase, you agree to Paddle’s Terms
           and Privacy Policy in addition to these Terms.
         </p>
-
         <h3 className="text-lg font-medium">4.1 Payments</h3>
         <p>
           All payments are securely handled through Paddle on behalf of{" "}
