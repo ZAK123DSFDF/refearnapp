@@ -1,6 +1,7 @@
-import { neon } from "@neondatabase/serverless"
-import { drizzle } from "drizzle-orm/neon-http"
+import { drizzle } from "drizzle-orm/postgres-js"
+import postgres from "postgres"
 import * as schema from "@/db/schema"
 
-const sql = neon(process.env.DATABASE_URL!)
-export const db = drizzle({ client: sql, schema })
+// This uses the Transaction Pooler URL (6543)
+const client = postgres(process.env.SUPABASE_DATABASE_URL!, { prepare: false })
+export const db = drizzle(client, { schema })

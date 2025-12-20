@@ -19,8 +19,7 @@ export interface Transaction {
 // Bulk update invoices for given payout refs
 async function bulkUpdateInvoices(refIds: string[]) {
   if (refIds.length === 0) return { rowCount: 0 }
-
-  return db
+  const result = await db
     .update(affiliateInvoice)
     .set({
       paidAmount: sql`${affiliateInvoice.paidAmount} + ${affiliateInvoice.unpaidAmount}`,
@@ -61,6 +60,8 @@ async function bulkUpdateInvoices(refIds: string[]) {
         )
       )
     )
+    .returning({ id: affiliateInvoice.id })
+  return { rowCount: result.length }
 }
 
 // Process transactions from PayPal
