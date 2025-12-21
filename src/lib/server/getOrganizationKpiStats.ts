@@ -45,7 +45,7 @@ export async function getOrganizationKpiStatsAction(
       ),
     })
     .from(affiliate)
-    .innerJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
     .leftJoin(
       affiliateClick,
       buildWhereWithDate(
