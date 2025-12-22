@@ -2,156 +2,125 @@ import {
   buildAuthCustomizationSeed,
   buildDashboardCustomizationSeed,
 } from "@/util/CustomizationSeed"
+import {
+  generateAffiliateClickId,
+  generateAffiliateCode,
+  generateAffiliatePaymentLinkId,
+} from "@/util/idGenerators"
 
 const parseDate = (str: string) => {
   const fixed = str.replace(" ", "T").replace(/(\.\d{3})\d+/, "$1") + "Z"
   return new Date(fixed)
 }
-export const affiliate_seed = [
-  {
-    id: "dd01db57-233b-4dd2-9230-d132c9462c03",
-    name: "zak",
-    email: "zak@gmail.com",
+const ORG_ID = "tp7JLBb5"
+const PASSWORD_HASH =
+  "$2b$10$PnbuKyGgf4XRYCHUr.EDtu6yTaVgGdihZM/u5q54Jryix9xYRG0q2"
+const PAYPAL_PERSONAL_EMAILS = Array.from(
+  { length: 20 },
+  (_, i) => `personal-sb-${i + 1}@test.example.com`
+)
+const INVOICE_REASONS = [
+  "one_time",
+  "subscription_create",
+  "subscription_update",
+] as const
+const randomInt = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min
+
+const randomDateIn2025 = () => {
+  const month = randomInt(0, 11) // JS months 0–11
+  const day = randomInt(1, 28) // safe for all months
+  const hour = randomInt(0, 23)
+  const minute = randomInt(0, 59)
+  const second = randomInt(0, 59)
+
+  return new Date(Date.UTC(2025, month, day, hour, minute, second))
+}
+
+export const affiliate_seed = Array.from({ length: 20 }, (_, i) => {
+  const index = i === 0 ? "" : i.toString()
+
+  return {
+    id: crypto.randomUUID(),
+    name: `zak${index}`,
+    email: `zak${index}@gmail.com`,
     type: "AFFILIATE" as const,
-    createdAt: parseDate("2025-07-16 11:51:09.338106"),
-    updatedAt: parseDate("2025-07-16 11:51:09.338106"),
-    organizationId: "tp7JLBb5",
-  },
-]
-export const affiliate_click_seed = [
-  {
-    id: "49tLBh1i",
-    affiliateLinkId: "fWL6hk",
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-    referrer: "unknown",
-    deviceType: "desktop",
-    browser: "Chrome",
-    os: "Windows",
-    createdAt: parseDate("2025-07-16 15:29:57.940116"),
-    updatedAt: parseDate("2025-07-16 15:29:57.940116"),
-  },
-  {
-    id: "twMQa5ZP",
-    affiliateLinkId: "7NyEjR",
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-    referrer: "unknown",
-    deviceType: "desktop",
-    browser: "Chrome",
-    os: "Windows",
-    createdAt: parseDate("2025-07-16 15:22:46.261015"),
-    updatedAt: parseDate("2025-07-16 15:22:46.261015"),
-  },
-]
-export const affiliate_invoice_seed = [
-  {
-    id: "pay_Gy5iQw4H8",
-    paymentProvider: "stripe" as const,
-    subscriptionId: "sub_1RlXCb4gdP9i8VnszkmkpkvO",
-    customerId: "cus_Sgv2TtRQI8unK2",
-    amount: "20.00",
-    currency: "USD" as const,
-    commission: "10.00",
-    paidAmount: "0.00",
-    affiliateLinkId: "7NyEjR",
-    unpaidAmount: "10.00",
-    reason: "subscription_create" as const,
-    createdAt: parseDate("2025-07-16 15:26:16.894221"),
-    updatedAt: parseDate("2025-07-16 15:26:16.894221"),
-  },
-  {
-    id: "pay_SLQGzPGq6",
-    paymentProvider: "stripe" as const,
-    subscriptionId: null,
-    customerId: "cus_oneTime_yarRPovbr6EZKF",
-    amount: "30.00",
-    currency: "USD" as const,
-    commission: "15.00",
-    paidAmount: "0.00",
-    affiliateLinkId: "7NyEjR",
-    unpaidAmount: "15.00",
-    reason: "one_time" as const,
-    createdAt: parseDate("2025-06-06 15:28:42"),
-    updatedAt: parseDate("2025-07-16 15:28:42"),
-  },
-  {
-    id: "pay_X17ybFwtv",
-    paymentProvider: "stripe" as const,
-    subscriptionId: "sub_1RlXCb4gdP9i8VnszkmkpkvO",
-    customerId: "cus_Sgv2TtRQI8unK2",
-    amount: "-20.00",
-    currency: "USD" as const,
-    commission: "-10.00",
-    paidAmount: "0.00",
-    affiliateLinkId: "7NyEjR",
-    unpaidAmount: "-10.00",
-    reason: "subscription_update" as const,
-    createdAt: parseDate("2025-07-16 15:26:38.589908"),
-    updatedAt: parseDate("2025-07-16 15:26:38.589908"),
-  },
-  {
-    id: "pay_iCVk6n4yP",
-    paymentProvider: "stripe" as const,
-    subscriptionId: "sub_1RlXCb4gdP9i8VnszkmkpkvO",
-    customerId: "cus_Sgv2TtRQI8unK2",
-    amount: "20.00",
-    currency: "USD" as const,
-    commission: "10.00",
-    paidAmount: "0.00",
-    affiliateLinkId: "7NyEjR",
-    unpaidAmount: "10.00",
-    reason: "subscription_update" as const,
-    createdAt: parseDate("2025-07-23 15:25:04"),
-    updatedAt: parseDate("2025-07-16 15:25:04.430337"),
-  },
-  {
-    id: "pay_jSLhrynfa",
-    paymentProvider: "stripe" as const,
-    subscriptionId: "sub_1RlXCb4gdP9i8VnszkmkpkvO",
-    customerId: "cus_Sgv2TtRQI8unK2",
-    amount: "-19.99",
-    currency: "USD" as const,
-    commission: "-10.00",
-    paidAmount: "0.00",
-    affiliateLinkId: "7NyEjR",
-    unpaidAmount: "-9.99",
-    reason: "subscription_update" as const,
-    createdAt: parseDate("2025-07-16 15:31:15.986216"),
-    updatedAt: parseDate("2025-07-16 15:31:15.986216"),
-  },
-  {
-    id: "pay_kxChw76Cv",
-    paymentProvider: "stripe" as const,
-    subscriptionId: "sub_1RlXCb4gdP9i8VnszkmkpkvO",
-    customerId: "cus_Sgv2TtRQI8unK2",
-    amount: "19.99",
-    currency: "USD" as const,
-    commission: "10.00",
-    paidAmount: "0.00",
-    affiliateLinkId: "7NyEjR",
-    unpaidAmount: "9.99",
-    reason: "subscription_update" as const,
-    createdAt: parseDate("2025-07-16 15:31:00.903045"),
-    updatedAt: parseDate("2025-07-16 15:31:00.903045"),
-  },
-]
-export const affiliate_link_seed = [
-  {
-    id: "7NyEjR",
-    createdAt: parseDate("2025-07-16 11:52:26.183274"),
-    updatedAt: parseDate("2025-07-16 11:52:26.183274"),
-    affiliateId: "dd01db57-233b-4dd2-9230-d132c9462c03",
-    organizationId: "tp7JLBb5",
-  },
-  {
-    id: "fWL6hk",
-    createdAt: parseDate("2025-07-16 14:54:05.474716"),
-    updatedAt: parseDate("2025-07-16 14:54:05.474716"),
-    affiliateId: "dd01db57-233b-4dd2-9230-d132c9462c03",
-    organizationId: "tp7JLBb5",
-  },
-]
+    organizationId: ORG_ID,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }
+})
+export const affiliate_link_seed = affiliate_seed.flatMap((affiliate) => {
+  const firstDate = randomDateIn2025()
+  const secondDate = randomDateIn2025()
+
+  return [
+    {
+      id: generateAffiliateCode(),
+      affiliateId: affiliate.id,
+      organizationId: ORG_ID,
+      createdAt: firstDate,
+      updatedAt: firstDate,
+    },
+    {
+      id: generateAffiliateCode(),
+      affiliateId: affiliate.id,
+      organizationId: ORG_ID,
+      createdAt: secondDate,
+      updatedAt: secondDate,
+    },
+  ]
+})
+export const affiliate_click_seed = affiliate_link_seed.flatMap((link) => {
+  const clicksCount = randomInt(1, 4)
+
+  return Array.from({ length: clicksCount }, () => {
+    const date = randomDateIn2025()
+
+    return {
+      id: generateAffiliateClickId(),
+      affiliateLinkId: link.id,
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+      referrer: "unknown",
+      deviceType: "desktop",
+      browser: "Chrome",
+      os: "Windows",
+      createdAt: date,
+      updatedAt: date,
+    }
+  })
+})
+
+export const affiliate_invoice_seed = affiliate_link_seed.flatMap((link) => {
+  const invoiceCount = randomInt(0, 2)
+
+  return Array.from({ length: invoiceCount }, () => {
+    const date = randomDateIn2025()
+    const amount = randomInt(10, 100)
+    const commission = Math.round(amount * 0.5 * 100) / 100 // 50%
+
+    return {
+      id: generateAffiliatePaymentLinkId(),
+      paymentProvider: "stripe" as const,
+      subscriptionId:
+        Math.random() > 0.5 ? `sub_${crypto.randomUUID().slice(0, 10)}` : null,
+      customerId: `cus_${crypto.randomUUID().slice(0, 10)}`,
+      amount: amount.toFixed(2),
+      currency: "USD" as const,
+      rawAmount: amount.toFixed(2),
+      rawCurrency: "USD",
+      commission: commission.toFixed(2),
+      paidAmount: "0.00",
+      unpaidAmount: commission.toFixed(2),
+      affiliateLinkId: link.id,
+      reason: INVOICE_REASONS[randomInt(0, INVOICE_REASONS.length - 1)],
+      createdAt: date,
+      updatedAt: date,
+    }
+  })
+})
+
 export const organization_seed = [
   {
     id: "tp7JLBb5",
@@ -250,18 +219,28 @@ export const account_seed = [
   },
 ]
 
-export const affiliate_account_seed = [
-  {
-    id: "a1b2c3d4-e5f6-7890-1234-56789abcdef0", // constant UUID
-    affiliateId: "dd01db57-233b-4dd2-9230-d132c9462c03",
-    provider: "credentials" as const,
-    providerAccountId: "zak@gmail.com",
-    password: "$2b$10$PnbuKyGgf4XRYCHUr.EDtu6yTaVgGdihZM/u5q54Jryix9xYRG0q2",
-    emailVerified: parseDate("2025-07-16 11:51:09.338106"),
-    createdAt: parseDate("2025-07-16 11:51:09.338106"),
-    updatedAt: parseDate("2025-07-16 11:51:09.338106"),
-  },
-]
+export const affiliate_account_seed = affiliate_seed.map((affiliate) => ({
+  id: crypto.randomUUID(),
+  affiliateId: affiliate.id,
+  provider: "credentials" as const,
+  providerAccountId: affiliate.email,
+  password: PASSWORD_HASH,
+  emailVerified: new Date(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}))
+export const affiliate_payout_method_seed = affiliate_seed.map(
+  (affiliate, index) => ({
+    id: crypto.randomUUID(),
+    affiliateId: affiliate.id,
+    provider: "paypal" as const,
+    accountIdentifier:
+      PAYPAL_PERSONAL_EMAILS[index % PAYPAL_PERSONAL_EMAILS.length],
+    isDefault: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  })
+)
 export const team_seed = [
   {
     id: "4a2e1a11-bef7-49f9-9333-52123c9e99aa",
