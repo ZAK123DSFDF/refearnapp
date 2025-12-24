@@ -1,7 +1,7 @@
 "use server"
 import { getAffiliateOrganization } from "@/lib/server/GetAffiliateOrganization"
 import { revalidatePath } from "next/cache"
-import { MutationData, ResponseData } from "@/lib/types/response"
+import { ActionResult, MutationData } from "@/lib/types/response"
 import { AffiliateLinkWithStats } from "@/lib/types/affiliateLinkWithStats"
 import { getAffiliateLinksWithStatsAction } from "@/lib/server/getAffiliateLinksWithStats"
 import { createFullUrl } from "@/lib/server/createFullUrl"
@@ -30,7 +30,7 @@ export const getAffiliateLinksWithStats = async (
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<AffiliateLinkWithStats[]>> => {
+): Promise<ActionResult<AffiliateLinkWithStats[]>> => {
   return handleAction("getAffiliateLinksWithStats", async () => {
     const decoded = await getAffiliateOrganization(orgId)
     const rows = await getAffiliateLinksWithStatsAction(decoded, year, month)

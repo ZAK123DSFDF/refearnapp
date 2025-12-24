@@ -1,5 +1,5 @@
 import { returnError } from "@/lib/errorHandler"
-import type { ResponseData, MutationData } from "@/lib/types/response"
+import { MutationData, ActionResult } from "@/lib/types/response"
 
 /**
  * Generic wrapper for async server actions.
@@ -11,7 +11,7 @@ import type { ResponseData, MutationData } from "@/lib/types/response"
  * @param fn - The async function to execute
  * @param measureTime - Whether to log execution time (default: true)
  */
-export async function handleAction<T extends ResponseData<any> | MutationData>(
+export async function handleAction<T extends ActionResult<any> | MutationData>(
   name: string | null,
   fn: () => Promise<T>,
   measureTime: boolean = true

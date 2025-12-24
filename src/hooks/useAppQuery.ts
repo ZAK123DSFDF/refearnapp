@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { UnpaidMonth } from "@/lib/types/unpaidMonth"
 
 interface UseAppQueryOptions {
@@ -15,7 +15,7 @@ interface AppQueryResult<TData> {
 
 export function useAppQuery<Args extends unknown[], TData>(
   queryKey: (string | number | undefined | UnpaidMonth[])[],
-  fetchFn: (...args: Args) => Promise<ResponseData<TData>>,
+  fetchFn: (...args: Args) => Promise<ActionResult<TData>>,
   fetchArgs: Args,
   options?: UseAppQueryOptions
 ): AppQueryResult<TData> {

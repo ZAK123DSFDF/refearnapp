@@ -91,13 +91,13 @@ export default function PayoutTable({
     ],
     fetchPayoutsBulk,
     [
+      "TABLE",
       orgId,
       selectedMonths,
       filters.orderBy,
       filters.orderDir,
       filters.offset,
       filters.email,
-      "TABLE",
     ],
     {
       enabled: !!(
@@ -170,8 +170,12 @@ export default function PayoutTable({
         isUnpaid: isUnpaidMode,
         months,
       })
+      if (!insertedRefs.ok) {
+        throw new Error(insertedRefs.error)
+      }
+
       const refMap = Object.fromEntries(
-        insertedRefs.map((r) => [r.affiliateId, r.refId])
+        insertedRefs.data.map((r) => [r.affiliateId, r.refId])
       )
 
       const enrichedTable = tableData.map((row) => ({
@@ -219,6 +223,7 @@ export default function PayoutTable({
     ],
     fetchPayouts,
     [
+      "TABLE",
       orgId,
       filters.year,
       filters.month,
@@ -226,7 +231,6 @@ export default function PayoutTable({
       filters.orderDir,
       filters.offset,
       filters.email,
-      "TABLE",
     ],
     {
       enabled: !!(!affiliate && orgId) && !isUnpaidMode,

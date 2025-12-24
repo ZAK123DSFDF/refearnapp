@@ -4,7 +4,7 @@ import { db } from "@/db/drizzle"
 import { invitation, team } from "@/db/schema"
 import { and, eq, ilike } from "drizzle-orm"
 import { handleAction } from "@/lib/handleAction"
-import { MutationData, ResponseData } from "@/lib/types/response"
+import { ActionResult, MutationData } from "@/lib/types/response"
 import { getUserPlan } from "@/lib/server/getUserPlan"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { sendVerificationEmail } from "@/lib/mail"
@@ -98,7 +98,7 @@ export async function getTeams(
   offset?: number,
   email?: string
 ): Promise<
-  ResponseData<{
+  ActionResult<{
     rows: TeamRow[]
     hasNext: boolean
   }>

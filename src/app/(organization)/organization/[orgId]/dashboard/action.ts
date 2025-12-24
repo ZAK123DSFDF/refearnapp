@@ -1,7 +1,7 @@
 "use server"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { getOrgAffiliateLinks } from "@/lib/server/GetOrgAffiliateLinks"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { OrganizationKpiStats } from "@/lib/types/affiliateKpiStats"
 import { OrganizationKpiTimeSeries } from "@/lib/types/affiliateChartStats"
 import { getTimeSeriesData } from "@/lib/server/getTimeSeriesData"
@@ -18,7 +18,7 @@ export async function getOrganizationKpiStats(
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<OrganizationKpiStats[]>> {
+): Promise<ActionResult<OrganizationKpiStats[]>> {
   return handleAction("fetching Organization KPI Stats", async () => {
     const org = await getOrgAuth(orgId)
     const [row] = await getOrganizationKpiStatsAction(orgId, year, month)
@@ -41,7 +41,7 @@ export async function getOrganizationKpiTimeSeries(
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<OrganizationKpiTimeSeries[]>> {
+): Promise<ActionResult<OrganizationKpiTimeSeries[]>> {
   return handleAction("fetching Organization KPI Time Series", async () => {
     const org = await getOrgAuth(orgId)
     const { linkIds } = await getOrgAffiliateLinks(org, orgId)
@@ -58,7 +58,7 @@ export async function getOrganizationReferrer(
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<OrganizationReferrerStat[]>> {
+): Promise<ActionResult<OrganizationReferrerStat[]>> {
   return handleAction("fetching Organization Referrer Stats", async () => {
     const org = await getOrgAuth(orgId)
     const { linkIds } = await getOrgAffiliateLinks(org, orgId)
@@ -70,7 +70,7 @@ export async function getTopAffiliates(
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<AffiliateStats[]>> {
+): Promise<ActionResult<AffiliateStats[]>> {
   return handleAction("fetching Top Affiliates", async () => {
     const org = await getOrgAuth(orgId)
     const TopAffiliateStats = (await getTopAffiliatesByConversionRate(

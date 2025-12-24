@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getAffiliatePaymentMethod } from "@/app/affiliate/[orgId]/dashboard/profile/action"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { useDashboardCard } from "@/hooks/useDashboardCard"
 import { cn } from "@/lib/utils"
 import { DashboardCardCustomizationOptions } from "@/components/ui-custom/Customization/DashboardCustomization/DashboardCardCustomizationOptions"
@@ -35,7 +35,7 @@ export function MissingPaypalEmailCard({
     useAtomValue(dashboardThemeCustomizationAtom)
   const { dashboardButtonTextColor, dashboardButtonBackgroundColor } =
     useAtomValue(dashboardButtonCustomizationAtom)
-  const { data, isLoading } = useQuery<ResponseData<AffiliatePaymentMethod>>({
+  const { data, isLoading } = useQuery<ActionResult<AffiliatePaymentMethod>>({
     queryKey: ["affiliatePaymentMethod", orgId],
     queryFn: () => getAffiliatePaymentMethod(orgId), // pass orgId here
     enabled: !!(!isPreview && affiliate && orgId),

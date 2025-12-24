@@ -1,6 +1,6 @@
 // app/actions/auth/getUser.ts
 "use server"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { SafeAffiliateWithCapabilities } from "@/lib/types/authAffiliate"
 import { revalidatePath } from "next/cache"
 import { getAffiliateOrganization } from "@/lib/server/GetAffiliateOrganization"
@@ -17,7 +17,7 @@ import { handleAction } from "@/lib/handleAction"
 
 export const getAffiliateData = async (
   orgId: string
-): Promise<ResponseData<SafeAffiliateWithCapabilities>> => {
+): Promise<ActionResult<SafeAffiliateWithCapabilities>> => {
   return handleAction("getAffiliateData", async () => {
     const decoded = await getAffiliateOrganization(orgId)
     const { canChangeEmail, canChangePassword } =
@@ -31,7 +31,7 @@ export const getAffiliateData = async (
 }
 export const getAffiliatePaymentMethod = async (
   orgId: string
-): Promise<ResponseData<AffiliatePaymentMethod>> => {
+): Promise<ActionResult<AffiliatePaymentMethod>> => {
   return handleAction("getAffiliatePaymentMethod", async () => {
     const decoded = await getAffiliateOrganization(orgId)
     const paypalMethod = await getPayoutEmailMethod(decoded)

@@ -1,6 +1,6 @@
 "use server"
 import { OrgData } from "@/lib/types/organization"
-import { MutationData, ResponseData } from "@/lib/types/response"
+import { ActionResult, MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 import { getOrgData } from "@/lib/server/getOrgData"
 import { updateSettings } from "@/lib/organizationAction/UpdateSettings"
@@ -10,7 +10,7 @@ import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
 
 export const orgTeamInfo = async (
   orgId: string
-): Promise<ResponseData<OrgData>> => {
+): Promise<ActionResult<OrgData>> => {
   return handleAction("org Team Info", async () => {
     return await getOrgData(orgId, true)
   })

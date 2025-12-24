@@ -1,117 +1,113 @@
 "use server"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { UnpaidMonth } from "@/lib/types/unpaidMonth"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { AffiliatePayout } from "@/lib/types/affiliateStats"
-import { getAffiliatePayoutBulkAction } from "@/lib/server/getAffiliatePayoutBulk"
 import { getUnpaidPayoutAction } from "@/lib/server/getUnpaidPayout"
-import { getAffiliatePayoutAction } from "@/lib/server/getAffiliatePayout"
 import { OrderBy, OrderDir } from "@/lib/types/orderTypes"
-import { convertedCurrency } from "@/util/ConvertedCurrency"
 import { handleAction } from "@/lib/handleAction"
-import {
-  createOrganizationAffiliatePayout,
-  CreatePayoutInput,
-} from "@/lib/organizationAction/createOrganizationAffiliatePayout"
+import { createOrganizationAffiliatePayout } from "@/lib/organizationAction/createOrganizationAffiliatePayout"
 import { PayoutResult } from "@/lib/types/payoutResult"
+import { getAffiliatePayoutData } from "@/lib/server/getAffiliatePayoutData"
+import { getAffiliatePayoutBulkData } from "@/lib/server/getAffiliatePayoutBulkData"
+import { InsertedRef } from "@/lib/types/insertedRef"
+import { CreatePayoutInput } from "@/lib/types/createPayoutInput"
 export async function getAffiliatePayouts(
+  mode: "TABLE" | "EXPORT" = "TABLE",
   orgId: string,
   year?: number,
   month?: number,
   orderBy?: OrderBy,
   orderDir?: OrderDir,
   offset?: number,
-  email?: string,
-  mode: "TABLE" | "EXPORT" = "TABLE"
-): Promise<ResponseData<PayoutResult<AffiliatePayout>>> {
+  email?: string
+): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
   return handleAction("getAffiliatePayouts", async () => {
     const org = await getOrgAuth(orgId)
-    const PAGE_SIZE = 10
-    const isExport = mode === "EXPORT"
-    const rows = (await getAffiliatePayoutAction(
+    return getAffiliatePayoutData(
+      mode,
+      org,
       orgId,
       year,
       month,
-      orderBy === "none" ? undefined : orderBy,
+      orderBy,
       orderDir,
-      isExport ? undefined : PAGE_SIZE + 1,
-      isExport ? undefined : ((offset ?? 1) - 1) * PAGE_SIZE,
+      offset,
       email
-    )) as AffiliatePayout[]
-    const converted = await convertedCurrency<AffiliatePayout>(
-      org.currency,
-      rows
     )
-    if (isExport) {
-      return {
-        ok: true,
-        data: {
-          mode: "EXPORT",
-          rows: converted,
-        },
-      }
-    }
-
-    return {
-      ok: true,
-      data: {
-        mode: "TABLE",
-        rows: converted.slice(0, PAGE_SIZE),
-        hasNext: converted.length > PAGE_SIZE,
-      },
-    }
+  })
+}
+export async function getExportAffiliatePayouts(
+  orgId: string,
+  year?: number,
+  month?: number,
+  orderBy?: OrderBy,
+  orderDir?: OrderDir,
+  email?: string
+): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
+  return handleAction("getExportAffiliatePayouts", async () => {
+    const org = await getOrgAuth(orgId)
+    return getAffiliatePayoutData(
+      "EXPORT",
+      org,
+      orgId,
+      year,
+      month,
+      orderBy,
+      orderDir,
+      undefined,
+      email
+    )
   })
 }
 export async function getAffiliatePayoutsBulk(
+  mode: "TABLE" | "EXPORT" = "TABLE",
   orgId: string,
   months: { month: number; year: number }[],
   orderBy?: OrderBy,
   orderDir?: OrderDir,
   offset?: number,
-  email?: string,
-  mode: "TABLE" | "EXPORT" = "TABLE"
-): Promise<ResponseData<PayoutResult<AffiliatePayout>>> {
+  email?: string
+): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
   return handleAction("getAffiliatePayoutsBulk", async () => {
     const org = await getOrgAuth(orgId)
-    const PAGE_SIZE = 10
-    const isExport = mode === "EXPORT"
-    const rows = (await getAffiliatePayoutBulkAction(
+    return getAffiliatePayoutBulkData(
+      mode,
+      org,
       orgId,
       months,
-      orderBy === "none" ? undefined : orderBy,
+      orderBy,
       orderDir,
-      isExport ? undefined : PAGE_SIZE + 1,
-      isExport ? undefined : ((offset ?? 1) - 1) * PAGE_SIZE,
+      offset,
       email
-    )) as AffiliatePayout[]
-    const converted = await convertedCurrency<AffiliatePayout>(
-      org.currency,
-      rows
     )
-    if (isExport) {
-      return {
-        ok: true,
-        data: {
-          mode: "EXPORT",
-          rows: converted,
-        },
-      }
-    }
-
-    return {
-      ok: true,
-      data: {
-        mode: "TABLE",
-        rows: converted.slice(0, PAGE_SIZE),
-        hasNext: converted.length > PAGE_SIZE,
-      },
-    }
+  })
+}
+export async function getExportAffiliatePayoutsBulk(
+  orgId: string,
+  months: { month: number; year: number }[],
+  orderBy?: OrderBy,
+  orderDir?: OrderDir,
+  email?: string
+): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
+  return handleAction("getExportAffiliatePayoutsBulk", async () => {
+    const org = await getOrgAuth(orgId)
+    return getAffiliatePayoutBulkData(
+      "EXPORT",
+      org,
+      orgId,
+      months,
+      orderBy,
+      orderDir,
+      undefined,
+      email
+    )
   })
 }
 
 export async function getUnpaidMonths(
   orgId: string
-): Promise<ResponseData<UnpaidMonth[]>> {
+): Promise<ActionResult<UnpaidMonth[]>> {
   return handleAction("getUnpaidMonths", async () => {
     await getOrgAuth(orgId)
     const rows = await getUnpaidPayoutAction(orgId)
@@ -126,18 +122,20 @@ export async function getUnpaidMonths(
     }
   })
 }
-
 export async function createAffiliatePayouts({
   orgId,
   affiliateIds,
   isUnpaid,
   months,
-}: CreatePayoutInput) {
-  await getOrgAuth(orgId)
-  return await createOrganizationAffiliatePayout({
-    orgId,
-    affiliateIds,
-    isUnpaid,
-    months,
+}: CreatePayoutInput): Promise<ActionResult<InsertedRef[]>> {
+  return handleAction("createAffiliatePayouts", async () => {
+    await getOrgAuth(orgId)
+    const insertedRefs = await createOrganizationAffiliatePayout({
+      orgId,
+      affiliateIds,
+      isUnpaid,
+      months,
+    })
+    return { ok: true, data: insertedRefs }
   })
 }

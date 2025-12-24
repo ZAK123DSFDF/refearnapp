@@ -1,7 +1,7 @@
 // app/actions/auth/orgInfo.ts
 "use server"
 import { OrgData } from "@/lib/types/organization"
-import { MutationData, ResponseData } from "@/lib/types/response"
+import { ActionResult, MutationData } from "@/lib/types/response"
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { handleAction } from "@/lib/handleAction"
 import { getOrgData } from "@/lib/server/getOrgData"
@@ -11,7 +11,7 @@ import { verifyOrgARECORD } from "@/lib/organizationAction/verifyOrgARECORD"
 
 export const orgInfo = async (
   orgId: string
-): Promise<ResponseData<OrgData>> => {
+): Promise<ActionResult<OrgData>> => {
   return handleAction("orgInfo", async () => {
     await getOrgAuth(orgId)
     return await getOrgData(orgId, false)

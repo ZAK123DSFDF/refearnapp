@@ -4,7 +4,7 @@ import { db } from "@/db/drizzle"
 import { team, teamAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import * as bcrypt from "bcrypt"
-import { MutationData, ResponseData } from "@/lib/types/response"
+import { ActionResult, MutationData } from "@/lib/types/response"
 import { SafeTeamWithCapabilities } from "@/lib/types/authUser"
 import { revalidatePath } from "next/cache"
 import { handleAction } from "@/lib/handleAction"
@@ -14,7 +14,7 @@ import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
 
 export const getTeamData = async (
   orgId: string
-): Promise<ResponseData<SafeTeamWithCapabilities>> => {
+): Promise<ActionResult<SafeTeamWithCapabilities>> => {
   return handleAction("get Team Data", async () => {
     await getTeamAuthAction(orgId)
     const { userId, canChangePassword, canChangeEmail } =

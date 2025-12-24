@@ -2,7 +2,7 @@
 "use server"
 import { getAffiliateOrganization } from "@/lib/server/GetAffiliateOrganization"
 import { AffiliatePaymentRow } from "@/lib/types/affiliatePaymentRow"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { getAffiliateCommissionByMonthAction } from "@/lib/server/getAffiliateCommissionByMonth"
 import { getOrganization } from "@/lib/server/getOrganization"
 import { ExchangeRate } from "@/util/ExchangeRate"
@@ -11,7 +11,7 @@ import { handleAction } from "@/lib/handleAction"
 export const getAffiliateCommissionByMonth = async (
   orgId: string,
   year?: number
-): Promise<ResponseData<AffiliatePaymentRow[]>> => {
+): Promise<ActionResult<AffiliatePaymentRow[]>> => {
   return handleAction("getAffiliateCommissionByMonth", async () => {
     const decoded = await getAffiliateOrganization(orgId)
     const targetYear = year ?? new Date().getFullYear()

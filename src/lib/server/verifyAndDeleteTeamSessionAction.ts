@@ -6,11 +6,11 @@ import { db } from "@/db/drizzle"
 import { team } from "@/db/schema"
 import { eq, and } from "drizzle-orm"
 import { handleAction } from "@/lib/handleAction"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 
 export const verifyAndDeleteTeamSessionAction = async (
   orgId: string
-): Promise<ResponseData<{ reason: string }>> => {
+): Promise<ActionResult<{ reason: string }>> => {
   return handleAction("Verify and Delete Team Session", async () => {
     const cookieStore = await cookies()
     const cookieName = `teamToken-${orgId}`

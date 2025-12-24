@@ -1,7 +1,7 @@
 "use server"
 import { AffiliateKpiStats } from "@/lib/types/affiliateKpiStats"
 import { getAffiliateOrganization } from "@/lib/server/GetAffiliateOrganization"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { AffiliateReferrerStat } from "@/lib/types/affiliateReferrerStat"
 import { AffiliateKpiTimeSeries } from "@/lib/types/affiliateChartStats"
 import { getAffiliateLinks } from "@/lib/server/getAffiliateLinks"
@@ -16,7 +16,7 @@ export async function getAffiliateKpiStats(
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<AffiliateKpiStats[]>> {
+): Promise<ActionResult<AffiliateKpiStats[]>> {
   return handleAction("getAffiliateKpiStats", async () => {
     const decoded = await getAffiliateOrganization(orgId)
     const [row] = await getAffiliateKpiStatsAction(
@@ -44,7 +44,7 @@ export async function getAffiliateKpiTimeSeries(
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<AffiliateKpiTimeSeries[]>> {
+): Promise<ActionResult<AffiliateKpiTimeSeries[]>> {
   return handleAction("getAffiliateKpiTimeSeries", async () => {
     const decoded = await getAffiliateOrganization(orgId)
     const { linkIds } = await getAffiliateLinks(decoded)
@@ -64,7 +64,7 @@ export async function getAffiliateReferrers(
   orgId: string,
   year?: number,
   month?: number
-): Promise<ResponseData<AffiliateReferrerStat[]>> {
+): Promise<ActionResult<AffiliateReferrerStat[]>> {
   return handleAction("getAffiliateReferrers", async () => {
     const decoded = await getAffiliateOrganization(orgId)
 

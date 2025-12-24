@@ -1,13 +1,13 @@
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import { db } from "@/db/drizzle"
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { OrgData } from "@/lib/types/organization"
 
 export const getOrgData = async (
   orgId: string,
   isTeam: boolean = false
-): Promise<ResponseData<OrgData>> => {
+): Promise<ActionResult<OrgData>> => {
   const cookieStore = await cookies()
   const tokenKey = isTeam ? `teamToken-${orgId}` : "organizationToken"
   const token = cookieStore.get(tokenKey)?.value

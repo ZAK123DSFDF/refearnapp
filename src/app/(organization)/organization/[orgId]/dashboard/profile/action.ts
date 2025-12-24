@@ -4,16 +4,15 @@ import { db } from "@/db/drizzle"
 import { account, user } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import * as bcrypt from "bcrypt"
-import { MutationData, ResponseData } from "@/lib/types/response"
+import { ActionResult, MutationData } from "@/lib/types/response"
 import { SafeUserWithCapabilities } from "@/lib/types/authUser"
 import { revalidatePath } from "next/cache"
 import { getUserAuthCapabilities } from "@/lib/server/getUserAuthCapabilities"
 import { getCurrentUser } from "@/lib/server/getCurrentUser"
 import { handleAction } from "@/lib/handleAction"
-import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 
 export const getUserData = async (): Promise<
-  ResponseData<SafeUserWithCapabilities>
+  ActionResult<SafeUserWithCapabilities>
 > => {
   return handleAction("getUserData", async () => {
     const { userId, canChangePassword, canChangeEmail } =

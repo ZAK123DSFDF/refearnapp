@@ -1,6 +1,6 @@
 "use server"
 
-import { ResponseData } from "@/lib/types/response"
+import { ActionResult } from "@/lib/types/response"
 import { AffiliateBasePayout, AffiliateStats } from "@/lib/types/affiliateStats"
 import { getAffiliatesWithStatsAction } from "@/lib/server/getAffiliatesWithStats"
 import { OrderBy, OrderDir } from "@/lib/types/orderTypes"
@@ -17,7 +17,7 @@ export async function getTeamAffiliatesWithStats(
   offset?: number,
   email?: string
 ): Promise<
-  ResponseData<{
+  ActionResult<{
     rows: AffiliateStats[]
     hasNext: boolean
   }>

@@ -1,20 +1,16 @@
 import { db } from "@/db/drizzle"
 import { payoutReference, payoutReferencePeriods } from "@/db/schema"
 import { customAlphabet } from "nanoid"
+import { InsertedRef } from "@/lib/types/insertedRef"
+import { CreatePayoutInput } from "@/lib/types/createPayoutInput"
 const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 const generateRefId = customAlphabet(alphabet, 8)
-export interface CreatePayoutInput {
-  orgId: string
-  affiliateIds: string[]
-  isUnpaid: boolean
-  months: { year: number; month?: number }[]
-}
 export async function createOrganizationAffiliatePayout({
   orgId,
   affiliateIds,
   isUnpaid,
   months,
-}: CreatePayoutInput) {
+}: CreatePayoutInput): Promise<InsertedRef[]> {
   if (affiliateIds.length === 0) return []
   const insertedRefs: { affiliateId: string; refId: string }[] =
     affiliateIds.map((affiliateId) => ({

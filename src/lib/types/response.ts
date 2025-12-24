@@ -1,4 +1,4 @@
-export type ResponseData<T> =
+export type ActionResult<T> =
   | {
       ok: true
       data: T
@@ -15,5 +15,5 @@ export type ResponseData<T> =
       data?: any
     }
 export type MutationData =
-  | Omit<Extract<ResponseData<any>, { ok: true }>, "data">
-  | Extract<ResponseData<any>, { ok: false }>
+  | Omit<Extract<ActionResult<any>, { ok: true }>, "data">
+  | Extract<ActionResult<any>, { ok: false }>
