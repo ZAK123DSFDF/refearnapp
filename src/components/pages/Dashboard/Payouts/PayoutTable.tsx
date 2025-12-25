@@ -14,10 +14,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import {
   createAffiliatePayouts,
+  createExportAffiliatePayouts,
+  createExportAffiliatePayoutsBulk,
   getAffiliatePayouts,
   getAffiliatePayoutsBulk,
-  getExportAffiliatePayouts,
-  getExportAffiliatePayoutsBulk,
   getUnpaidMonths,
 } from "@/app/(organization)/organization/[orgId]/dashboard/payout/action"
 import { useEffect, useState } from "react"
@@ -36,16 +36,19 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { TableView } from "@/components/ui-custom/TableView"
 import {
   createTeamAffiliatePayouts,
+  createTeamExportAffiliatePayouts,
+  createTeamExportAffiliatePayoutsBulk,
   getTeamAffiliatePayouts,
   getTeamAffiliatePayoutsBulk,
-  getTeamExportAffiliatePayouts,
-  getTeamExportAffiliatePayoutsBulk,
   getTeamUnpaidMonths,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/payout/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { useAppMutation } from "@/hooks/useAppMutation"
-import { InsertedRef } from "@/lib/types/insertedRef"
+import { PayoutResult } from "@/lib/types/payoutResult"
+import { AffiliatePayout } from "@/lib/types/affiliateStats"
 import { ActionResult } from "@/lib/types/response"
+import { useCachedValidation } from "@/hooks/useCachedValidation"
+import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 
 interface AffiliatesTablePayoutProps {
   orgId: string
@@ -68,6 +71,7 @@ export default function PayoutTable({
   const { filters, setFilters } = useQueryFilter()
   const [unpaidOpen, setUnpaidOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const { showCustomToast } = useCustomToast()
   const fetchPayouts = isTeam ? getTeamAffiliatePayouts : getAffiliatePayouts
   const fetchPayoutsBulk = isTeam
     ? getTeamAffiliatePayoutsBulk
@@ -76,20 +80,29 @@ export default function PayoutTable({
   const createPayouts = isTeam
     ? createTeamAffiliatePayouts
     : createAffiliatePayouts
+  const createExportPayout = isTeam
+    ? createTeamExportAffiliatePayouts
+    : createExportAffiliatePayouts
+  const createExportPayoutsBulk = isTeam
+    ? createTeamExportAffiliatePayoutsBulk
+    : createExportAffiliatePayoutsBulk
+  const createExportPayoutMutation = useAppMutation(createExportPayout, {
+    affiliate,
+    disableSuccessToast: true,
+  })
+  const createExportPayoutsBulkMutation = useAppMutation(
+    createExportPayoutsBulk,
+    {
+      affiliate,
+      disableSuccessToast: true,
+    }
+  )
   const normalizedMonths = getNormalizedMonths(
     isUnpaidMode,
     selectedMonths,
     filters
   )
-  const createPayoutMutation = useAppMutation<
-    ActionResult<InsertedRef[]>,
-    {
-      orgId: string
-      affiliateIds: string[]
-      isUnpaid: boolean
-      months: { year: number; month: number }[]
-    }
-  >(createPayouts, {
+  const createPayoutMutation = useAppMutation(createPayouts, {
     affiliate,
     disableSuccessToast: true,
   })
@@ -131,52 +144,6 @@ export default function PayoutTable({
       ),
     }
   )
-  const exportQuery = isUnpaidMode
-    ? useAppQuery(
-        [
-          "export-payouts-bulk",
-          orgId,
-          normalizedMonths,
-          filters.orderBy,
-          filters.orderDir,
-          filters.email,
-        ],
-        isTeam
-          ? getTeamExportAffiliatePayoutsBulk
-          : getExportAffiliatePayoutsBulk,
-        [
-          orgId,
-          normalizedMonths.map((m) => ({
-            year: m.year,
-            month: m.month ?? 0,
-          })),
-          filters.orderBy,
-          filters.orderDir,
-          filters.email,
-        ],
-        { enabled: false }
-      )
-    : useAppQuery(
-        [
-          "export-payouts",
-          orgId,
-          filters.year,
-          filters.month,
-          filters.orderBy,
-          filters.orderDir,
-          filters.email,
-        ],
-        isTeam ? getTeamExportAffiliatePayouts : getExportAffiliatePayouts,
-        [
-          orgId,
-          filters.year,
-          filters.month,
-          filters.orderBy,
-          filters.orderDir,
-          filters.email,
-        ],
-        { enabled: false }
-      )
   async function generateCSV(tableData: any[]) {
     const header = "PayPal Email,Amount,Currency,Note\n"
 
@@ -192,64 +159,136 @@ export default function PayoutTable({
 
     return header + rows.join("\n")
   }
-  const handleExport = async () => {
-    // 1️⃣ Fetch export data (non-paginated, validated)
-    const res = await exportQuery.refetch()
-
-    if (!res.data?.data) return
-
-    const exportRows = res.data.data.rows
-    exportRows.map((r) => r.id)
-
-    // 2️⃣ Create payouts (refs)
-    type MonthFilter = { year: number; month: number }
-
-    let months: MonthFilter[] = []
+  const getSelectedMonths = (): { year: number; month: number }[] => {
     if (isUnpaidMode) {
-      months = normalizedMonths.map((m) => ({
+      return normalizedMonths.map((m) => ({
         year: m.year,
         month: m.month ?? 0,
       }))
-    } else if (filters.year) {
-      months = [{ year: filters.year, month: filters.month ?? 0 }]
     }
 
+    if (filters.year) {
+      return [{ year: filters.year, month: filters.month ?? 0 }]
+    }
+
+    return []
+  }
+  const buildPayoutKey = (
+    months: { year: number; month: number }[],
+    isUnpaidMode: boolean
+  ) => {
+    const normalizedMonths = months
+      .map((m) => `${m.year}-${m.month}`)
+      .sort()
+      .join("|")
+
+    return `mode:${isUnpaidMode ? "unpaid" : "regular"}|months:${normalizedMonths}`
+  }
+  const payoutCache = useCachedValidation({
+    id: "signup-email",
+    orgId: orgId,
+    affiliate: false,
+    cacheDurationMs: 2 * 60 * 1000,
+    showError: (msg) =>
+      showCustomToast({
+        type: "error",
+        title: "Failed",
+        description: msg,
+        affiliate: false,
+      }),
+    errorMessage: "No unpaid commissions with PayPal email found",
+    maxCacheSize: 10,
+  })
+  const createRefAndDownloadCSV = (
+    res: ActionResult<PayoutResult<AffiliatePayout>>,
+    months: { year: number; month: number }[]
+  ) => {
+    if (!res.ok || !res.data) return
+    const affiliateIds = res.data.rows.map((r) => r.id)
     createPayoutMutation.mutate(
       {
         orgId,
-        affiliateIds: exportRows.map((r) => r.id),
+        affiliateIds,
         isUnpaid: isUnpaidMode,
         months,
       },
       {
-        onSuccess: async (mutationRes) => {
-          if (!mutationRes.ok || !mutationRes.data) return
-
-          // 3️⃣ Attach refs
+        onSuccess: async (resPayout) => {
+          if (!resPayout.ok || !resPayout.data) return
           const refMap = Object.fromEntries(
-            mutationRes.data.map((r) => [r.affiliateId, r.refId])
+            resPayout.data.map((r) => [r.affiliateId, r.refId])
           )
-
-          const enrichedRows = exportRows.map((row) => ({
+          const enrichedRows = res.data.rows.map((row) => ({
             ...row,
             refId: refMap[row.id] ?? null,
           }))
-
-          // 4️⃣ Generate & download CSV
           const csv = await generateCSV(enrichedRows)
           downloadCSV(csv)
         },
       }
     )
   }
+  const runExportMutation = (
+    params: {
+      months: { year: number; month: number }[]
+    },
+    onSuccess: (res: ActionResult<PayoutResult<AffiliatePayout>>) => void
+  ) => {
+    if (isUnpaidMode) {
+      createExportPayoutsBulkMutation.mutate(
+        {
+          orgId,
+          months: params.months,
+          orderBy: filters.orderBy,
+          orderDir: filters.orderDir,
+          email: filters.email,
+        },
+        { onSuccess }
+      )
+    } else {
+      createExportPayoutMutation.mutate(
+        {
+          orgId,
+          year: filters.year,
+          month: filters.month,
+          orderBy: filters.orderBy,
+          orderDir: filters.orderDir,
+          email: filters.email,
+        },
+        { onSuccess }
+      )
+    }
+  }
+
+  const handleExport = () => {
+    const months = getSelectedMonths()
+    const key = buildPayoutKey(months, isUnpaidMode)
+    if (payoutCache.shouldSkip(key)) return
+    runExportMutation({ months }, (res) => {
+      if (!res.ok || !res.data || res.data.rows.length === 0) {
+        payoutCache.addFailedValue(key)
+        return
+      }
+      createRefAndDownloadCSV(res, months)
+    })
+  }
 
   const handleMassPayout = () => {
+    const months = getSelectedMonths()
     const isDev = process.env.NODE_ENV === "development"
     const baseUrl = isDev
       ? "https://www.sandbox.paypal.com/mep/payoutsweb"
       : "https://www.paypal.com/mep/payoutsweb"
-
-    window.open(baseUrl, "_blank")
+    const openPayPal = () => window.open(baseUrl, "_blank")
+    const key = buildPayoutKey(months, isUnpaidMode)
+    if (payoutCache.shouldSkip(key)) return
+    runExportMutation({ months }, (res) => {
+      if (!res.ok || !res.data || res.data.rows.length === 0) {
+        payoutCache.addFailedValue(key)
+        return
+      }
+      openPayPal()
+    })
   }
   const {
     data: regularPayouts,
@@ -432,9 +471,6 @@ export default function PayoutTable({
                 variant="outline"
                 onClick={handleExport}
                 className="w-full sm:w-auto"
-                disabled={
-                  exportQuery.isPending || createPayoutMutation.isPending
-                }
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export CSV

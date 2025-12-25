@@ -10,6 +10,7 @@ export function useCachedValidation({
   showError,
   errorMessage,
   maxCacheSize = 10,
+  cacheDurationMs,
 }: {
   id: string
   orgId?: string
@@ -17,12 +18,13 @@ export function useCachedValidation({
   showError: (msg: string) => void
   errorMessage: string
   maxCacheSize?: number
+  cacheDurationMs?: number
 }) {
   const cacheScope = buildCacheScope(affiliate, orgId)
   const atom = useMemo(() => getCacheAtom(id, cacheScope), [id, cacheScope])
   const [cache, setCache] = useAtom(atom)
 
-  const EXPIRY_MS = 5 * 60 * 1000 // 300,000 ms
+  const EXPIRY_MS = cacheDurationMs ?? 5 * 60 * 1000
   useEffect(() => {
     const interval = setInterval(() => {
       setCache((prev) => {

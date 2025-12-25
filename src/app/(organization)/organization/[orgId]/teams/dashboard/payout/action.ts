@@ -14,6 +14,8 @@ import { getAffiliatePayoutBulkData } from "@/lib/server/getAffiliatePayoutBulkD
 import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { InsertedRef } from "@/lib/types/insertedRef"
 import { CreatePayoutInput } from "@/lib/types/createPayoutInput"
+import { ExportAffiliatePayouts } from "@/lib/types/exportAffiliatePayout"
+import { ExportAffiliatePayoutsBulk } from "@/lib/types/exportAffiliatePayoutBulk"
 export async function getTeamAffiliatePayouts(
   mode: "TABLE" | "EXPORT" = "TABLE",
   orgId: string,
@@ -39,14 +41,16 @@ export async function getTeamAffiliatePayouts(
     )
   })
 }
-export async function getTeamExportAffiliatePayouts(
-  orgId: string,
-  year?: number,
-  month?: number,
-  orderBy?: OrderBy,
-  orderDir?: OrderDir,
-  email?: string
-): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
+export async function createTeamExportAffiliatePayouts({
+  orgId,
+  year,
+  month,
+  orderBy,
+  orderDir,
+  email,
+}: ExportAffiliatePayouts): Promise<
+  ActionResult<PayoutResult<AffiliatePayout>>
+> {
   return handleAction("getTeamExportAffiliatePayouts", async () => {
     const org = await getTeamAuthAction(orgId)
     return getAffiliatePayoutData(
@@ -85,13 +89,15 @@ export async function getTeamAffiliatePayoutsBulk(
     )
   })
 }
-export async function getTeamExportAffiliatePayoutsBulk(
-  orgId: string,
-  months: { month: number; year: number }[],
-  orderBy?: OrderBy,
-  orderDir?: OrderDir,
-  email?: string
-): Promise<ActionResult<PayoutResult<AffiliatePayout>>> {
+export async function createTeamExportAffiliatePayoutsBulk({
+  orgId,
+  months,
+  orderBy,
+  orderDir,
+  email,
+}: ExportAffiliatePayoutsBulk): Promise<
+  ActionResult<PayoutResult<AffiliatePayout>>
+> {
   return handleAction("getTeamExportAffiliatePayoutsBulk", async () => {
     const org = await getOrgAuth(orgId)
     return getAffiliatePayoutBulkData(
