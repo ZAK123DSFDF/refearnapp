@@ -17,9 +17,19 @@ import { TableView } from "@/components/ui-custom/TableView"
 import { getDomains } from "@/app/(organization)/organization/[orgId]/dashboard/manageDomains/action"
 import { manageDomainsColumns } from "@/components/pages/Dashboard/manageDomains/manageDomainsColumns"
 import { useState } from "react"
-import { useCachedValidation } from "@/hooks/useCachedValidation"
-
-export function manageDomainsTable({ orgId }: { orgId: string }) {
+import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
+import { getTeamDomains } from "@/app/(organization)/organization/[orgId]/teams/dashboard/manageDomains/action"
+interface AffiliatesTableManageDomainsProps {
+  orgId: string
+  affiliate: boolean
+  isTeam?: boolean
+}
+export function ManageDomainsTable({
+  orgId,
+  affiliate,
+  isTeam,
+}: AffiliatesTableManageDomainsProps) {
+  useVerifyTeamSession(orgId, isTeam)
   const [sorting] = useState<SortingState>([])
   const [columnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility] = React.useState<VisibilityState>({})
@@ -28,9 +38,10 @@ export function manageDomainsTable({ orgId }: { orgId: string }) {
   const { filters, setFilters } = useQueryFilter({
     emailKey: "domain",
   })
+  const getManageDomains = isTeam ? getTeamDomains : getDomains
   const { data, error, isPending } = useAppQuery(
     ["org-domains", orgId, filters.offset, filters.email],
-    getDomains,
+    getManageDomains,
     [orgId, filters.offset, filters.email],
     { enabled: !!orgId }
   )

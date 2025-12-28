@@ -1,9 +1,9 @@
 import { handleAction } from "@/lib/handleAction"
-import { getOrgAuth } from "@/lib/server/GetOrgAuth"
 import { ActionResult } from "@/lib/types/response"
 import { DomainRow } from "@/lib/types/domainRow"
 import { getDomainsAction } from "@/lib/server/getDomainsAction"
-export async function getDomains(
+import { getTeamAuthAction } from "@/lib/server/getTeamAuthAction"
+export async function getTeamDomains(
   orgId: string,
   offset?: number,
   domain?: string
@@ -13,8 +13,8 @@ export async function getDomains(
     hasNext: boolean
   }>
 > {
-  return handleAction("getDomains", async () => {
-    await getOrgAuth(orgId)
+  return handleAction("getTeamDomains", async () => {
+    await getTeamAuthAction(orgId)
     return getDomainsAction(orgId, offset, domain)
   })
 }

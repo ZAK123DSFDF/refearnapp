@@ -99,7 +99,7 @@ export async function createTeamExportAffiliatePayoutsBulk({
   ActionResult<PayoutResult<AffiliatePayout>>
 > {
   return handleAction("getTeamExportAffiliatePayoutsBulk", async () => {
-    const org = await getOrgAuth(orgId)
+    const org = await getTeamAuthAction(orgId)
     return getAffiliatePayoutBulkData(
       "EXPORT",
       org,
