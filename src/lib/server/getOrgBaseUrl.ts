@@ -5,6 +5,7 @@ export const getOrgBaseUrl = async (orgId: string) => {
   const activeDomain = await db.query.websiteDomain.findFirst({
     where: and(
       eq(websiteDomain.orgId, orgId),
+      eq(websiteDomain.isPrimary, true),
       eq(websiteDomain.isActive, true)
     ),
   })

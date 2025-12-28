@@ -25,6 +25,7 @@ import {
 } from "@/util/idGenerators"
 import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
+import { relations } from "drizzle-orm"
 export const roleEnum = pgEnum("role", ["OWNER", "ADMIN", "TEAM"])
 export const accountTypeEnum = pgEnum("account_type", [
   "ORGANIZATION",
@@ -68,6 +69,11 @@ export const currencyEnum = pgEnum("currency", [
   "GBP",
   "CAD",
   "AUD",
+])
+export const dnsStatusEnum = pgEnum("dns_status", [
+  "Pending",
+  "Verified",
+  "Failed",
 ])
 export const domainTypeEnum = pgEnum("domain_type", ["DEFAULT", "CUSTOM"])
 export const affiliateInvoiceReasonEnum = pgEnum("affiliate_invoice_reason", [
@@ -256,8 +262,11 @@ export const websiteDomain = pgTable(
       .references(() => organization.id, { onDelete: "cascade" }),
     domainName: text("domain_name").notNull().unique(),
     type: domainTypeEnum("type").notNull().default("DEFAULT"),
+    isPrimary: boolean("is_primary").notNull().default(false),
     isActive: boolean("is_active").notNull().default(false),
     isRedirect: boolean("is_redirect").notNull().default(false),
+    isVerified: boolean("is_verified").notNull().default(false),
+    dnsStatus: dnsStatusEnum("dns_status").notNull().default("Pending"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

@@ -101,8 +101,10 @@ export const CreateOrganization = async (
     await db.insert(websiteDomain).values({
       orgId: newOrg.id,
       domainName: normalizedDomain,
+      dnsStatus: "Verified",
       type: "DEFAULT",
       isActive: true,
+      isPrimary: true,
       isRedirect: false,
     })
 

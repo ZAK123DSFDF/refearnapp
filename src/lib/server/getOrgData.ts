@@ -41,16 +41,6 @@ export const getOrgData = async (
       toast: "The requested organization does not exist.",
     }
   }
-
-  const website = await db.query.websiteDomain.findFirst({
-    where: (domain, { eq, and }) =>
-      and(
-        eq(domain.orgId, orgId),
-        eq(domain.isActive, true),
-        eq(domain.isRedirect, false)
-      ),
-  })
-
   return {
     ok: true,
     data: {
@@ -82,9 +72,6 @@ export const getOrgData = async (
         | "CAD"
         | "AUD",
       attributionModel: org.attributionModel,
-      defaultDomain: website?.domainName?.endsWith(".refearnapp.com")
-        ? website.domainName.replace(".refearnapp.com", "")
-        : (website?.domainName ?? ""),
     },
   }
 }

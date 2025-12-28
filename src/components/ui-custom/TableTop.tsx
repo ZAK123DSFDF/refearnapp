@@ -20,6 +20,7 @@ type TableProps<TData> = {
   affiliate: boolean
   mode?: "default" | "top"
   hideOrder?: boolean
+  placeholder?: string
 }
 
 export const TableTop = <TData,>({
@@ -30,6 +31,7 @@ export const TableTop = <TData,>({
   affiliate,
   mode = "default",
   hideOrder = false,
+  placeholder = "Filter emails...",
 }: TableProps<TData>) => {
   const iconHiddenAt = hideOrder ? "md:hidden" : "lg:hidden"
   const textVisibleAt = hideOrder ? "hidden md:flex" : "hidden lg:flex"
@@ -41,7 +43,7 @@ export const TableTop = <TData,>({
           <SearchInput
             value={filters.email ?? ""}
             onChange={onEmailChange}
-            placeholder="Filter emails..."
+            placeholder={placeholder}
             className="w-full md:w-[240px]"
           />
 

@@ -1,14 +1,7 @@
 "use client"
 
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardFooter,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
 import deepEqual from "fast-deep-equal"
-import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form"
 import { Form } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -21,34 +14,21 @@ import {
   Coins,
   Globe,
   Link2,
-  Loader2,
   Percent,
   History,
   Target,
 } from "lucide-react"
 import { z } from "zod"
 
-import {
-  updateOrgSettings,
-  verifyARecord,
-  verifyCNAME,
-} from "@/app/(organization)/organization/[orgId]/dashboard/settings/action"
+import { updateOrgSettings } from "@/app/(organization)/organization/[orgId]/dashboard/settings/action"
 import { orgSettingsSchema } from "@/lib/schema/orgSettingSchema"
-import React, { useEffect, useMemo, useState } from "react"
+import React from "react"
 import { InputField, TextareaField } from "@/components/Auth/FormFields"
 import { SelectField } from "@/components/ui-custom/SelectFields"
 import { LogoUpload } from "@/components/ui-custom/LogoUpload"
 import { OrgData } from "@/lib/types/organization"
-import { DomainInputField } from "@/components/ui-custom/DomainInputField"
-import { AppDialog } from "@/components/ui-custom/AppDialog"
-import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
-import { useCachedValidation } from "@/hooks/useCachedValidation"
 import { useAppMutation } from "@/hooks/useAppMutation"
-import {
-  updateTeamOrgSettings,
-  verifyTeamARecord,
-  verifyTeamCNAME,
-} from "@/app/(organization)/organization/[orgId]/teams/dashboard/settings/action"
+import { updateTeamOrgSettings } from "@/app/(organization)/organization/[orgId]/teams/dashboard/settings/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { FormSection } from "@/components/ui-custom/FormSection"
 
@@ -60,7 +40,6 @@ export default function Settings({
   isTeam = false,
 }: Props & { isTeam?: boolean }) {
   useVerifyTeamSession(orgData.id, isTeam)
-  const { showCustomToast } = useCustomToast()
   const safeDefaults: OrgFormData = {
     id: orgData?.id ?? "",
     name: orgData?.name ?? "",
@@ -80,7 +59,6 @@ export default function Settings({
     commissionDurationUnit:
       (orgData?.commissionDurationUnit as "day" | "week" | "month" | "year") ??
       "day",
-    defaultDomain: orgData?.defaultDomain ?? "",
     currency:
       (orgData?.currency as "USD" | "EUR" | "GBP" | "CAD" | "AUD") ?? "USD",
     attributionModel:
@@ -92,77 +70,7 @@ export default function Settings({
     resolver: zodResolver(orgSettingsSchema),
     defaultValues: safeDefaults,
   })
-  const currentValues = form.watch()
-  const [isVerified, setIsVerified] = useState(false)
-  const [domainType, setDomainType] = useState<
-    "platform" | "custom-main" | "custom-subdomain" | null
-  >(null)
-  const [open, setOpen] = useState<boolean>(false)
-  const domainValue = form.watch("defaultDomain")?.trim() || ""
-  const oldDomain = safeDefaults.defaultDomain.trim()
-  const domainChanged = domainValue !== oldDomain
-  const normalizeDomain = (value: string) => {
-    if (!value) return ""
-    const lower = value
-      .trim()
-      .toLowerCase()
-      .replace(/^https?:\/\//, "")
-    return lower.endsWith(".refearnapp.com")
-      ? lower.replace(".refearnapp.com", "")
-      : lower
-  }
   const updateFn = isTeam ? updateTeamOrgSettings : updateOrgSettings
-  const verifyARecordFn = isTeam ? verifyTeamARecord : verifyARecord
-  const verifyCNAMEFn = isTeam ? verifyTeamCNAME : verifyCNAME
-  const nonDomainFieldsChanged = useMemo(() => {
-    const current = form.getValues()
-    return Object.keys(safeDefaults).some(
-      (key) =>
-        key !== "defaultDomain" &&
-        !deepEqual(
-          current[key as keyof OrgFormData],
-          safeDefaults[key as keyof OrgFormData]
-        )
-    )
-  }, [form.watch(), safeDefaults])
-
-  const onlyDomainChanged = domainChanged && !nonDomainFieldsChanged
-
-  // 👇 dynamic button label
-  const checkLabel =
-    domainType === "custom-main"
-      ? "Check Custom Domain"
-      : domainType === "custom-subdomain"
-        ? "Check Custom Subdomain"
-        : "Check Domain"
-  const isFormUnchanged = useMemo(() => {
-    const current = {
-      ...currentValues,
-      defaultDomain: normalizeDomain(currentValues.defaultDomain),
-    }
-    const defaults = {
-      ...safeDefaults,
-      defaultDomain: normalizeDomain(safeDefaults.defaultDomain),
-    }
-    return deepEqual(current, defaults)
-  }, [currentValues, safeDefaults])
-  useEffect(() => {
-    if (isVerified) setIsVerified(false)
-  }, [domainValue, domainType])
-  const domainCache = useCachedValidation({
-    id: "org-settings-domain",
-    orgId: orgData.id,
-    affiliate: false,
-    showError: (msg) =>
-      showCustomToast({
-        type: "error",
-        title: "Failed",
-        description: msg,
-        affiliate: false,
-      }),
-    errorMessage:
-      "This domain is already linked to another organization. Please use a different domain.",
-  })
   const mut = useAppMutation<MutationData, Partial<OrgData> & { id: string }>(
     async (data) => updateFn(data),
     {
@@ -170,79 +78,21 @@ export default function Settings({
       onSuccess: (res) => {
         if (res.ok) {
           form.reset(form.getValues())
-        } else {
-          domainCache.addFailedValue(res.data)
-        }
-      },
-    }
-  )
-
-  const verifyMut = useAppMutation<MutationData, void>(
-    async () => {
-      const domain = form.getValues("defaultDomain").trim()
-      if (!domain) {
-        showCustomToast({
-          type: "error",
-          title: "Missing Domain",
-          description: "Please enter a domain before verifying.",
-          affiliate: false,
-        })
-        return { ok: false, data: null } as MutationData
-      }
-
-      if (domainType === "custom-main") {
-        return verifyARecordFn(domain)
-      }
-
-      if (domainType === "custom-subdomain") {
-        return verifyCNAMEFn(domain)
-      }
-      showCustomToast({
-        type: "error",
-        title: "Invalid Domain Type",
-        description: "Please select a valid domain type before verifying.",
-        affiliate: false,
-      })
-
-      return { ok: false, data: null } as MutationData
-    },
-    {
-      affiliate: false,
-      onSuccess: (res) => {
-        if (res.ok) {
-          setIsVerified(true)
-          setOpen(false)
-        } else {
-          setIsVerified(false)
         }
       },
     }
   )
 
   const onSubmit = (data: OrgFormData) => {
-    const newDomain = normalizeDomain(data.defaultDomain)
-
-    const oldDomain = normalizeDomain(safeDefaults.defaultDomain)
-    const finalDomain = newDomain.endsWith(".refearnapp.com")
-      ? newDomain
-      : /^[a-z0-9-]+$/.test(newDomain)
-        ? `${newDomain}.refearnapp.com`
-        : newDomain
-    if (domainCache.shouldSkip(finalDomain)) return
     const changed = (Object.keys(data) as (keyof OrgData)[]).reduce(
       (acc, key) => {
-        if (key === "defaultDomain") {
-          if (finalDomain !== oldDomain) {
-            acc[key] = finalDomain as any
-          }
-        } else if (!deepEqual(data[key], safeDefaults[key])) {
+        if (!deepEqual(data[key], safeDefaults[key])) {
           acc[key] = data[key] as any
         }
         return acc
       },
       {} as Partial<OrgData>
     )
-
     if (Object.keys(changed).length === 0) return
 
     mut.mutate({ id: data.id, ...changed })
@@ -462,79 +312,6 @@ export default function Settings({
                   affiliate={false}
                 />
               </div>
-
-              <div className="flex flex-col xl:grid xl:grid-cols-2 gap-4 xl:items-center">
-                <DomainInputField
-                  control={form.control}
-                  form={form}
-                  onDomainTypeChange={setDomainType}
-                />
-
-                <div className="flex w-full xl:w-auto">
-                  <Button
-                    type="button"
-                    disabled={
-                      !domainType ||
-                      domainType === "platform" ||
-                      !domainChanged ||
-                      isVerified
-                    }
-                    className="w-full xl:w-auto"
-                    onClick={() => setOpen(true)}
-                  >
-                    {checkLabel}
-                  </Button>
-                </div>
-              </div>
-              <CardFooter className="flex justify-end px-0">
-                <Button
-                  type="submit"
-                  disabled={
-                    mut.isPending ||
-                    isFormUnchanged ||
-                    (onlyDomainChanged &&
-                      domainType !== "platform" &&
-                      !isVerified)
-                  }
-                >
-                  {mut.isPending && (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  )}
-                  Save Changes
-                </Button>
-              </CardFooter>
-              <AppDialog
-                open={open}
-                onOpenChange={setOpen}
-                title={
-                  domainType === "custom-main"
-                    ? "Verify Custom Domain (A Record)"
-                    : "Verify Custom Subdomain (CNAME)"
-                }
-                confirmText={
-                  domainType === "custom-main"
-                    ? "Verify Domain"
-                    : "Verify Subdomain"
-                }
-                confirmLoading={verifyMut.isPending}
-                onConfirm={() => verifyMut.mutate()}
-                affiliate={false}
-              >
-                {domainType === "custom-main" ? (
-                  <p className="text-sm text-muted-foreground">
-                    Please add an <strong>A record</strong> pointing your domain
-                    to <code>123.45.67.89</code> in your DNS provider. Once
-                    added, click <strong>Verify Domain</strong> to confirm.
-                  </p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Please add a <strong>CNAME record</strong> pointing your
-                    subdomain to <code>cname.refearnapp.com</code> in your DNS
-                    provider. Once added, click{" "}
-                    <strong>Verify Subdomain</strong> to confirm.
-                  </p>
-                )}
-              </AppDialog>
             </CardContent>
           </Card>
         </form>

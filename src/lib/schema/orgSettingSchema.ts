@@ -1,5 +1,4 @@
 import { z } from "zod"
-import { hostnameSchema, subdomainSchema } from "@/lib/schema/domainSchema"
 
 export const orgSettingsSchema = z.object({
   id: z.string().min(1),
@@ -19,5 +18,4 @@ export const orgSettingsSchema = z.object({
   commissionDurationUnit: z.enum(["day", "week", "month", "year"]),
   currency: z.enum(["USD", "EUR", "GBP", "CAD", "AUD"]),
   attributionModel: z.enum(["FIRST_CLICK", "LAST_CLICK"]),
-  defaultDomain: z.union([subdomainSchema, hostnameSchema]),
 })

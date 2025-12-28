@@ -10,7 +10,7 @@ export async function getActiveDomain(orgId: string) {
     where: and(
       eq(websiteDomain.orgId, orgId),
       eq(websiteDomain.isActive, true),
-      eq(websiteDomain.isRedirect, false)
+      eq(websiteDomain.isPrimary, true)
     ),
   })
 

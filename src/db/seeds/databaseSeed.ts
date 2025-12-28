@@ -145,6 +145,7 @@ export const websiteDomain_seed = [
     type: "DEFAULT" as const,
     isActive: true,
     isRedirect: false,
+    isPrimary: true,
     createdAt: parseDate("2025-10-14 04:00:00"),
     updatedAt: parseDate("2025-10-14 04:00:00"),
   },
