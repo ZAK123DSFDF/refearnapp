@@ -10,6 +10,7 @@ import {
   CreditCard,
   Layers,
   User,
+  Globe,
 } from "lucide-react"
 import {
   Sidebar,
@@ -82,6 +83,11 @@ const OrganizationDashboardSidebar = ({
       title: "Settings",
       url: `/organization/${orgId}/dashboard/settings`,
       icon: Settings,
+    },
+    {
+      title: "Manage Domains",
+      url: `/organization/${orgId}/dashboard/manageDomains`,
+      icon: Globe,
     },
   ]
   if (plan.plan === "PRO" || plan.plan === "ULTIMATE") {

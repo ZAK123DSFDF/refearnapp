@@ -1,6 +1,12 @@
 "use client"
 
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card"
 import deepEqual from "fast-deep-equal"
 import { useForm } from "react-hook-form"
 import { Form } from "@/components/ui/form"
@@ -17,12 +23,13 @@ import {
   Percent,
   History,
   Target,
+  Loader2,
 } from "lucide-react"
 import { z } from "zod"
 
 import { updateOrgSettings } from "@/app/(organization)/organization/[orgId]/dashboard/settings/action"
 import { orgSettingsSchema } from "@/lib/schema/orgSettingSchema"
-import React from "react"
+import React, { useMemo } from "react"
 import { InputField, TextareaField } from "@/components/Auth/FormFields"
 import { SelectField } from "@/components/ui-custom/SelectFields"
 import { LogoUpload } from "@/components/ui-custom/LogoUpload"
@@ -31,6 +38,7 @@ import { useAppMutation } from "@/hooks/useAppMutation"
 import { updateTeamOrgSettings } from "@/app/(organization)/organization/[orgId]/teams/dashboard/settings/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { FormSection } from "@/components/ui-custom/FormSection"
+import { Button } from "@/components/ui/button"
 
 type OrgFormData = z.infer<typeof orgSettingsSchema>
 type Props = { orgData: OrgData }
@@ -70,6 +78,7 @@ export default function Settings({
     resolver: zodResolver(orgSettingsSchema),
     defaultValues: safeDefaults,
   })
+  const currentValues = form.watch()
   const updateFn = isTeam ? updateTeamOrgSettings : updateOrgSettings
   const mut = useAppMutation<MutationData, Partial<OrgData> & { id: string }>(
     async (data) => updateFn(data),
@@ -82,7 +91,9 @@ export default function Settings({
       },
     }
   )
-
+  const isFormUnchanged = useMemo(() => {
+    return deepEqual(currentValues, safeDefaults)
+  }, [currentValues, safeDefaults])
   const onSubmit = (data: OrgFormData) => {
     const changed = (Object.keys(data) as (keyof OrgData)[]).reduce(
       (acc, key) => {
@@ -313,6 +324,14 @@ export default function Settings({
                 />
               </div>
             </CardContent>
+            <CardFooter className="flex justify-end">
+              <Button type="submit" disabled={mut.isPending || isFormUnchanged}>
+                {mut.isPending && (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                )}
+                Save Changes
+              </Button>
+            </CardFooter>
           </Card>
         </form>
       </Form>

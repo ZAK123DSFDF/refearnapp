@@ -26,8 +26,8 @@ interface AffiliatesTableManageDomainsProps {
 }
 export function ManageDomainsTable({
   orgId,
-  affiliate,
-  isTeam,
+  affiliate = false,
+  isTeam = false,
 }: AffiliatesTableManageDomainsProps) {
   useVerifyTeamSession(orgId, isTeam)
   const [sorting] = useState<SortingState>([])

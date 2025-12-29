@@ -10,6 +10,7 @@ import {
   CreditCard,
   Layers,
   User,
+  Globe,
 } from "lucide-react"
 import {
   Sidebar,
@@ -68,6 +69,11 @@ const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
       title: "Settings",
       url: `/organization/${orgId}/teams/dashboard/settings`,
       icon: Settings,
+    },
+    {
+      title: "Manage Domains",
+      url: `/organization/${orgId}/teams/dashboard/manageDomains`,
+      icon: Globe,
     },
   ]
 

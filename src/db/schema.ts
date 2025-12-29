@@ -25,7 +25,6 @@ import {
 } from "@/util/idGenerators"
 import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
-import { relations } from "drizzle-orm"
 export const roleEnum = pgEnum("role", ["OWNER", "ADMIN", "TEAM"])
 export const accountTypeEnum = pgEnum("account_type", [
   "ORGANIZATION",
