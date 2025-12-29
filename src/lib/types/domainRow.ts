@@ -4,5 +4,6 @@ export type DomainRow = {
   isActive: boolean
   isRedirect: boolean
   isVerified: boolean
+  isPrimary: boolean
   dnsStatus: "Pending" | "Verified" | "Failed"
 }

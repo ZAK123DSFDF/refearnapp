@@ -66,8 +66,18 @@ export function ManageDomainsTable({
   const table = useReactTable({
     data: tableData,
     columns: manageDomainsColumns({
-      onToggle: () => {},
-      onDelete: () => {},
+      onToggleActive: (id, isActive) => {
+        console.log("Toggle active:", id, !isActive)
+      },
+      onMakePrimary: (id) => {
+        console.log("Make primary:", id)
+      },
+      onToggleRedirect: (id, isRedirect) => {
+        console.log("Toggle redirect:", id, !isRedirect)
+      },
+      onDelete: (id) => {
+        console.log("Delete domain:", id)
+      },
     }),
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,

@@ -31,6 +31,7 @@ export async function getDomainsAction(
       isRedirect: websiteDomain.isRedirect,
       dnsStatus: websiteDomain.dnsStatus,
       isVerified: websiteDomain.isVerified,
+      isPrimary: websiteDomain.isPrimary,
     })
     .from(websiteDomain)
     .where(and(...whereClauses))
