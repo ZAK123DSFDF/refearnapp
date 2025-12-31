@@ -10,6 +10,8 @@ import { toggleDomainActiveAction } from "@/lib/server/toggleDomainActiveAction"
 import { makeDomainPrimaryAction } from "@/lib/server/makeDomainPrimaryAction"
 import { toggleDomainRedirectAction } from "@/lib/server/toggleDomainRedirectAction"
 import { deleteDomainAction } from "@/lib/server/deleteDomainAction"
+import { verifyOrgCNAME } from "@/lib/organizationAction/verifyOrgCNAME"
+import { verifyOrgARECORD } from "@/lib/organizationAction/verifyOrgARECORD"
 export async function getDomains(
   orgId: string,
   offset?: number,
@@ -32,7 +34,6 @@ export async function createDomains({
 }: CreateDomainType): Promise<MutationData> {
   return handleAction("createDomains", async () => {
     await getOrgAuth(orgId)
-
     await createDomainsAction({
       orgId,
       domain,
@@ -103,5 +104,39 @@ export async function deleteDomain({
     await getOrgAuth(orgId)
     await deleteDomainAction({ orgId, domainId })
     return { ok: true, toast: "Domain deleted" }
+  })
+}
+export async function verifyCNAME({
+  orgId,
+  domain,
+}: {
+  orgId: string
+  domain: string
+}): Promise<MutationData> {
+  return handleAction("verifyCNAME", async () => {
+    await getOrgAuth(orgId)
+    await verifyOrgCNAME(domain)
+    return {
+      ok: true,
+      toast: "✅ CNAME record is correctly set.",
+    }
+  })
+}
+
+// ✅ Verify A record (for main domains)
+export async function verifyARecord({
+  orgId,
+  domain,
+}: {
+  orgId: string
+  domain: string
+}): Promise<MutationData> {
+  return handleAction("verifyARecord", async () => {
+    await getOrgAuth(orgId)
+    await verifyOrgARECORD(domain)
+    return {
+      ok: true,
+      toast: "✅ A record is correctly set.",
+    }
   })
 }
