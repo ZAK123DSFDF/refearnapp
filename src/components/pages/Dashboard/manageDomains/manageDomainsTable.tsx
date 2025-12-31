@@ -21,6 +21,7 @@ import {
   makeDomainPrimary,
   toggleDomainActive,
   toggleDomainRedirect,
+  verifyDomain,
 } from "@/app/(organization)/organization/[orgId]/dashboard/manageDomains/action"
 import { manageDomainsColumns } from "@/components/pages/Dashboard/manageDomains/manageDomainsColumns"
 import { useRef, useState } from "react"
@@ -32,6 +33,7 @@ import {
   makeTeamDomainPrimary,
   toggleTeamDomainActive,
   toggleTeamDomainRedirect,
+  verifyTeamDomain,
 } from "@/app/(organization)/organization/[orgId]/teams/dashboard/manageDomains/action"
 import { Button } from "@/components/ui/button"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
@@ -91,6 +93,7 @@ export function ManageDomainsTable({
     ? toggleTeamDomainRedirect
     : toggleDomainRedirect
   const deleteManageDomain = isTeam ? deleteTeamDomain : deleteDomain
+  const verifyManageDomain = isTeam ? verifyTeamDomain : verifyDomain
   const queryClient = useQueryClient()
   const { data, error, isPending } = useAppQuery(
     ["org-domains", orgId, filters.offset, filters.email],
@@ -108,6 +111,9 @@ export function ManageDomainsTable({
     affiliate,
   })
   const deleteDomainMutation = useAppMutation(deleteManageDomain, { affiliate })
+  const verifyDnsMutation = useAppMutation(verifyManageDomain, {
+    affiliate,
+  })
   const handleConfirmAction = () => {
     if (!actionDialog) return
 
@@ -154,6 +160,9 @@ export function ManageDomainsTable({
           { onSuccess }
         )
         break
+      case "verify-dns":
+        verifyDnsMutation.mutate({ orgId, domainId }, { onSuccess })
+        break
 
       case "delete":
         deleteDomainMutation.mutate({ orgId, domainId }, { onSuccess })
@@ -197,7 +206,17 @@ export function ManageDomainsTable({
           type: "delete",
         }),
 
-      onVerifyDns: (id) => console.log("Verify DNS for", id),
+      onVerifyDns: (id) => {
+        const row = tableData.find((d) => d.id === id)
+        if (!row) return
+
+        setActionDialog({
+          type: "verify-dns",
+          domainId: id,
+          domainName: row.domainName,
+          domainType: row.type,
+        })
+      },
     }),
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -301,19 +320,66 @@ export function ManageDomainsTable({
       <AppDialog
         open={!!actionDialog}
         onOpenChange={(open) => !open && setActionDialog(null)}
-        title={actionMeta?.title}
-        description={actionMeta?.description}
-        confirmText={actionMeta?.confirmText}
+        title={
+          actionDialog?.type === "verify-dns"
+            ? "Verify Domain DNS"
+            : actionMeta?.title
+        }
+        description={
+          actionDialog?.type === "verify-dns"
+            ? "Add the following DNS record to your domain provider, then click Verify."
+            : actionMeta?.description
+        }
+        confirmText={
+          actionDialog?.type === "verify-dns"
+            ? "Verify Domain"
+            : actionMeta?.confirmText
+        }
         confirmColor={actionMeta?.color}
         onConfirm={handleConfirmAction}
         affiliate={affiliate}
         confirmLoading={
+          verifyDnsMutation.isPending ||
           toggleActiveMutation.isPending ||
           makePrimaryMutation.isPending ||
           toggleRedirectMutation.isPending ||
           deleteDomainMutation.isPending
         }
-      />
+      >
+        {actionDialog?.type === "verify-dns" && (
+          <div className="space-y-3 text-sm">
+            {actionDialog.domainType === "CUSTOM_DOMAIN" ? (
+              <div className="rounded-md border p-3 bg-gray-50 font-mono">
+                <div>
+                  <b>Type:</b> A
+                </div>
+                <div>
+                  <b>Name:</b> @
+                </div>
+                <div>
+                  <b>Value:</b> 76.76.21.21
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-md border p-3 bg-gray-50 font-mono">
+                <div>
+                  <b>Type:</b> CNAME
+                </div>
+                <div>
+                  <b>Name:</b> {actionDialog.domainName?.split(".")[0]}
+                </div>
+                <div>
+                  <b>Value:</b> cname.vercel-dns.com
+                </div>
+              </div>
+            )}
+
+            <p className="text-xs text-gray-500">
+              DNS changes may take a few minutes to propagate.
+            </p>
+          </div>
+        )}
+      </AppDialog>
     </Card>
   )
 }

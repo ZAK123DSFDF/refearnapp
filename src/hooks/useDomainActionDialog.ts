@@ -7,11 +7,13 @@ export type DomainActionType =
   | "enable-redirect"
   | "disable-redirect"
   | "delete"
+  | "verify-dns"
 
 export interface DomainActionState {
   type: DomainActionType
   domainId: string
   domainName?: string
+  domainType?: "CUSTOM_DOMAIN" | "CUSTOM_SUBDOMAIN" | "DEFAULT"
 }
 
 export function useDomainActionMeta(action: DomainActionState | null) {
@@ -67,7 +69,16 @@ export function useDomainActionMeta(action: DomainActionState | null) {
         confirmText: "Delete Domain",
         color: "#F87171",
       }
-
+    case "verify-dns":
+      return {
+        title: "Verify Domain DNS",
+        description:
+          action.domainType === "CUSTOM_DOMAIN"
+            ? `Add the A record below for${name}, then click Verify.`
+            : `Add the CNAME record below for${name}, then click Verify.`,
+        confirmText: "Verify Domain",
+        color: "#60A5FA",
+      }
     default:
       return null
   }

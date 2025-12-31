@@ -10,8 +10,7 @@ import { toggleDomainActiveAction } from "@/lib/server/toggleDomainActiveAction"
 import { makeDomainPrimaryAction } from "@/lib/server/makeDomainPrimaryAction"
 import { toggleDomainRedirectAction } from "@/lib/server/toggleDomainRedirectAction"
 import { deleteDomainAction } from "@/lib/server/deleteDomainAction"
-import { verifyOrgCNAME } from "@/lib/organizationAction/verifyOrgCNAME"
-import { verifyOrgARECORD } from "@/lib/organizationAction/verifyOrgARECORD"
+import { verifyDomainDnsAction } from "@/lib/server/verifyDomainDnsAction"
 export async function getTeamDomains(
   orgId: string,
   offset?: number,
@@ -106,34 +105,16 @@ export async function deleteTeamDomain({
     return { ok: true, toast: "Domain deleted" }
   })
 }
-export async function verifyTeamCNAME({
+export async function verifyTeamDomain({
   orgId,
-  domain,
+  domainId,
 }: {
   orgId: string
-  domain: string
+  domainId: string
 }): Promise<MutationData> {
-  return handleAction("verifyCNAME", async () => {
+  return handleAction("verifyDomain", async () => {
     await getTeamAuthAction(orgId)
-    await verifyOrgCNAME(domain)
-    return {
-      ok: true,
-      toast: "✅ CNAME record is correctly set.",
-    }
-  })
-}
-
-// ✅ Verify A record (for main domains)
-export async function verifyTeamARecord({
-  orgId,
-  domain,
-}: {
-  orgId: string
-  domain: string
-}): Promise<MutationData> {
-  return handleAction("verifyARecord", async () => {
-    await getTeamAuthAction(orgId)
-    await verifyOrgARECORD(domain)
+    await verifyDomainDnsAction({ orgId, domainId })
     return {
       ok: true,
       toast: "✅ A record is correctly set.",
