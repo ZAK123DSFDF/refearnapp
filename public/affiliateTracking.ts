@@ -1,8 +1,8 @@
 import { UAParser } from "ua-parser-js"
 ;(function () {
-  const TRACKING_ENDPOINT =
-    "https://affiliate-marketing-hazel.vercel.app/api/track"
-  const ORGID_ENDPOINT = "https://affiliate-marketing-hazel.vercel.app/api/org"
+  const CLOUDFLARE_URL = "https://tracking-worker.zekariyasberihun8.workers.dev"
+  const TRACKING_ENDPOINT = `${CLOUDFLARE_URL}/track`
+  const ORGID_ENDPOINT = `${CLOUDFLARE_URL}/org`
   const REF_KEYS = ["ref", "aff", "via"]
 
   function convertToSeconds(value: number, unit: string): number {
@@ -33,6 +33,17 @@ import { UAParser } from "ua-parser-js"
         `${ORGID_ENDPOINT}?code=${encodeURIComponent(code)}`
       )
       if (!res.ok) throw new Error("Failed to fetch organization info")
+      type OrgTrackingConfig = {
+        cookieLifetimeValue: number
+        cookieLifetimeUnit: string
+        commissionType: "percentage" | "fixed"
+        commissionValue: string | number
+        commissionDurationValue: number
+        commissionDurationUnit: string
+        attributionModel: "FIRST_CLICK" | "LAST_CLICK"
+      }
+      const org = (await res.json()) as OrgTrackingConfig
+
       const {
         cookieLifetimeValue,
         cookieLifetimeUnit,
@@ -41,7 +52,7 @@ import { UAParser } from "ua-parser-js"
         commissionDurationValue,
         commissionDurationUnit,
         attributionModel,
-      } = await res.json()
+      } = org
 
       const maxAge = convertToSeconds(cookieLifetimeValue, cookieLifetimeUnit)
 

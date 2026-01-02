@@ -464,7 +464,7 @@ export const affiliateClick = pgTable(
     affiliateLinkId: text("affiliate_link_id")
       .notNull()
       .references(() => affiliateLink.id, { onDelete: "cascade" }),
-    userAgent: text("user_agent"),
+    clickCount: integer("click_count").default(1),
     referrer: text("referrer").default("unknown").notNull(),
     deviceType: text("device_type"),
     browser: text("browser"),
