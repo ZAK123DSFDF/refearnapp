@@ -23,7 +23,7 @@ export default function StripeIntegration({ orgId }: { orgId: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orgId }),
       })
-      const data = await res.json().catch(() => ({}))
+      const data = (await res.json().catch(() => ({}))) as any
       if (!res.ok) {
         showCustomToast({
           type: "error",
@@ -45,7 +45,7 @@ export default function StripeIntegration({ orgId }: { orgId: string }) {
         body: JSON.stringify({ orgId }),
       })
 
-      const data = await res.json()
+      const data = (await res.json()) as any
       if (!res.ok) {
         return {
           ok: false,
@@ -73,7 +73,7 @@ export default function StripeIntegration({ orgId }: { orgId: string }) {
         body: JSON.stringify({ orgId }),
       })
 
-      const data = await res.json()
+      const data = (await res.json()) as any
       if (!res.ok) {
         return {
           ok: false,

@@ -103,7 +103,7 @@ export const addFileAtom = atom(
       }
       const res = await fetch(endpoint, { method: "POST", body: formData })
       if (!res.ok) throw new Error("Upload failed")
-      const { url } = await res.json()
+      const { url } = (await res.json()) as any
       // success
       updateUploads(get, set, (uploads) => {
         const latest = uploads[uploadId]

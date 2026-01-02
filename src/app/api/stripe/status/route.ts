@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: Request) {
   try {
-    const { orgId } = await req.json()
+    const { orgId } = (await req.json()) as any
     if (!orgId) {
       return NextResponse.json({
         connected: false,

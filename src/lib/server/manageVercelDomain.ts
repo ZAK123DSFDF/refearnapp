@@ -12,7 +12,7 @@ export async function addDomainToVercel(domain: string) {
     }
   )
 
-  const data = await res.json()
+  const data = (await res.json()) as any
 
   if (!res.ok) {
     throw {
@@ -34,7 +34,7 @@ export async function verifyDomainOnVercel(domain: string) {
     }
   )
 
-  const data = await res.json()
+  const data = (await res.json()) as any
 
   if (!res.ok) {
     throw {
@@ -57,7 +57,7 @@ export async function deleteDomainFromVercel(domain: string) {
   )
 
   if (!res.ok) {
-    const data = await res.json()
+    const data = (await res.json()) as any
     throw {
       status: res.status,
       toast: data?.error?.message ?? "Failed to delete domain from Vercel",

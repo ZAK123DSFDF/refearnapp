@@ -23,7 +23,7 @@ async function getPaddleSubscription(subscriptionId: string) {
     },
   })
 
-  const json = await res.json()
+  const json = (await res.json()) as any
   if (!json.data) {
     console.error("Paddle API Error:", json)
     throw new Error("Could not fetch live subscription from Paddle")
@@ -57,7 +57,7 @@ async function createSimulation(fullSubscriptionPayload: any, cycles: number) {
     body: JSON.stringify(payload),
   })
 
-  const json = await res.json()
+  const json = (await res.json()) as any
   if (!json.data) {
     console.log("Create simulation error:", json)
     throw new Error("Failed to create simulation")
@@ -75,7 +75,7 @@ async function runSimulation(simulationId: string) {
     },
   })
 
-  const json = await res.json()
+  const json = (await res.json()) as any
   return json.data
 }
 

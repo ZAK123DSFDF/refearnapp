@@ -21,7 +21,7 @@ async function getPaddleSubscription(subscriptionId: string) {
   const res = await fetch(`${PADDLE_API}/subscriptions/${subscriptionId}`, {
     headers: { Authorization: `Bearer ${API_KEY}` },
   })
-  const json = await res.json()
+  const json = (await res.json()) as any
   if (!json.data) {
     console.log(json)
     throw new Error("❌ Could not fetch subscription from Paddle")
@@ -46,7 +46,7 @@ async function createImmediateCancelSimulation(payload: any) {
     body: JSON.stringify(body),
   })
 
-  const json = await res.json()
+  const json = (await res.json()) as any
   if (!json.data) {
     console.log("Simulation create error:", json)
     throw new Error("❌ Failed to create cancel simulation")
@@ -64,7 +64,7 @@ async function runSimulation(id: string) {
     },
   })
 
-  const json = await res.json()
+  const json = (await res.json()) as any
   return json.data
 }
 

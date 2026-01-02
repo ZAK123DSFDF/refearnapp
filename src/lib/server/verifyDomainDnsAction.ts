@@ -27,9 +27,9 @@ export async function verifyDomainDnsAction({
     throw { ok: false, toast: "Domain not found" }
   }
 
-  const verifyData = await verifyDomainOnVercel(domain.domainName)
+  const verifyData = (await verifyDomainOnVercel(domain.domainName)) as any
   // 2. Check DNS Configuration (The missing piece)
-  const configData = await getVercelDomainConfig(domain.domainName)
+  const configData = (await getVercelDomainConfig(domain.domainName)) as any
   const isDnsValid = !configData.misconfigured
   const isFullyActive = verifyData.verified && isDnsValid
   await db
