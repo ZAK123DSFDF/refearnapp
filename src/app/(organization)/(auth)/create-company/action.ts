@@ -100,36 +100,6 @@ export const CreateOrganization = async (
       .returning()
 
     if (!newOrg) throw { status: 500, toast: "Failed to create org" }
-    const [userSub, userPurchase] = await Promise.all([
-      db.query.subscription.findFirst({
-        where: eq(subscription.userId, decoded.id),
-      }),
-      db.query.purchase.findFirst({
-        where: eq(purchase.userId, decoded.id),
-      }),
-    ])
-    const planType = userPurchase ? userPurchase.tier : userSub?.plan || "FREE"
-    const paymentType = userPurchase ? "ONE-TIME" : "SUBSCRIPTION"
-    const expiresAt = userSub?.expiresAt
-      ? userSub.expiresAt.toISOString()
-      : "null"
-    await redis.hset(`org:${newOrg.id}`, {
-      userId: decoded.id,
-      planType: planType,
-      paymentType: paymentType,
-      expiresAt: expiresAt,
-      name: newOrg.name,
-      websiteUrl: newOrg.websiteUrl,
-      referralParam: newOrg.referralParam,
-      cookieLifetimeValue: String(newOrg.cookieLifetimeValue),
-      cookieLifetimeUnit: newOrg.cookieLifetimeUnit,
-      commissionType: newOrg.commissionType,
-      commissionValue: newOrg.commissionValue,
-      commissionDurationValue: String(newOrg.commissionDurationValue),
-      commissionDurationUnit: newOrg.commissionDurationUnit,
-      attributionModel: newOrg.attributionModel,
-      currency: newOrg.currency,
-    })
     await db.insert(websiteDomain).values({
       orgId: newOrg.id,
       domainName: normalizedDomain,

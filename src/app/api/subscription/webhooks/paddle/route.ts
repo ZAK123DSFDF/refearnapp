@@ -4,8 +4,7 @@ import { purchase, subscription } from "@/db/schema"
 import { db } from "@/db/drizzle"
 import { eq } from "drizzle-orm"
 import { decodeOrgFromCustomData } from "@/util/DecodeOrgFromCustomData"
-import { updateRedisObject } from "@/util/UpdateRedisObject"
-import { RedisOrgHash } from "@/lib/types/redisOrgHash"
+import { syncOrgDataToRedisLinks } from "@/lib/server/syncOrgDataToRedisLinks"
 const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
   environment: Environment.sandbox,
 })
@@ -112,7 +111,7 @@ export async function POST(req: Request) {
           priceId,
           currency,
         })
-        await updateRedisObject<RedisOrgHash>(`org:${decodedOrg.activeOrgId}`, {
+        await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
           userId: decodedOrg.id,
           planType,
           paymentType: "ONE-TIME",
@@ -149,7 +148,7 @@ export async function POST(req: Request) {
               : null,
           })
           .where(eq(subscription.userId, decodedOrg.id))
-        await updateRedisObject<RedisOrgHash>(`org:${decodedOrg.activeOrgId}`, {
+        await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
           userId: decodedOrg.id,
           planType,
           paymentType: "SUBSCRIPTION",
@@ -206,8 +205,8 @@ export async function POST(req: Request) {
             expiresAt: nextBill,
           })
           .where(eq(subscription.userId, userId))
-        await updateRedisObject<RedisOrgHash>(`org:${decodedOrg.activeOrgId}`, {
-          expiresAt: nextBill?.toISOString(),
+        await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
+          expiresAt: nextBill?.toISOString() ?? null,
         })
         return NextResponse.json({ ok: true })
       }
@@ -234,7 +233,7 @@ export async function POST(req: Request) {
             ...(isSamePeriod ? {} : { expiresAt: nextBill }),
           })
           .where(eq(subscription.userId, userId))
-        await updateRedisObject<RedisOrgHash>(`org:${decodedOrg.activeOrgId}`, {
+        await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
           ...(isSamePeriod ? {} : { expiresAt: nextBill.toISOString() }),
         })
         return NextResponse.json({ ok: true })
@@ -260,7 +259,7 @@ export async function POST(req: Request) {
           .update(purchase)
           .set({ isActive: true })
           .where(eq(purchase.userId, decodedOrg.id))
-        await updateRedisObject<RedisOrgHash>(`org:${decodedOrg.activeOrgId}`, {
+        await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
           userId: decodedOrg.id,
           planType: pendingPurchase.tier,
           paymentType: "ONE-TIME",
@@ -285,7 +284,7 @@ export async function POST(req: Request) {
           updatedAt: new Date(),
         })
         .where(eq(subscription.userId, decodedOrg.id))
-      await updateRedisObject<RedisOrgHash>(`org:${decodedOrg.activeOrgId}`, {
+      await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
         userId: decodedOrg.id,
         paymentType: "SUBSCRIPTION",
         planType: "FREE",

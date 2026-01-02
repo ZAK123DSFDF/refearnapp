@@ -1,11 +1,10 @@
 import { db } from "@/db/drizzle"
-import { affiliateLink, organization } from "@/db/schema"
+import { organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { OrgData } from "@/lib/types/organization"
-import { updateRedisObject } from "@/util/UpdateRedisObject"
 import { buildRedisUpdates } from "@/util/BuildRedisUpdates"
-import { redis } from "@/lib/redis"
+import { syncOrgDataToRedisLinks } from "@/lib/server/syncOrgDataToRedisLinks"
 
 export async function updateSettings(
   data: Partial<OrgData> & { id: string },
@@ -69,18 +68,7 @@ export async function updateSettings(
   const redisUpdates = buildRedisUpdates(updateData, REDIS_ORG_FIELDS)
 
   if (Object.keys(redisUpdates).length > 0) {
-    await updateRedisObject(`org:${data.id}`, redisUpdates)
-    const links = await db.query.affiliateLink.findMany({
-      where: eq(affiliateLink.organizationId, data.id),
-      columns: { id: true },
-    })
-    if (links.length > 0) {
-      const pipeline = redis.pipeline()
-      for (const link of links) {
-        pipeline.hset(`ref:${link.id}`, redisUpdates)
-      }
-      await pipeline.exec()
-    }
+    await syncOrgDataToRedisLinks(data.id, redisUpdates)
   }
   if (opts?.team) {
     revalidatePath(`/organization/${data.id}/teams/dashboard/settings`)

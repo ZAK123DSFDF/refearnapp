@@ -11,6 +11,14 @@ export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
   if (!org) {
     throw { status: 500, toast: "failed to fetch organization data" }
   }
+  const [userSub, userPurchase] = await Promise.all([
+    db.query.subscription.findFirst({
+      where: (s, { eq }) => eq(s.userId, org.userId),
+    }),
+    db.query.purchase.findFirst({
+      where: (p, { eq }) => eq(p.userId, org.userId),
+    }),
+  ])
   const existingLinks = await db.query.affiliateLink.findMany({
     where: (a, { eq }) => eq(a.affiliateId, decoded.id),
   })
@@ -32,15 +40,24 @@ export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
     affiliateId: decoded.id,
     organizationId: decoded.orgId,
   })
+  const planType = userPurchase ? userPurchase.tier : userSub?.plan || "FREE"
+  const paymentType = userPurchase ? "ONE-TIME" : "SUBSCRIPTION"
+  const expiresAt = userSub?.expiresAt
+    ? userSub.expiresAt.toISOString()
+    : "null"
   await redis.hset(`ref:${code}`, {
     orgId: org.id,
+    ownerId: org.userId,
+    planType,
+    paymentType,
+    expiresAt,
     name: org.name,
     websiteUrl: domain,
     referralParam: org.referralParam || "ref",
     cookieLifetimeValue: String(org.cookieLifetimeValue),
     cookieLifetimeUnit: org.cookieLifetimeUnit || "day",
     commissionType: org.commissionType || "percentage",
-    commissionValue: org.commissionValue || "0.00",
+    commissionValue: String(org.commissionValue),
     commissionDurationValue: String(org.commissionDurationValue),
     commissionDurationUnit: org.commissionDurationUnit || "day",
     attributionModel: org.attributionModel,
