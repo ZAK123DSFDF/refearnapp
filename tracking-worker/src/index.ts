@@ -1,6 +1,6 @@
 import { Redis } from '@upstash/redis/cloudflare';
 import { shouldTrackRedis } from './shouldTrackRedis';
-
+import { getOrgSettings } from './getOrgSettings';
 export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
@@ -13,7 +13,6 @@ export default {
 		};
 
 		if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
-
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
 			const code = url.searchParams.get('code');
@@ -21,8 +20,8 @@ export default {
 				return new Response('Missing code', { status: 400, headers: corsHeaders });
 			}
 
-			const raw = await redis.hgetall(`ref:${code}`);
-			if (!raw || !raw.orgId) {
+			const org = await getOrgSettings(code, redis);
+			if (!org) {
 				return new Response('Not found', { status: 404, headers: corsHeaders });
 			}
 
@@ -36,7 +35,7 @@ export default {
 				attributionModel,
 				referralParam,
 				currency,
-			} = raw;
+			} = org;
 
 			return new Response(
 				JSON.stringify({
@@ -74,7 +73,7 @@ export default {
 				return new Response('Missing ref', { status: 400, headers: corsHeaders });
 			}
 
-			const org = (await redis.hgetall(`ref:${code}`)) as Record<string, string> | null;
+			const org = await getOrgSettings(code, redis);
 			if (!org || !org.orgId) {
 				return new Response(JSON.stringify({ success: false, reason: 'Invalid code' }), { status: 200, headers: corsHeaders });
 			}
