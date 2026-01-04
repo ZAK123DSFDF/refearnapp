@@ -32,8 +32,8 @@ export function usePaddleCheckout() {
   const [initialCheckout, setInitialCheckout] = useState(false)
   useEffect(() => {
     initializePaddle({
-      environment: "sandbox",
-      token: paddleConfig.token,
+      environment: paddleConfig.client.checkoutEnvironment,
+      token: paddleConfig.client.token,
       eventCallback: (data) => {
         if (data.name === "checkout.completed") {
           console.log("Paddle: payment completed", data)

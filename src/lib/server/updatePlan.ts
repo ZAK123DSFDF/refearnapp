@@ -1,12 +1,12 @@
 // lib/server/updatePlan.ts
 import { paddleConfig } from "@/util/PaddleConfig"
-import { Paddle, Environment } from "@paddle/paddle-node-sdk"
+import { Paddle } from "@paddle/paddle-node-sdk"
 import { db } from "@/db/drizzle"
 import { subscription } from "@/db/schema"
 import { eq } from "drizzle-orm"
 
-const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment: Environment.sandbox,
+const paddle = new Paddle(paddleConfig.server.apiToken, {
+  environment: paddleConfig.env,
 })
 
 /**

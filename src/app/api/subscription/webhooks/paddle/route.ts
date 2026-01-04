@@ -1,18 +1,18 @@
-import { Environment, EventName, Paddle } from "@paddle/paddle-node-sdk"
+import { EventName, Paddle } from "@paddle/paddle-node-sdk"
 import { NextResponse } from "next/server"
 import { purchase, subscription } from "@/db/schema"
 import { db } from "@/db/drizzle"
 import { eq } from "drizzle-orm"
 import { decodeOrgFromCustomData } from "@/util/DecodeOrgFromCustomData"
 import { syncOrgDataToRedisLinks } from "@/lib/server/syncOrgDataToRedisLinks"
-const paddle = new Paddle(process.env.PADDLE_SECRET_TOKEN!, {
-  environment: Environment.sandbox,
+import { paddleConfig } from "@/util/PaddleConfig"
+const paddle = new Paddle(paddleConfig.server.apiToken, {
+  environment: paddleConfig.env,
 })
 
 export async function POST(req: Request) {
   const signature = req.headers.get("paddle-signature") || ""
   const rawBody = await req.text()
-  const secretKey = process.env.WEBHOOK_SECRET_KEY || ""
 
   try {
     if (!signature || !rawBody) {
@@ -21,7 +21,11 @@ export async function POST(req: Request) {
     }
 
     // ✅ Verify and parse webhook
-    const event = await paddle.webhooks.unmarshal(rawBody, secretKey, signature)
+    const event = await paddle.webhooks.unmarshal(
+      rawBody,
+      paddleConfig.server.webhookSecret,
+      signature
+    )
     const { eventType, data } = event
 
     // 💳 Transaction completed — main event we care about

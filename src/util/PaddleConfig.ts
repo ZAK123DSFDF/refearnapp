@@ -1,9 +1,25 @@
+import { Environment } from "@paddle/paddle-node-sdk"
+
 const isProd = process.env.NODE_ENV === "production"
 
 export const paddleConfig = {
-  token: isProd
-    ? process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_PRODUCTION!
-    : process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_SANDBOX!,
+  env: isProd ? Environment.production : Environment.sandbox,
+  server: {
+    apiToken: isProd
+      ? process.env.PADDLE_SECRET_TOKEN_PRODUCTION!
+      : process.env.PADDLE_SECRET_TOKEN_SANDBOX!,
+    webhookSecret: isProd
+      ? process.env.PADDLE_WEBHOOK_SECRET_PRODUCTION!
+      : process.env.PADDLE_WEBHOOK_SECRET_SANDBOX!,
+  },
+  client: {
+    token: isProd
+      ? process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_PRODUCTION!
+      : process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN_SANDBOX!,
+    checkoutEnvironment: isProd
+      ? ("production" as const)
+      : ("sandbox" as const),
+  },
   priceIds: {
     SUBSCRIPTION: {
       MONTHLY: {
