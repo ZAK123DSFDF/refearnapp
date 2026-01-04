@@ -13,6 +13,7 @@ import { usePaddleCheckout } from "@/hooks/usePaddleCheckout"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { updateSubscriptionAction } from "@/app/(organization)/organization/[orgId]/dashboard/pricing/action"
 import { Loader2 } from "lucide-react"
+import { PRICING_CONFIG } from "@/lib/types/priceConfig"
 
 export function PricingGrid({
   billingType,
@@ -161,19 +162,24 @@ export function PricingGrid({
       }).then(() => console.log("Checkout closed"))
     }
   }
-
   const getPrice = (tier: PlanInfo["plan"]) => {
     if (tier === "FREE") return "$0"
     if (billingType === "SUBSCRIPTION") {
-      const monthlyPrice = tier === "PRO" ? 25 : 40
+      const monthlyPrice =
+        tier === "PRO"
+          ? PRICING_CONFIG.SUBSCRIPTION.PRO.MONTHLY
+          : PRICING_CONFIG.SUBSCRIPTION.ULTIMATE.MONTHLY
       if (subscriptionCycle === "MONTHLY") return `$${monthlyPrice} / month`
       if (subscriptionCycle === "YEARLY") {
-        const yearlyPrice = tier === "PRO" ? 252 : 403
-        return `$${yearlyPrice} / year`
+        const yearlyPrice =
+          tier === "PRO"
+            ? Math.round(PRICING_CONFIG.SUBSCRIPTION.PRO.YEARLY / 12)
+            : Math.round(PRICING_CONFIG.SUBSCRIPTION.ULTIMATE.YEARLY / 12)
+        return `$${yearlyPrice} / month`
       }
     } else {
-      const proPrice = 199
-      const ultimatePrice = 299
+      const proPrice = PRICING_CONFIG.PURCHASE.PRO
+      const ultimatePrice = PRICING_CONFIG.PURCHASE.ULTIMATE
       if (tier === "PRO") return `$${proPrice} one-time`
       if (tier === "ULTIMATE") {
         const proOwned =
@@ -194,15 +200,39 @@ export function PricingGrid({
   const getOldPrice = (tier: PlanInfo["plan"]) => {
     if (tier === "FREE") return null
     if (billingType === "SUBSCRIPTION") {
-      const monthlyPrice = tier === "PRO" ? 35 : 55
+      const monthlyPrice =
+        tier === "PRO"
+          ? Math.round(
+              PRICING_CONFIG.SUBSCRIPTION.PRO.MONTHLY *
+                PRICING_CONFIG.MARKUP_PERCENT
+            ) - 0.5
+          : Math.round(
+              PRICING_CONFIG.SUBSCRIPTION.ULTIMATE.MONTHLY *
+                PRICING_CONFIG.MARKUP_PERCENT
+            )
+      const yearlyPrice =
+        tier === "PRO"
+          ? Math.round(
+              (PRICING_CONFIG.SUBSCRIPTION.PRO.YEARLY *
+                PRICING_CONFIG.MARKUP_PERCENT) /
+                12
+            )
+          : Math.round(
+              (PRICING_CONFIG.SUBSCRIPTION.ULTIMATE.YEARLY *
+                PRICING_CONFIG.MARKUP_PERCENT) /
+                12
+            ) + 0.5
       if (subscriptionCycle === "MONTHLY") return `$${monthlyPrice} / month`
       if (subscriptionCycle === "YEARLY") {
-        const yearlyPrice = Math.round(monthlyPrice * 12 * 0.84)
-        return `$${yearlyPrice} / year`
+        return `$${yearlyPrice} / month`
       }
     } else {
-      const oldProPrice = 250
-      const oldUltimatePrice = 350
+      const oldProPrice = Math.round(
+        PRICING_CONFIG.PURCHASE.PRO * PRICING_CONFIG.MARKUP_PERCENT
+      )
+      const oldUltimatePrice = Math.round(
+        PRICING_CONFIG.PURCHASE.ULTIMATE * PRICING_CONFIG.MARKUP_PERCENT
+      )
       if (tier === "PRO") return `$${oldProPrice} one-time`
       if (tier === "ULTIMATE") {
         const proOwned =
