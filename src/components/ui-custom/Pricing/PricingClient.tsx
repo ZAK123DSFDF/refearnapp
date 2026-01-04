@@ -122,11 +122,11 @@ export default function PricingClient({
         plan.pendingPurchaseTier === "PRO" &&
         targetPlan === "ULTIMATE"
       ) {
-        return "Upgrade to Ultimate ($40)"
+        return "Upgrade to Ultimate ($100)"
       }
       if (currentType === "PURCHASE") {
         if (currentPlan === "PRO" && targetPlan === "ULTIMATE")
-          return "Upgrade to Ultimate ($40)"
+          return "Upgrade to Ultimate ($100)"
       }
 
       if (currentType === "SUBSCRIPTION" || currentType === "EXPIRED") {
