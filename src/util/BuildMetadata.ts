@@ -3,7 +3,7 @@ import type { Metadata } from "next"
 const unifiedDescription =
   "RefearnApp gives SaaS founders a simple, powerful way to run affiliate programs. Track referrals, understand performance, and grow revenue—without the technical overhead."
 
-const defaultImage = "/opengraph.png"
+const defaultImage = "/opengraph-update.png"
 const siteUrl = "https://refearnapp.com"
 interface MetadataOptions {
   title?: string

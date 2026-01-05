@@ -20,7 +20,7 @@ export async function generateMetadata({
     url: `${orgBaseUrl}/dashboard/payment`,
     icon: org.logoUrl ?? "/refearnapp.svg",
     siteName: org.name,
-    image: org.openGraphUrl ?? "/opengraph.png",
+    image: org.openGraphUrl ?? "/opengraph-update.png",
     indexable: false,
   })
 }

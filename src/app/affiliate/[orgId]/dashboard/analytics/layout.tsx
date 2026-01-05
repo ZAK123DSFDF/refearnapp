@@ -28,7 +28,7 @@ export async function generateMetadata({
     url: `${orgBaseUrl}/dashboard/analytics`,
     icon: org.logoUrl ?? "/refearnapp.svg",
     siteName: org.name,
-    image: org.openGraphUrl ?? "/opengraph.png",
+    image: org.openGraphUrl ?? "/opengraph-update.png",
     indexable: false,
   })
 }

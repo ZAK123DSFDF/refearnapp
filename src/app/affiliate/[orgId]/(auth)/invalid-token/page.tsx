@@ -18,7 +18,7 @@ export async function generateMetadata({
     url: `${orgBaseUrl}/invalid-token`,
     icon: org.logoUrl ?? "/refearnapp.svg",
     siteName: org.name,
-    image: org.openGraphUrl ?? "/opengraph.png",
+    image: org.openGraphUrl ?? "/opengraph-update.png",
     indexable: false,
   })
 }
