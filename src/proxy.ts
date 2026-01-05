@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db/drizzle"
 import { websiteDomain } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
+import { isReservedDomain } from "@/lib/constants/domains"
 
 export async function proxy(req: NextRequest) {
   const host = req.headers.get("host")
@@ -9,8 +10,7 @@ export async function proxy(req: NextRequest) {
 
   // 🚫 Skip platform / dev / vercel
   if (
-    host === "refearnapp.com" ||
-    host === "www.refearnapp.com" ||
+    isReservedDomain(host) ||
     host.endsWith(".vercel.app") ||
     host.startsWith("localhost") ||
     host.startsWith("127.0.0.1")

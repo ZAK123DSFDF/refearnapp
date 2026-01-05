@@ -5,8 +5,6 @@ import {
   organization,
   organizationAuthCustomization,
   organizationDashboardCustomization,
-  purchase,
-  subscription,
   websiteDomain,
 } from "@/db/schema"
 import { db } from "@/db/drizzle"
@@ -20,7 +18,7 @@ import { sanitizeDomain } from "@/util/SanitizeDomain"
 import { MutationData } from "@/lib/types/response"
 import { handleAction } from "@/lib/handleAction"
 import { getUserPlan } from "@/lib/server/getUserPlan"
-import { redis } from "@/lib/redis"
+import { isReservedDomain } from "@/lib/constants/domains"
 
 const s3Client = new S3Client({
   region: "auto",
@@ -77,6 +75,13 @@ export const CreateOrganization = async (
       .toLowerCase()
       .replace(/^https?:\/\//, "")
 
+    if (isReservedDomain(normalizedDomain)) {
+      throw {
+        ok: false,
+        toast:
+          "This domain is reserved for system use. Please choose a different subdomain.",
+      }
+    }
     // 🔍 Check if domain already exists in DB
     const existingDomain = await db.query.websiteDomain.findFirst({
       where: eq(websiteDomain.domainName, normalizedDomain),

@@ -5,6 +5,7 @@ import { websiteDomain } from "@/db/schema"
 import { CreateDomainType } from "@/lib/types/createDomainType"
 import { addDomainToVercel } from "@/lib/server/manageVercelDomain"
 import { and, eq, ne } from "drizzle-orm"
+import { isReservedDomain } from "@/lib/constants/domains"
 
 export async function createDomainsAction({
   orgId,
@@ -15,6 +16,13 @@ export async function createDomainsAction({
     .trim()
     .toLowerCase()
     .replace(/^https?:\/\//, "")
+  if (isReservedDomain(normalized)) {
+    throw {
+      ok: false,
+      toast:
+        "This domain is reserved for system use. Please choose a different subdomain.",
+    }
+  }
   const mapped = mapDomainType(domainType)
   const finalDomain = mapped.finalDomain(normalized)
   if (mapped.type === "DEFAULT") {
