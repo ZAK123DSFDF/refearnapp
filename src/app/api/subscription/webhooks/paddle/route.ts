@@ -274,29 +274,28 @@ export async function POST(req: Request) {
           .where(eq(subscription.userId, decodedOrg.id))
       } else {
         console.log("ℹ️ No pending one-time purchase — user becomes FREE")
-      }
-
-      await db
-        .update(subscription)
-        .set({
-          plan: "FREE",
-          billingInterval: "MONTHLY",
-          price: null,
-          priceId: null,
-          expiresAt: new Date(), // or keep null if you prefer
-          subscriptionChangeAt: null,
-          updatedAt: new Date(),
+        await db
+          .update(subscription)
+          .set({
+            plan: "FREE",
+            billingInterval: "MONTHLY",
+            price: null,
+            priceId: null,
+            expiresAt: new Date(), // or keep null if you prefer
+            subscriptionChangeAt: null,
+            updatedAt: new Date(),
+          })
+          .where(eq(subscription.userId, decodedOrg.id))
+        await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
+          ownerId: decodedOrg.id,
+          paymentType: "SUBSCRIPTION",
+          planType: "FREE",
+          expiresAt: new Date().toISOString(),
         })
-        .where(eq(subscription.userId, decodedOrg.id))
-      await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
-        ownerId: decodedOrg.id,
-        paymentType: "SUBSCRIPTION",
-        planType: "FREE",
-        expiresAt: new Date().toISOString(),
-      })
-      console.log(
-        `🧹 Subscription canceled → reset to FREE for ${decodedOrg.id}`
-      )
+        console.log(
+          `🧹 Subscription canceled → reset to FREE for ${decodedOrg.id}`
+        )
+      }
     }
   } catch (error) {
     console.error("❌ Webhook Error:", error)

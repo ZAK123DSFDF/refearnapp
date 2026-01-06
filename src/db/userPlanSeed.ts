@@ -1,7 +1,8 @@
 import prompts from "prompts"
 import { db } from "@/db/drizzle"
-import { subscription, purchase } from "@/db/schema"
+import { subscription, purchase, organization } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { syncOrgDataToRedisLinks } from "@/lib/server/syncOrgDataToRedisLinks"
 
 const DEV_USER_ID = "29022934-eb52-49af-aca4-b6ed553c89dd"
 
@@ -11,28 +12,46 @@ async function devSetUserPlan({
   type,
 }: {
   userId: string
-  plan: "FREE" | "PRO" | "ULTIMATE" | "ONE_TIME_100" | "ONE_TIME_200"
+  plan: "FREE" | "PRO" | "ULTIMATE"
   type: "FREE" | "SUBSCRIPTION" | "PURCHASE"
 }) {
   try {
+    // 1. Find the organization owned by this user to get the orgId
+    const userOrg = await db.query.organization.findFirst({
+      where: eq(organization.userId, userId),
+    })
+
+    if (!userOrg) {
+      console.error(
+        `❌ No organization found for user ${userId}. Redis cannot be synced.`
+      )
+      return
+    }
+
     // 🧹 Clear existing records
     await db.delete(subscription).where(eq(subscription.userId, userId))
     await db.delete(purchase).where(eq(purchase.userId, userId))
 
+    let expiresAt: Date | null = null
+    let paymentType: "SUBSCRIPTION" | "ONE-TIME" = "SUBSCRIPTION"
+
     // 🪙 SUBSCRIPTION PLAN
     if (type === "SUBSCRIPTION") {
+      expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      paymentType = "SUBSCRIPTION"
       await db.insert(subscription).values({
         userId,
         plan: plan === "ULTIMATE" ? "ULTIMATE" : "PRO",
         billingInterval: "MONTHLY",
         currency: "USD",
         price: plan === "ULTIMATE" ? "2000" : "1000",
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // +30 days
+        expiresAt,
       })
     }
-
     // 💳 ONE-TIME PURCHASE
     else if (type === "PURCHASE") {
+      paymentType = "ONE-TIME"
+      expiresAt = null // Purchases usually don't expire
       await db.insert(purchase).values({
         userId,
         tier: plan as "PRO" | "ULTIMATE",
@@ -40,21 +59,30 @@ async function devSetUserPlan({
         currency: "USD",
       })
     }
-
-    // 🆓 FREE PLAN (insert minimal data for consistency)
+    // 🆓 FREE PLAN
     else {
+      paymentType = "SUBSCRIPTION"
+      expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
       await db.insert(subscription).values({
         userId,
         plan: "FREE",
         billingInterval: "MONTHLY",
         currency: "USD",
         price: "0",
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // still expire after 30 days for testing
+        expiresAt,
       })
     }
 
+    // 🔥 SYNC TO REDIS
+    // This uses your type-safe sync function to update planType and expiresAt in Redis
+    await syncOrgDataToRedisLinks(userOrg.id, {
+      planType: plan as "FREE" | "PRO" | "ULTIMATE",
+      paymentType: paymentType,
+      expiresAt: expiresAt ? expiresAt.toISOString() : null,
+    })
+
     console.info(
-      `✅ Successfully set ${type} plan "${plan}" for user ${userId}`
+      `✅ Successfully set ${type} plan "${plan}" and synced Redis for user ${userId}`
     )
   } catch (error) {
     console.error(`❌ Failed to set plan`, error)
