@@ -116,7 +116,7 @@ export async function POST(req: Request) {
           currency,
         })
         await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
-          userId: decodedOrg.id,
+          ownerId: decodedOrg.id,
           planType,
           paymentType: "ONE-TIME",
           expiresAt: null,
@@ -153,7 +153,7 @@ export async function POST(req: Request) {
           })
           .where(eq(subscription.userId, decodedOrg.id))
         await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
-          userId: decodedOrg.id,
+          ownerId: decodedOrg.id,
           planType,
           paymentType: "SUBSCRIPTION",
           expiresAt: data.billingPeriod?.endsAt
@@ -264,7 +264,7 @@ export async function POST(req: Request) {
           .set({ isActive: true })
           .where(eq(purchase.userId, decodedOrg.id))
         await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
-          userId: decodedOrg.id,
+          ownerId: decodedOrg.id,
           planType: pendingPurchase.tier,
           paymentType: "ONE-TIME",
           expiresAt: null,
@@ -289,7 +289,7 @@ export async function POST(req: Request) {
         })
         .where(eq(subscription.userId, decodedOrg.id))
       await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
-        userId: decodedOrg.id,
+        ownerId: decodedOrg.id,
         paymentType: "SUBSCRIPTION",
         planType: "FREE",
         expiresAt: new Date().toISOString(),

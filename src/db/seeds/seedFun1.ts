@@ -33,7 +33,7 @@ import {
   user_seed,
   websiteDomain_seed,
 } from "@/db/seeds/databaseSeed"
-
+import { redis } from "@/lib/redis"
 async function seedFun() {
   await db.transaction(async (tx) => {
     // 1️⃣ Core identities
@@ -68,6 +68,47 @@ async function seedFun() {
       .insert(organizationDashboardCustomization)
       .values(organization_dashboard_customization_seed)
   })
+  console.log("📡 Syncing Affiliate Links to Redis...")
+
+  const org = organization_seed[0]
+  const activePurchase = purchase_seed[0]
+  const planType = activePurchase ? activePurchase.tier : "FREE"
+  const paymentType = activePurchase ? "ONE-TIME" : "SUBSCRIPTION"
+
+  // 1. Create a Pipeline
+  const pipeline = redis.pipeline()
+
+  affiliate_link_seed.forEach((link) => {
+    const domain = org.websiteUrl.replace(/^https?:\/\//, "")
+
+    const redisData = {
+      orgId: org.id,
+      ownerId: org.userId,
+      planType: String(planType),
+      paymentType: String(paymentType),
+      expiresAt: "null",
+      name: org.name,
+      websiteUrl: domain,
+      referralParam: org.referralParam || "ref",
+      cookieLifetimeValue: String(org.cookieLifetimeValue),
+      cookieLifetimeUnit: org.cookieLifetimeUnit || "day",
+      commissionType: org.commissionType || "percentage",
+      commissionValue: String(org.commissionValue),
+      commissionDurationValue: String(org.commissionDurationValue),
+      commissionDurationUnit: org.commissionDurationUnit || "day",
+      attributionModel: org.attributionModel,
+      currency: org.currency,
+    }
+
+    // 2. Use .set() with stringify instead of .hset()
+    // This counts as 1 command regardless of how many fields are inside
+    pipeline.set(`ref:${link.id}`, JSON.stringify(redisData))
+  })
+
+  // 3. Execute the pipeline
+  await pipeline.exec()
+
+  console.log(`✅ Synced ${affiliate_link_seed.length} links (1 command each)`)
 }
 
 seedFun()

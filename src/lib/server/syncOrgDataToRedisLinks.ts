@@ -2,6 +2,7 @@ import { db } from "@/db/drizzle"
 import { affiliateLink } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { redis } from "@/lib/redis"
+import { RedisLinkUpdate } from "@/lib/types/redisLinkMetadata"
 
 /**
  * Broadcasts updates to all affiliate links belonging to an organization.
@@ -9,7 +10,7 @@ import { redis } from "@/lib/redis"
  */
 export async function syncOrgDataToRedisLinks(
   orgId: string,
-  updates: Record<string, string | number | null>
+  updates: RedisLinkUpdate
 ) {
   // 1. Find all links for this org
   const links = await db.query.affiliateLink.findMany({
@@ -19,18 +20,33 @@ export async function syncOrgDataToRedisLinks(
 
   if (links.length === 0) return
 
-  // 2. Prepare updates (convert nulls to "null" strings for Worker safety)
-  const processedUpdates: Record<string, string | number> = {}
-  for (const [k, v] of Object.entries(updates)) {
-    processedUpdates[k] = v === null ? "null" : v
-  }
+  // 2. Fetch all current data for these links in one go
+  const keys = links.map((l) => `ref:${l.id}`)
+  const currentDataStrings = await redis.mget(...keys)
 
-  // 3. One Pipeline trip for all links
   const pipeline = redis.pipeline()
-  for (const link of links) {
-    pipeline.hset(`ref:${link.id}`, processedUpdates)
-  }
+
+  links.forEach((link, index) => {
+    const rawData = currentDataStrings[index]
+    if (!rawData) return // Skip if link somehow isn't in Redis
+
+    try {
+      // Parse existing JSON
+      const currentObj = JSON.parse(rawData as string)
+
+      // Merge the new updates into the existing object
+      const updatedObj = {
+        ...currentObj,
+        ...updates,
+      }
+
+      // 3. Save the merged object back as a String
+      pipeline.set(`ref:${link.id}`, JSON.stringify(updatedObj))
+    } catch (e) {
+      console.error(`Failed to sync link ${link.id}:`, e)
+    }
+  })
 
   await pipeline.exec()
-  console.log(`✅ Synced ${links.length} links for Org: ${orgId}`)
+  console.log(`✅ Synced ${links.length} JSON links for Org: ${orgId}`)
 }

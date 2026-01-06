@@ -122,17 +122,63 @@ export default {
 		const exists = await redis.exists('sync_batch');
 		if (!exists) return;
 
+		// 1. Isolate the data with a timestamped key
 		const processingKey = `sync_processing_${Date.now()}`;
 		await redis.rename('sync_batch', processingKey);
-		const batch = (await redis.hgetall(processingKey)) as Record<string, string>;
 
-		const response = await fetch(`${env.MAIN_APP_URL}/api/internal/sync-batch`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json', 'x-internal-secret': env.INTERNAL_SECRET },
-			body: JSON.stringify({ batch }),
-		});
+		let cursor = '0';
+		const fullBatch: Record<string, string> = {};
 
-		if (response.ok) await redis.del(processingKey);
-		else await redis.rename(processingKey, 'sync_batch');
+		// 2. Efficiently pull data into memory
+		do {
+			const [nextCursor, items] = await redis.hscan(processingKey, cursor, { count: 1000 });
+			cursor = nextCursor;
+
+			for (let i = 0; i < items.length; i += 2) {
+				// ✅ FIX: Explicitly cast key and value to String to resolve TS2322
+				const key = String(items[i]);
+				fullBatch[key] = String(items[i + 1]);
+			}
+		} while (cursor !== '0');
+
+		// 3. Prevent empty pings
+		const batchKeys = Object.keys(fullBatch);
+		if (batchKeys.length === 0) {
+			await redis.del(processingKey);
+			return;
+		}
+
+		try {
+			const response = await fetch(`${env.MAIN_APP_URL}/api/internal/sync-batch`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-internal-secret': env.INTERNAL_SECRET,
+				},
+				body: JSON.stringify({ batch: fullBatch }),
+			});
+
+			if (response.ok) {
+				// SUCCESS: Cleanup temp data
+				await redis.del(processingKey);
+				console.log(`✅ Synced ${batchKeys.length} items to Vercel.`);
+			} else {
+				throw new Error(`Server returned ${response.status}`);
+			}
+		} catch (error) {
+			console.error('❌ Sync failed, merging data back to main batch:', error);
+
+			/** * SAFE FAIL-BACK:
+			 * We iterate the fullBatch and use HINCRBY to merge it back into 'sync_batch'.
+			 * This ensures if new clicks happened while we were trying to sync,
+			 * we don't overwrite them; we add to them.
+			 */
+			const pipeline = redis.pipeline();
+			for (const [key, val] of Object.entries(fullBatch)) {
+				pipeline.hincrby('sync_batch', key, parseInt(val));
+			}
+			await pipeline.exec();
+			await redis.del(processingKey);
+		}
 	},
 };

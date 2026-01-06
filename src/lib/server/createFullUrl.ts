@@ -3,6 +3,7 @@ import { db } from "@/db/drizzle"
 import { generateAffiliateCode } from "@/util/idGenerators"
 import { affiliateLink } from "@/db/schema"
 import { redis } from "@/lib/redis"
+import { RedisLinkMetadata } from "@/lib/types/redisLinkMetadata"
 
 export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
   const org = await db.query.organization.findFirst({
@@ -45,7 +46,7 @@ export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
   const expiresAt = userSub?.expiresAt
     ? userSub.expiresAt.toISOString()
     : "null"
-  await redis.hset(`ref:${code}`, {
+  const redisMetadata: RedisLinkMetadata = {
     orgId: org.id,
     ownerId: org.userId,
     planType,
@@ -62,6 +63,7 @@ export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
     commissionDurationUnit: org.commissionDurationUnit || "day",
     attributionModel: org.attributionModel,
     currency: org.currency,
-  })
+  }
+  await redis.set(`ref:${code}`, JSON.stringify(redisMetadata))
   return { org, fullUrl }
 }
