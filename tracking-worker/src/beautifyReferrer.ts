@@ -1,4 +1,4 @@
-function beautifyReferrer(rawReferrer: string | undefined): string {
+export function beautifyReferrer(rawReferrer: string | undefined): string {
 	if (!rawReferrer || rawReferrer === 'direct') return 'direct';
 
 	try {

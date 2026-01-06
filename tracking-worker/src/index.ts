@@ -1,6 +1,7 @@
 import { Redis } from '@upstash/redis/cloudflare';
 import { shouldTrackRedis } from './shouldTrackRedis';
 import { getOrgSettings } from './getOrgSettings';
+import { beautifyReferrer } from './beautifyReferrer';
 export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
