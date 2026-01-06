@@ -14,116 +14,108 @@ export default {
 
 		if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 		// --- GET ORG SETTINGS ---
-		try {
-			if (url.pathname === '/org') {
-				const code = url.searchParams.get('code');
-				if (!code) {
-					return new Response('Missing code', { status: 400, headers: corsHeaders });
-				}
+		if (url.pathname === '/org') {
+			const code = url.searchParams.get('code');
+			if (!code) {
+				return new Response('Missing code', { status: 400, headers: corsHeaders });
+			}
 
-				const org = await getOrgSettings(code, redis);
-				if (!org) {
-					return new Response('Not found', { status: 404, headers: corsHeaders });
-				}
+			const org = await getOrgSettings(code, redis);
+			if (!org) {
+				return new Response('Not found', { status: 404, headers: corsHeaders });
+			}
 
-				const {
-					cookieLifetimeValue,
+			const {
+				cookieLifetimeValue,
+				cookieLifetimeUnit,
+				commissionType,
+				commissionValue,
+				commissionDurationValue,
+				commissionDurationUnit,
+				attributionModel,
+				referralParam,
+				currency,
+			} = org;
+
+			return new Response(
+				JSON.stringify({
+					cookieLifetimeValue: Number(cookieLifetimeValue),
 					cookieLifetimeUnit,
 					commissionType,
-					commissionValue,
-					commissionDurationValue,
+					commissionValue: Number(commissionValue),
+					commissionDurationValue: Number(commissionDurationValue),
 					commissionDurationUnit,
 					attributionModel,
 					referralParam,
 					currency,
-				} = org;
-
-				return new Response(
-					JSON.stringify({
-						cookieLifetimeValue: Number(cookieLifetimeValue),
-						cookieLifetimeUnit,
-						commissionType,
-						commissionValue: Number(commissionValue),
-						commissionDurationValue: Number(commissionDurationValue),
-						commissionDurationUnit,
-						attributionModel,
-						referralParam,
-						currency,
-					}),
-					{
-						headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-					},
-				);
-			}
-
-			// --- TRACK CLICK ---
-			if (url.pathname === '/track' && request.method === 'POST') {
-				const data = (await request.json()) as {
-					ref: string;
-					referrer?: string;
-					userAgent?: string;
-					url?: string;
-					host?: string;
-					browser?: string;
-					os?: string;
-					deviceType?: string;
-				};
-
-				const code = data.ref;
-				if (!code) {
-					return new Response('Missing ref', { status: 400, headers: corsHeaders });
-				}
-
-				const org = await getOrgSettings(code, redis);
-				if (!org || !org.orgId) {
-					return new Response(JSON.stringify({ success: false, reason: 'Invalid code' }), { status: 200, headers: corsHeaders });
-				}
-
-				const canTrack = shouldTrackRedis(org);
-
-				if (!canTrack) {
-					return new Response(
-						JSON.stringify({
-							success: false,
-							reason: 'Tracking disabled',
-						}),
-						{ status: 200, headers: corsHeaders },
-					);
-				}
-				// 🚀 THE HIGH-SCALE AGGREGATION ENGINE
-				const now = new Date();
-				const dateStr = now.toISOString().slice(0, 10);
-				const hour = now.getUTCHours();
-				const monthStr = now.toISOString().slice(0, 7);
-				const aggKey = [
-					code,
-					org.orgId,
-					dateStr,
-					hour,
-					data.host || 'unknown',
-					data.referrer || 'direct',
-					data.deviceType || 'desktop',
-					data.browser || 'unknown',
-					data.os || 'unknown',
-					data.url || 'unknown',
-				].join(':::');
-				ctx.waitUntil(Promise.all([redis.hincrby('sync_batch', aggKey, 1), redis.incr(`usage:total_clicks:${org.ownerId}:${monthStr}`)]));
-				return new Response(
-					JSON.stringify({
-						success: true,
-					}),
-					{ headers: corsHeaders },
-				);
-			}
-
-			return new Response('Not Found', { status: 404 });
-		} catch (error) {
-			console.error(error);
-			return new Response(JSON.stringify({ error: 'something went wrong' }), {
-				status: 500,
-				headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-			});
+				}),
+				{
+					headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+				},
+			);
 		}
+
+		// --- TRACK CLICK ---
+		if (url.pathname === '/track' && request.method === 'POST') {
+			const data = (await request.json()) as {
+				ref: string;
+				referrer?: string;
+				userAgent?: string;
+				url?: string;
+				host?: string;
+				browser?: string;
+				os?: string;
+				deviceType?: string;
+			};
+
+			const code = data.ref;
+			if (!code) {
+				return new Response('Missing ref', { status: 400, headers: corsHeaders });
+			}
+
+			const org = await getOrgSettings(code, redis);
+			if (!org || !org.orgId) {
+				return new Response(JSON.stringify({ success: false, reason: 'Invalid code' }), { status: 200, headers: corsHeaders });
+			}
+
+			const canTrack = shouldTrackRedis(org);
+
+			if (!canTrack) {
+				return new Response(
+					JSON.stringify({
+						success: false,
+						reason: 'Tracking disabled',
+					}),
+					{ status: 200, headers: corsHeaders },
+				);
+			}
+			// 🚀 THE HIGH-SCALE AGGREGATION ENGINE
+			const now = new Date();
+			const dateStr = now.toISOString().slice(0, 10);
+			const hour = now.getUTCHours();
+			const monthStr = now.toISOString().slice(0, 7);
+			const aggKey = [
+				code,
+				org.orgId,
+				dateStr,
+				hour,
+				data.host || 'unknown',
+				data.referrer || 'direct',
+				data.deviceType || 'desktop',
+				data.browser || 'unknown',
+				data.os || 'unknown',
+				data.url || 'unknown',
+			].join(':::');
+			ctx.waitUntil(Promise.all([redis.hincrby('sync_batch', aggKey, 1), redis.incr(`usage:total_clicks:${org.ownerId}:${monthStr}`)]));
+			return new Response(
+				JSON.stringify({
+					success: true,
+				}),
+				{ headers: corsHeaders },
+			);
+		}
+
+		return new Response('Not Found', { status: 404 });
 	},
 	async scheduled(_: any, env: any) {
 		const redis = Redis.fromEnv(env);
