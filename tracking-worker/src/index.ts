@@ -20,6 +20,7 @@ export default {
 		if (url.pathname === '/org') {
 			const ua = request.headers.get('user-agent') || '';
 			const trusted = Boolean(request.headers.get('cookie')?.includes('refearnapp_affiliate_click_tracked'));
+			console.log('Trusted:', trusted);
 			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
 			if (isBot || !trusted) {
 				return new Response('Bot blocked', { status: 403, headers: corsHeaders });
@@ -79,6 +80,7 @@ export default {
 			const ua = data.userAgent || request.headers.get('user-agent') || '';
 			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
 			const trusted = Boolean(request.headers.get('cookie')?.includes('refearnapp_affiliate_click_tracked'));
+			console.log('Trusted:', trusted);
 			if (isBot || !trusted) {
 				return new Response(JSON.stringify({ success: false, reason: 'Bot excluded' }), {
 					status: 403,
