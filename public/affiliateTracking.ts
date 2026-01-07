@@ -74,7 +74,7 @@ import { UAParser } from "ua-parser-js"
   function getReferralCode(): string | null {
     const botPattern =
       /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot|TelegramBot|WhatsApp|Snapchat|Discordbot|Mastodon|pinit/i
-    if (botPattern.test(navigator.userAgent) || navigator.webdriver) {
+    if (botPattern.test(navigator.userAgent)) {
       console.log("RefEarn: Bot ignored")
       return null
     }
@@ -111,6 +111,7 @@ import { UAParser } from "ua-parser-js"
     if (!sent) {
       fetch(TRACKING_ENDPOINT, {
         method: "POST",
+        mode: "no-cors",
         headers: {
           "Content-Type": "application/json",
         },
