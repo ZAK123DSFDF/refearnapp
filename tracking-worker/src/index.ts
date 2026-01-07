@@ -3,7 +3,7 @@ import { shouldTrackRedis } from './shouldTrackRedis';
 import { getOrgSettings } from './getOrgSettings';
 import { beautifyReferrer } from './beautifyReferrer';
 const BOT_REGEX =
-	/bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot/i;
+	/bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot|TelegramBot|WhatsApp|Snapchat|Discordbot|Mastodon|pinit/i;
 export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
@@ -19,7 +19,8 @@ export default {
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
 			const ua = request.headers.get('user-agent') || '';
-			if (BOT_REGEX.test(ua)) {
+			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
+			if (isBot) {
 				return new Response('Bot blocked', { status: 403, headers: corsHeaders });
 			}
 			const code = url.searchParams.get('code');
@@ -75,7 +76,8 @@ export default {
 				deviceType?: string;
 			};
 			const ua = data.userAgent || request.headers.get('user-agent') || '';
-			if (BOT_REGEX.test(ua)) {
+			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
+			if (isBot) {
 				return new Response(JSON.stringify({ success: false, reason: 'Bot excluded' }), {
 					status: 403,
 					headers: corsHeaders,

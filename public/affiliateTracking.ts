@@ -1,10 +1,5 @@
 import { UAParser } from "ua-parser-js"
 ;(function () {
-  const botPattern =
-    /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot/i
-  if (botPattern.test(navigator.userAgent)) {
-    return // Silent exit for bots
-  }
   const CLOUDFLARE_URL = "https://tracking-worker.zekariyasberihun8.workers.dev"
   const TRACKING_ENDPOINT = `${CLOUDFLARE_URL}/track`
   const ORGID_ENDPOINT = `${CLOUDFLARE_URL}/org`
@@ -78,8 +73,8 @@ import { UAParser } from "ua-parser-js"
 
   function getReferralCode(): string | null {
     const botPattern =
-      /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot/i
-    if (botPattern.test(navigator.userAgent)) {
+      /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot|TelegramBot|WhatsApp|Snapchat|Discordbot|Mastodon|pinit/i
+    if (botPattern.test(navigator.userAgent) || navigator.webdriver) {
       console.log("RefEarn: Bot ignored")
       return null
     }
