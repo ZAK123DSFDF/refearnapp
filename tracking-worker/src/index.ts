@@ -2,6 +2,8 @@ import { Redis } from '@upstash/redis/cloudflare';
 import { shouldTrackRedis } from './shouldTrackRedis';
 import { getOrgSettings } from './getOrgSettings';
 import { beautifyReferrer } from './beautifyReferrer';
+const BOT_REGEX =
+	/bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot/i;
 export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
@@ -16,6 +18,10 @@ export default {
 		if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
+			const ua = request.headers.get('user-agent') || '';
+			if (BOT_REGEX.test(ua)) {
+				return new Response('Bot blocked', { status: 403, headers: corsHeaders });
+			}
 			const code = url.searchParams.get('code');
 			if (!code) {
 				return new Response('Missing code', { status: 400, headers: corsHeaders });
@@ -68,15 +74,10 @@ export default {
 				os?: string;
 				deviceType?: string;
 			};
-			const ua = data.userAgent || '';
-			const isBot =
-				/bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot/i.test(
-					ua,
-				);
-
-			if (isBot) {
+			const ua = data.userAgent || request.headers.get('user-agent') || '';
+			if (BOT_REGEX.test(ua)) {
 				return new Response(JSON.stringify({ success: false, reason: 'Bot excluded' }), {
-					status: 200,
+					status: 403,
 					headers: corsHeaders,
 				});
 			}

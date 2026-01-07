@@ -77,6 +77,12 @@ import { UAParser } from "ua-parser-js"
   }
 
   function getReferralCode(): string | null {
+    const botPattern =
+      /bot|googlebot|crawler|spider|robot|crawling|facebookexternalhit|facebookcatalog|Facebot|Twitterbot|Pinterest|LinkedInBot|Slackbot/i
+    if (botPattern.test(navigator.userAgent)) {
+      console.log("RefEarn: Bot ignored")
+      return null
+    }
     const urlParams = new URLSearchParams(window.location.search)
     for (const key of REF_KEYS) {
       if (urlParams.has(key)) return urlParams.get(key)
@@ -130,11 +136,12 @@ import { UAParser } from "ua-parser-js"
           (affiliateData.attributionModel === "LAST_CLICK" &&
             trackedCode !== refCode)
         ) {
+          const cleanUrl = window.location.origin + window.location.pathname
           sendTrackingData({
             ref: refCode,
             referrer: document.referrer,
             userAgent: navigator.userAgent,
-            url: window.location.href,
+            url: cleanUrl,
             host: window.location.hostname,
             ...getDeviceInfo(),
           })
