@@ -11,7 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get("code")
-  const orgId = searchParams.get("orgId")
+  const orgId = searchParams.get("state")
 
   if (!code || !orgId) {
     return NextResponse.redirect(
