@@ -19,7 +19,7 @@ export default {
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
 			const ua = request.headers.get('user-agent') || '';
-			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
+			const isBot = BOT_REGEX.test(ua);
 			if (isBot) {
 				return new Response('Bot blocked', { status: 403, headers: corsHeaders });
 			}
@@ -76,7 +76,7 @@ export default {
 				deviceType?: string;
 			};
 			const ua = data.userAgent || request.headers.get('user-agent') || '';
-			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
+			const isBot = BOT_REGEX.test(ua);
 			if (isBot) {
 				return new Response(JSON.stringify({ success: false, reason: 'Bot excluded' }), {
 					status: 403,
