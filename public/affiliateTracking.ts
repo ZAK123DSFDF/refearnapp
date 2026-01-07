@@ -30,12 +30,7 @@ import { UAParser } from "ua-parser-js"
   async function storeRefCode(code: string) {
     try {
       const res = await fetch(
-        `${ORGID_ENDPOINT}?code=${encodeURIComponent(code)}`,
-        {
-          headers: {
-            "x-refearnapp-token": "refearnapp-v1-human",
-          },
-        }
+        `${ORGID_ENDPOINT}?code=${encodeURIComponent(code)}`
       )
       if (!res.ok) throw new Error("Failed to fetch organization info")
       type OrgTrackingConfig = {
@@ -122,7 +117,6 @@ import { UAParser } from "ua-parser-js"
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-refearnapp-token": "refearnapp-v1-human",
         },
         body: payload,
         keepalive: true,

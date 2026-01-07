@@ -20,9 +20,8 @@ export default {
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
 			const ua = request.headers.get('user-agent') || '';
-			const clientHeader = request.headers.get('x-refearnapp-token');
 			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
-			if (isBot || clientHeader !== CLIENT_TOKEN) {
+			if (isBot) {
 				return new Response('Bot blocked', { status: 403, headers: corsHeaders });
 			}
 			const code = url.searchParams.get('code');
@@ -78,10 +77,9 @@ export default {
 				deviceType?: string;
 				token?: string;
 			};
-			const clientHeader = request.headers.get('x-refearnapp-token');
 			const ua = data.userAgent || request.headers.get('user-agent') || '';
 			const isBot = BOT_REGEX.test(ua) || ua.includes('FBAN') || ua.includes('FBAV');
-			if (isBot || clientHeader !== CLIENT_TOKEN || data.token !== CLIENT_TOKEN) {
+			if (isBot || data.token !== CLIENT_TOKEN) {
 				return new Response(JSON.stringify({ success: false, reason: 'Bot excluded' }), {
 					status: 403,
 					headers: corsHeaders,
