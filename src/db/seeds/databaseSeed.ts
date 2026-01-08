@@ -34,12 +34,16 @@ const randomDateIn2025 = () => {
 }
 
 export const affiliate_seed = Array.from({ length: 20 }, (_, i) => {
-  const index = i === 0 ? "" : i.toString()
+  // Logic for the first entry vs the rest
+  const isFirst = i === 0
+
+  const name = isFirst ? "zekariyas" : `zak${i}`
+  const email = isFirst ? "zekariyasberihun8@gmail.com" : `zak${i}@gmail.com`
 
   return {
     id: crypto.randomUUID(),
-    name: `zak${index}`,
-    email: `zak${index}@gmail.com`,
+    name: name,
+    email: email,
     type: "AFFILIATE" as const,
     organizationId: ORG_ID,
     createdAt: new Date(),
@@ -241,12 +245,14 @@ export const affiliate_payout_method_seed = affiliate_seed.map(
   })
 )
 export const team_seed = Array.from({ length: 20 }, (_, i) => {
-  const index = i === 0 ? "" : i.toString()
+  const isFirst = i === 0
+  const name = isFirst ? "zekariyas" : `zak${i}`
+  const email = isFirst ? "zekariyasberihun8@gmail.com" : `zak${i}@gmail.com`
 
   return {
     id: crypto.randomUUID(),
-    name: `zak${index}`,
-    email: `zak${index}@gmail.com`,
+    name: name,
+    email: email,
     role: "TEAM" as const,
     type: "ORGANIZATION" as const,
     organizationId: ORG_ID,
