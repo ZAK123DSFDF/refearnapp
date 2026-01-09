@@ -288,7 +288,26 @@ export async function POST(req: NextRequest) {
 
       break
     }
+    case "charge.refunded": {
+      const charge = event.data.object as Stripe.Charge
 
+      console.log("⚠️ [STRIPE WEBHOOK] CHARGE REFUNDED")
+      console.log("- Refunded Charge ID:", charge.id)
+      console.log("- Payment Intent:", charge.payment_intent)
+      console.log("- Amount Refunded:", charge.amount_refunded)
+      console.log("- Metadata:", JSON.stringify(charge, null, 2))
+      break
+    }
+    case "charge.succeeded": {
+      const charge = event.data.object as Stripe.Charge
+
+      console.log("💳 [STRIPE WEBHOOK] CHARGE SUCCEEDED")
+      console.log("- Charge ID:", charge.id)
+      console.log("- Payment Intent:", charge.payment_intent)
+      console.log("- Customer ID:", charge.customer)
+      console.log("- Metadata:", JSON.stringify(charge, null, 2))
+      break
+    }
     default:
       console.log(`Unhandled event type: ${event.type}`)
   }

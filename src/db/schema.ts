@@ -513,6 +513,7 @@ export const affiliateInvoice = pgTable(
       .primaryKey()
       .$defaultFn(() => generateAffiliatePaymentLinkId()),
     paymentProvider: paymentProviderEnum("payment_provider").notNull(),
+    transactionId: text("transaction_id"),
     subscriptionId: text("subscription_id"),
     customerId: text("customer_id").notNull(),
     amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
@@ -530,6 +531,7 @@ export const affiliateInvoice = pgTable(
       .default("0")
       .notNull(),
     reason: affiliateInvoiceReasonEnum("reason").notNull().default("one_time"),
+    refundedAt: timestamp("refunded_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -538,6 +540,7 @@ export const affiliateInvoice = pgTable(
       table.affiliateLinkId,
       table.createdAt
     ),
+    index("affiliate_invoice_transaction_id_idx").on(table.transactionId),
     index("affiliate_invoice_created_at_idx").on(table.createdAt),
   ]
 )
