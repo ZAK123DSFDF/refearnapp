@@ -1,5 +1,12 @@
 import React from "react"
-import { Settings, Code2, Share2, BarChart3, ChevronDown } from "lucide-react"
+import {
+  Settings,
+  Code2,
+  Share2,
+  BarChart3,
+  ChevronDown,
+  CreditCard,
+} from "lucide-react"
 
 const steps = [
   {
@@ -18,13 +25,20 @@ const steps = [
   },
   {
     number: "03",
+    icon: <CreditCard className="w-10 h-10 text-primary" />,
+    title: "Integrate Checkout Tracking",
+    description:
+      "Pass the tracking ID to your payment processor (like Paddle or Stripe) to automatically attribute successful sales to your partners.",
+  },
+  {
+    number: "04",
     icon: <Share2 className="w-10 h-10 text-primary" />,
     title: "Share Your Affiliate Portal",
     description:
       "Invite partners and give them a branded portal where they can generate links, view stats, and track progress.",
   },
   {
-    number: "04",
+    number: "05",
     icon: <BarChart3 className="w-10 h-10 text-primary" />,
     title: "Track Performance Seamlessly",
     description:
