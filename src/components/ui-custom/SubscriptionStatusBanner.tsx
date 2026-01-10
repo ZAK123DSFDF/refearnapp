@@ -36,8 +36,19 @@ export function SubscriptionStatusBanner({
           Your {plan.plan} plan has expired
         </AlertTitle>
         <AlertDescription className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-2 gap-3">
-          <span>Please renew to continue accessing premium features.</span>
-          <Button onClick={handleRenewClick}>Renew Now</Button>
+          <div className="flex flex-col">
+            <span className="font-medium">Tracking is currently disabled.</span>
+            <span className="text-sm opacity-90">
+              You cannot track clicks, create organizations, or invite team
+              members until you renew.
+            </span>
+          </div>
+          <Button
+            onClick={handleRenewClick}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 shrink-0"
+          >
+            Renew Subscription
+          </Button>
         </AlertDescription>
       </Alert>
     </div>
