@@ -10,6 +10,7 @@ export const RESERVED_SUBDOMAINS = [
   "dashboard",
   "app",
   "www",
+  "origin",
 ] as const
 
 export const PRIMARY_DOMAIN = "refearnapp.com"

@@ -8,7 +8,35 @@ export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
-
+		const PAGES_URL = 'https://refearnapp.pages.dev';
+		const VERCEL_ORIGIN = 'https://origin.refearnapp.com';
+		if (url.pathname === '/') {
+			const resp = await fetch(PAGES_URL);
+			return new Response(resp.body, resp);
+		}
+		const marketingAssets = [
+			'/_next/static',
+			'/images',
+			'/fonts',
+			'/favicon.ico',
+			'/assets',
+			'/affiliate',
+			'/window.svg',
+			'/vercel.svg',
+			'/stripe-logo.svg',
+			'/refearnapp-opengraph.svg',
+			'/refearnapp.svg',
+			'/paddle-logo.svg',
+			'/opengraph-update.png',
+			'/next.svg',
+			'/index.html',
+			'/globe.svg',
+			'/file.svg',
+		];
+		if (marketingAssets.some((path) => url.pathname.startsWith(path))) {
+			const assetResp = await fetch(`${PAGES_URL}${url.pathname}`);
+			if (assetResp.ok) return assetResp;
+		}
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': '*',
 			'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -153,8 +181,10 @@ export default {
 
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
+		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
+		newRequest.headers.set('host', 'refearnapp.com');
 
-		return new Response('Not Found', { status: 404, headers: corsHeaders });
+		return fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
