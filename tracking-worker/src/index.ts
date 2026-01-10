@@ -10,6 +10,7 @@ export default {
 		const redis = Redis.fromEnv(env);
 		const PAGES_URL = 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = 'https://origin.refearnapp.com';
+		const PRIMARY_HOST = 'www.refearnapp.com';
 		if (url.pathname === '/') {
 			const resp = await fetch(PAGES_URL);
 			return new Response(resp.body, resp);
@@ -181,7 +182,8 @@ export default {
 			return new Response('System Live. Use ?type=sync|seed to test.', { status: 200 });
 		}
 		const newRequest = new Request(`${VERCEL_ORIGIN}${url.pathname}${url.search}`, request);
-		newRequest.headers.set('host', 'refearnapp.com');
+		newRequest.headers.set('host', PRIMARY_HOST);
+		newRequest.headers.set('x-forwarded-host', PRIMARY_HOST);
 
 		return fetch(newRequest);
 	},
