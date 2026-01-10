@@ -44,7 +44,6 @@ export async function getTimeSeriesData<T>(
           sql<number>`coalesce(sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission} else 0 end), 0)`.mapWith(
             Number
           ),
-        isRefunded: sql<boolean>`${affiliateInvoice.refundedAt} is not null`,
       })
       .from(affiliateInvoice)
       .where(
