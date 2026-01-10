@@ -15,7 +15,6 @@ export default {
 			return new Response(resp.body, resp);
 		}
 		const marketingAssets = [
-			'/_next/static',
 			'/images',
 			'/fonts',
 			'/favicon.ico',
