@@ -16,26 +16,27 @@ export default {
 			return new Response(resp.body, resp);
 		}
 		const marketingAssets = [
-			'/images',
-			'/fonts',
-			'/favicon.ico',
-			'/assets',
-			'/affiliate',
-			'/window.svg',
-			'/vercel.svg',
-			'/stripe-logo.svg',
-			'/refearnapp-opengraph.svg',
 			'/refearnapp.svg',
-			'/paddle-logo.svg',
 			'/opengraph-update.png',
-			'/next.svg',
-			'/index.html',
-			'/globe.svg',
-			'/file.svg',
+			'/brand.js',
+			'/faq.js',
+			'/feature.js',
+			'/footer.js',
+			'/header.js',
+			'/hero.js',
+			'/how-it-works.js',
+			'/pricing.js',
+			'/style.css',
+			'/testimonials.js',
 		];
-		if (marketingAssets.some((path) => url.pathname.startsWith(path))) {
+		const isAsset = marketingAssets.some((path) => url.pathname === path);
+
+		if (isAsset) {
+			// Fetch the asset from Cloudflare Pages
 			const assetResp = await fetch(`${PAGES_URL}${url.pathname}`);
-			if (assetResp.ok) return assetResp;
+			const newResp = new Response(assetResp.body, assetResp);
+			newResp.headers.set('Access-Control-Allow-Origin', '*');
+			return newResp;
 		}
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': '*',
