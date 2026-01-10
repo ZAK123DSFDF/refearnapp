@@ -11,33 +11,20 @@ export default {
 		const PAGES_URL = 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = 'www.refearnapp.com';
+		const ASSET_EXTENSIONS = ['.js', '.css', '.png', '.jpg', '.jpeg', '.svg', '.webp', '.ico'];
 		if (url.pathname === '/') {
 			const resp = await fetch(PAGES_URL);
 			return new Response(resp.body, resp);
 		}
-		const marketingAssets = [
-			'/refearnapp.svg',
-			'/opengraph-update.png',
-			'/brand.js',
-			'/faq.js',
-			'/feature.js',
-			'/footer.js',
-			'/header.js',
-			'/hero.js',
-			'/how-it-works.js',
-			'/pricing.js',
-			'/style.css',
-			'/testimonials.js',
-			'/output.css',
-		];
-		const isAsset = marketingAssets.some((path) => url.pathname === path);
+		const isAsset = ASSET_EXTENSIONS.some((ext) => url.pathname.endsWith(ext));
 
 		if (isAsset) {
-			// Fetch the asset from Cloudflare Pages
 			const assetResp = await fetch(`${PAGES_URL}${url.pathname}`);
-			const newResp = new Response(assetResp.body, assetResp);
-			newResp.headers.set('Access-Control-Allow-Origin', '*');
-			return newResp;
+			if (assetResp.status === 200) {
+				const newResp = new Response(assetResp.body, assetResp);
+				newResp.headers.set('Access-Control-Allow-Origin', '*');
+				return newResp;
+			}
 		}
 		const corsHeaders = {
 			'Access-Control-Allow-Origin': '*',
