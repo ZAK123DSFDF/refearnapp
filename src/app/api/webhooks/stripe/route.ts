@@ -201,31 +201,44 @@ export async function POST(req: NextRequest) {
       const customerId = invoice.customer as string
       const reason = invoice.billing_reason
 
-      if (!subscriptionId) {
-        console.warn("❌ No valid subscriptionId found.")
-        return
-      }
-
       if (reason === "subscription_update" || reason === "subscription_cycle") {
-        const isExpired = await checkSubscriptionExpired(
-          subscriptionId,
-          invoiceCreatedDate
-        )
-        if (isExpired) {
-          console.warn("❌ Subscription expired — skipping:", subscriptionId)
-          break
+        // 1. Expiration Check
+        if (subscriptionId) {
+          const isExpired = await checkSubscriptionExpired(
+            subscriptionId,
+            invoiceCreatedDate
+          )
+          if (isExpired) {
+            console.warn(
+              "❌ Subscription commission period expired:",
+              subscriptionId
+            )
+            break
+          }
         }
-        const latestInvoice = await db.query.affiliateInvoice.findFirst({
-          where: (table, { eq }) => eq(table.subscriptionId, subscriptionId),
+
+        // 2. Lookup by Customer ID (The Reliable Anchor)
+        // We look for the most recent record for this customer to find the affiliate link
+        const latestRecord = await db.query.affiliateInvoice.findFirst({
+          where: (table, { eq, and }) =>
+            and(
+              eq(table.customerId, customerId),
+              eq(table.reason, "placeholder_from_charge")
+            ),
           orderBy: (table, { desc }) => [desc(table.createdAt)],
         })
-
-        if (!latestInvoice || !latestInvoice.affiliateLinkId) {
-          console.warn("❌ No affiliate record found to link this payment to.")
+        // Handle "Subinvoice is possibly undefined" by returning early if no history exists
+        if (!latestRecord || !latestRecord.affiliateLinkId) {
+          console.warn(
+            "❌ No previous invoice or affiliate link found for customer:",
+            customerId
+          )
           return
         }
+
+        // 3. Get Organization Data
         const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-          where: (link, { eq }) => eq(link.id, latestInvoice.affiliateLinkId!),
+          where: (link, { eq }) => eq(link.id, latestRecord.affiliateLinkId!),
         })
         if (!affiliateLinkRecord) break
 
@@ -233,27 +246,33 @@ export async function POST(req: NextRequest) {
           affiliateLinkRecord.organizationId
         )
         if (!organizationRecord) break
+
+        // 4. Identify Placeholder
+        // If the latest record is a placeholder from a charge, we update it.
+        // Otherwise, it's a new month, so we pass null to 'invoicePaidUpdate' to trigger an INSERT.
         const placeholderId =
-          latestInvoice.reason === "placeholder_from_charge"
-            ? latestInvoice.id
+          latestRecord.reason === "placeholder_from_charge"
+            ? latestRecord.id
             : null
 
         const total = String(invoice.total_excluding_tax ?? 0)
         const currency = invoice.currency
         const commissionType = organizationRecord.commissionType ?? "percentage"
         const commissionValue = organizationRecord.commissionValue ?? "0.00"
+
+        // 5. Final Update or Insert
         await invoicePaidUpdate(
           total,
           currency,
           customerId,
-          subscriptionId,
-          latestInvoice.affiliateLinkId,
+          subscriptionId || "",
+          latestRecord.affiliateLinkId,
           commissionType,
           commissionValue,
           placeholderId
         )
 
-        console.log(`✅ Handled ${reason} for sub: ${subscriptionId}`)
+        console.log(`✅ Handled ${reason} for customer: ${customerId}`)
       }
       break
     }
