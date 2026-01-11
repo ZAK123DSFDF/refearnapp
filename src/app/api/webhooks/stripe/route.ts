@@ -3,18 +3,17 @@ import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 
 import { db } from "@/db/drizzle"
-import { affiliateInvoice, subscriptionExpiration } from "@/db/schema"
-import { addDays } from "date-fns"
+import { affiliateInvoice } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { generateStripeCustomerId } from "@/util/StripeCustomerId"
 import { convertToUSD } from "@/util/CurrencyConvert"
 import { getCurrencyDecimals } from "@/util/CurrencyDecimal"
 import { safeFormatAmount } from "@/util/SafeParse"
 import { invoicePaidUpdate } from "@/util/InvoicePaidUpdate"
-import { calculateExpirationDate } from "@/util/CalculateExpiration"
 import { getAffiliateLinkRecord } from "@/services/getAffiliateLinkRecord"
 import { getOrganizationById } from "@/services/getOrganizationById"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
+import { handleSubscriptionExpiration } from "@/lib/server/handleSubscriptionExpiration"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
 })
@@ -76,11 +75,15 @@ export async function POST(req: NextRequest) {
 
       // 1. CHECK FOR PLACEHOLDER
       const placeholder = await db.query.affiliateInvoice.findFirst({
-        where: (table, { eq, and }) =>
+        where: (table, { eq, and, or }) =>
           and(
             eq(table.customerId, customerId),
-            eq(table.reason, "placeholder_from_charge")
+            or(
+              eq(table.reason, "placeholder_from_charge"),
+              eq(table.reason, "placeholder_from_subscription")
+            )
           ),
+        orderBy: (table, { desc }) => [desc(table.createdAt)],
       })
 
       // 2. EITHER UPDATE OR INSERT (ONLY ONCE)
@@ -121,20 +124,16 @@ export async function POST(req: NextRequest) {
 
       // 3. SEPARATE LOGIC FOR EXPIRATION (ONLY)
       if (subscriptionId) {
-        const subscriptionExpirationRecord =
-          await getSubscriptionExpiration(subscriptionId)
-        if (!subscriptionExpirationRecord) {
-          const expirationDate = calculateExpirationDate(
-            new Date(),
-            organizationRecord.commissionDurationValue,
-            organizationRecord.commissionDurationUnit
-          )
-          await db.insert(subscriptionExpiration).values({
-            subscriptionId,
-            expirationDate,
-          })
-          console.log("✅ Created subscription expiration record")
+        const sub = await stripe.subscriptions.retrieve(subscriptionId)
+        let trialDays = 0
+        if (sub.trial_end && sub.trial_start) {
+          trialDays = Math.round((sub.trial_end - sub.trial_start) / 86400)
         }
+        await handleSubscriptionExpiration(
+          subscriptionId,
+          organizationRecord,
+          trialDays
+        )
       }
 
       break
@@ -143,84 +142,48 @@ export async function POST(req: NextRequest) {
     case "customer.subscription.created": {
       const subscription = event.data.object as Stripe.Subscription
       const subscriptionId = subscription.id
-
-      console.log("✅ Subscription created:", subscriptionId)
+      const customerId = subscription.customer as string
 
       if (
         subscription.status === "trialing" &&
-        subscription.trial_end !== null &&
-        subscription.trial_start !== null
+        subscription.trial_end &&
+        subscription.trial_start
       ) {
-        const trialDurationMs =
-          (subscription.trial_end - subscription.trial_start) * 1000
-        const trialDaysOnly = Math.round(
-          trialDurationMs / (1000 * 60 * 60 * 24)
+        const trialDays = Math.round(
+          (subscription.trial_end - subscription.trial_start) / (60 * 60 * 24)
         )
-        const tryGetAffiliatePayment = async (
-          retries: number
-        ): Promise<any> => {
-          for (let i = 0; i <= retries; i++) {
-            const existing = await db.query.affiliateInvoice.findFirst({
-              where: (tx, { eq }) => eq(tx.subscriptionId, subscriptionId),
-            })
-            if (existing) return existing
-            if (i < retries) await new Promise((res) => setTimeout(res, 2000))
-          }
-          return null
-        }
 
-        const invoice = await tryGetAffiliatePayment(4)
-        if (!invoice) {
-          console.warn(
-            "❌ No affiliate payment found after retries:",
-            subscriptionId
-          )
-          break
-        }
-        const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-          where: (link, { eq }) => eq(link.id, invoice.affiliateLinkId),
+        // Check for existing invoice (could be from charge or session)
+        let invoice = await db.query.affiliateInvoice.findFirst({
+          where: (tx, { eq }) => eq(tx.subscriptionId, subscriptionId),
         })
-        if (!affiliateLinkRecord) {
-          console.warn("❌ No affiliate link found for invoice:", invoice.id)
-          break
-        }
-        const organizationRecord = await getOrganizationById(
-          affiliateLinkRecord.organizationId
-        )
-        if (!organizationRecord) break
-        const existingExpiration =
-          await getSubscriptionExpiration(subscriptionId)
-        let expirationDate: Date
-        if (existingExpiration) {
-          expirationDate = addDays(new Date(), trialDaysOnly)
 
-          await db
-            .update(subscriptionExpiration)
-            .set({ expirationDate })
-            .where(eq(subscriptionExpiration.subscriptionId, subscriptionId))
-        } else {
-          expirationDate = calculateExpirationDate(
-            new Date(),
-            organizationRecord.commissionDurationValue,
-            organizationRecord.commissionDurationUnit
-          )
-
-          await db.insert(subscriptionExpiration).values({
+        if (!invoice) {
+          await db.insert(affiliateInvoice).values({
+            paymentProvider: "stripe",
             subscriptionId,
-            expirationDate,
+            customerId,
+            amount: "0.00",
+            currency: "USD",
+            commission: "0.00",
+            paidAmount: "0.00",
+            unpaidAmount: "0.00",
+            reason: "placeholder_from_subscription",
           })
+          console.log(
+            "⏳ Created subscription placeholder. Waiting for session metadata."
+          )
+        } else if (invoice.affiliateLinkId) {
+          const link = await db.query.affiliateLink.findFirst({
+            where: (l, { eq }) => eq(l.id, invoice!.affiliateLinkId!),
+          })
+          if (link) {
+            const org = await getOrganizationById(link.organizationId)
+            if (org)
+              await handleSubscriptionExpiration(subscriptionId, org, trialDays)
+          }
         }
-
-        console.log(
-          "✅ Updated affiliate payment with trial days:",
-          subscriptionId
-        )
-      } else {
-        console.log(
-          `Subscription status is '${subscription.status}' — skipping`
-        )
       }
-
       break
     }
 
