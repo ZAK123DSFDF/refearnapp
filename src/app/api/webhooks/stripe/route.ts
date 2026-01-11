@@ -124,7 +124,14 @@ export async function POST(req: NextRequest) {
 
       // 3. SEPARATE LOGIC FOR EXPIRATION (ONLY)
       if (subscriptionId) {
-        const sub = await stripe.subscriptions.retrieve(subscriptionId)
+        const stripeAccountRecord =
+          await db.query.organizationStripeAccount.findFirst({
+            where: (table, { eq }) => eq(table.orgId, organizationRecord.id),
+          })
+        const stripeAccountId = stripeAccountRecord?.stripeAccountId
+        const sub = await stripe.subscriptions.retrieve(subscriptionId, {
+          stripeAccount: stripeAccountId,
+        })
         let trialDays = 0
         if (sub.trial_end && sub.trial_start) {
           trialDays = Math.round((sub.trial_end - sub.trial_start) / 86400)
