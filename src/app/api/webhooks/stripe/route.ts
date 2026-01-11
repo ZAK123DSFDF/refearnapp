@@ -196,6 +196,8 @@ export async function POST(req: NextRequest) {
     case "invoice.paid": {
       const invoice = event.data.object as Stripe.Invoice
       const invoiceCreatedDate = new Date(invoice.created * 1000)
+
+      // Standardizing subscription ID retrieval
       const subscriptionId = invoice.parent?.subscription_details
         ?.subscription as string
       const customerId = invoice.customer as string
@@ -213,27 +215,27 @@ export async function POST(req: NextRequest) {
               "❌ Subscription commission period expired:",
               subscriptionId
             )
-            break
+            break // Falls through to the final NextResponse.json
           }
         }
 
-        // 2. Lookup by Customer ID (The Reliable Anchor)
-        // We look for the most recent record for this customer to find the affiliate link
+        // 2. THE FIX: Find the most recent record for this customer (any reason)
+        // This ensures we find the original affiliateLinkId even for renewals.
         const latestRecord = await db.query.affiliateInvoice.findFirst({
-          where: (table, { eq, and }) =>
-            and(
-              eq(table.customerId, customerId),
-              eq(table.reason, "placeholder_from_charge")
-            ),
+          where: (table, { eq }) => eq(table.customerId, customerId),
           orderBy: (table, { desc }) => [desc(table.createdAt)],
         })
-        // Handle "Subinvoice is possibly undefined" by returning early if no history exists
+
         if (!latestRecord || !latestRecord.affiliateLinkId) {
           console.warn(
-            "❌ No previous invoice or affiliate link found for customer:",
+            "❌ No affiliate link history found for customer:",
             customerId
           )
-          return
+          // FIX: Use return NextResponse.json instead of just return
+          return NextResponse.json(
+            { error: "No history found" },
+            { status: 200 }
+          )
         }
 
         // 3. Get Organization Data
@@ -247,11 +249,11 @@ export async function POST(req: NextRequest) {
         )
         if (!organizationRecord) break
 
-        // 4. Identify Placeholder
-        // If the latest record is a placeholder from a charge, we update it.
-        // Otherwise, it's a new month, so we pass null to 'invoicePaidUpdate' to trigger an INSERT.
+        // 4. Identify if we should UPDATE or INSERT
+        // We ONLY update if the record found is a placeholder from the recent charge
         const placeholderId =
-          latestRecord.reason === "placeholder_from_charge"
+          latestRecord.reason === "placeholder_from_charge" ||
+          latestRecord.reason === "placeholder_from_subscription"
             ? latestRecord.id
             : null
 
@@ -272,7 +274,9 @@ export async function POST(req: NextRequest) {
           placeholderId
         )
 
-        console.log(`✅ Handled ${reason} for customer: ${customerId}`)
+        console.log(
+          `✅ Handled ${reason} for customer: ${customerId}. Merged: ${!!placeholderId}`
+        )
       }
       break
     }
