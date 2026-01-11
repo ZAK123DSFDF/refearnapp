@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       }
 
       const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-        where: (link, { eq }) => eq(link.id, existingInvoice.affiliateLinkId),
+        where: (link, { eq }) => eq(link.id, existingInvoice.affiliateLinkId!),
       })
       if (!affiliateLinkRecord)
         return NextResponse.json(
