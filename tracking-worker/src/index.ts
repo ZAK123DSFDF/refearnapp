@@ -29,6 +29,8 @@ export default {
 			'/style.css',
 			'/testimonials.js',
 			'/output.css',
+			'/favicon-96x96.png',
+			'/apple-touch-icon.png',
 		];
 		const isAsset = marketingAssets.some((path) => url.pathname === path);
 
