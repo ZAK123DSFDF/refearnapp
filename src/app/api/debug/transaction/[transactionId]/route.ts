@@ -3,15 +3,12 @@ import { affiliateInvoice } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { NextRequest, NextResponse } from "next/server"
 
-// ✅ params must be treated as a Promise in Next.js 15
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ transactionId: string }> }
 ) {
-  // 1. Await the params to get the transactionId
   const { transactionId } = await params
 
-  // 2. Check for the Secret Header
   const authHeader = request.headers.get("x-refearn-debug-secret")
   if (authHeader !== process.env.DEBUG_SECRET) {
     return new Response("Unauthorized", { status: 401 })
@@ -30,8 +27,8 @@ export async function GET(
       id: invoice.transactionId,
       customer_id: invoice.customerId,
       subscription_id: invoice.subscriptionId,
-      amount: invoice.rawAmount,
-      currency: invoice.rawCurrency,
+      amount: invoice.amount,
+      currency: "USD",
     })
   } catch (error) {
     console.error("Debug API Error:", error)
