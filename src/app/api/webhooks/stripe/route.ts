@@ -77,10 +77,7 @@ export async function POST(req: NextRequest) {
         where: (table, { eq, and, or }) =>
           and(
             eq(table.customerId, availableId),
-            or(
-              eq(table.reason, "placeholder_from_charge"),
-              eq(table.reason, "placeholder_from_subscription")
-            )
+            or(eq(table.reason, "placeholder_from_charge"))
           ),
         orderBy: (table, { desc }) => [desc(table.createdAt)],
       })
@@ -144,55 +141,6 @@ export async function POST(req: NextRequest) {
 
       break
     }
-
-    case "customer.subscription.created": {
-      const subscription = event.data.object as Stripe.Subscription
-      const subscriptionId = subscription.id
-      const customerId = subscription.customer as string
-
-      if (
-        subscription.status === "trialing" &&
-        subscription.trial_end &&
-        subscription.trial_start
-      ) {
-        const trialDays = Math.round(
-          (subscription.trial_end - subscription.trial_start) / (60 * 60 * 24)
-        )
-
-        // Check for existing invoice (could be from charge or session)
-        let invoice = await db.query.affiliateInvoice.findFirst({
-          where: (tx, { eq }) => eq(tx.subscriptionId, subscriptionId),
-        })
-
-        if (!invoice) {
-          await db.insert(affiliateInvoice).values({
-            paymentProvider: "stripe",
-            subscriptionId,
-            customerId,
-            amount: "0.00",
-            currency: "USD",
-            commission: "0.00",
-            paidAmount: "0.00",
-            unpaidAmount: "0.00",
-            reason: "placeholder_from_subscription",
-          })
-          console.log(
-            "⏳ Created subscription placeholder. Waiting for session metadata."
-          )
-        } else if (invoice.affiliateLinkId) {
-          const link = await db.query.affiliateLink.findFirst({
-            where: (l, { eq }) => eq(l.id, invoice!.affiliateLinkId!),
-          })
-          if (link) {
-            const org = await getOrganizationById(link.organizationId)
-            if (org)
-              await handleSubscriptionExpiration(subscriptionId, org, trialDays)
-          }
-        }
-      }
-      break
-    }
-
     case "invoice.paid": {
       const invoice = event.data.object as Stripe.Invoice
       const invoiceCreatedDate = new Date(invoice.created * 1000)
