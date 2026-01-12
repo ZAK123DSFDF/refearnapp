@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session
       const metadata = session.metadata || {}
+
       const refDataRaw = metadata.refearnapp_affiliate_code
       if (!refDataRaw) break
 
@@ -49,6 +50,14 @@ export async function POST(req: NextRequest) {
 
       const mode = session.mode
       const isSubscription = mode === "subscription"
+      const isTrial = isSubscription && session.amount_total === 0
+      let finalReason: "trial_start" | "subscription_create" | "one_time"
+
+      if (isSubscription) {
+        finalReason = isTrial ? "trial_start" : "subscription_create"
+      } else {
+        finalReason = "one_time"
+      }
       const availableId =
         (session.customer as string) ?? (session.payment_intent as string)
       const subscriptionId = isSubscription
@@ -95,7 +104,7 @@ export async function POST(req: NextRequest) {
             commission: commission.toString(),
             unpaidAmount: commission.toFixed(2),
             affiliateLinkId: affiliateLinkRecord.id,
-            reason: isSubscription ? "subscription_create" : "one_time",
+            reason: finalReason,
             updatedAt: new Date(),
           })
           .where(eq(affiliateInvoice.id, placeholder.id))
@@ -113,7 +122,7 @@ export async function POST(req: NextRequest) {
           paidAmount: "0.00",
           unpaidAmount: commission.toFixed(2),
           affiliateLinkId: affiliateLinkRecord.id,
-          reason: isSubscription ? "subscription_create" : "one_time",
+          reason: finalReason,
         })
         console.log("✅ Created fresh invoice.")
       }
@@ -239,8 +248,12 @@ export async function POST(req: NextRequest) {
         (charge.customer as string) ?? (charge.payment_intent as string)
       const chargeId = charge.id
       const existingInvoice = await db.query.affiliateInvoice.findFirst({
-        where: (table, { eq, and, isNull }) =>
-          and(eq(table.customerId, availableId), isNull(table.transactionId)),
+        where: (table, { eq, and, isNull, ne }) =>
+          and(
+            eq(table.customerId, availableId),
+            isNull(table.transactionId),
+            ne(table.reason, "trial_start")
+          ),
         orderBy: (table, { desc }) => [desc(table.createdAt)],
       })
 
