@@ -72,51 +72,21 @@ export async function POST(req: NextRequest) {
         commission = parseFloat(commissionValue)
       }
 
-      // 1. CHECK FOR PLACEHOLDER
-      const placeholder = await db.query.affiliateInvoice.findFirst({
-        where: (table, { eq, and, or }) =>
-          and(
-            eq(table.customerId, availableId),
-            or(eq(table.reason, "placeholder_from_charge"))
-          ),
-        orderBy: (table, { desc }) => [desc(table.createdAt)],
+      await db.insert(affiliateInvoice).values({
+        paymentProvider: "stripe",
+        subscriptionId,
+        customerId: availableId,
+        amount: amount.toString(),
+        currency: "USD",
+        rawAmount,
+        rawCurrency,
+        commission: commission.toString(),
+        paidAmount: "0.00",
+        unpaidAmount: commission.toFixed(2),
+        affiliateLinkId: affiliateLinkRecord.id,
+        reason: isSubscription ? "subscription_create" : "one_time",
       })
-
-      // 2. EITHER UPDATE OR INSERT (ONLY ONCE)
-      if (placeholder) {
-        await db
-          .update(affiliateInvoice)
-          .set({
-            subscriptionId,
-            amount: amount.toString(),
-            currency: "USD",
-            rawAmount,
-            rawCurrency,
-            commission: commission.toString(),
-            unpaidAmount: commission.toFixed(2),
-            affiliateLinkId: affiliateLinkRecord.id,
-            reason: isSubscription ? "subscription_create" : "one_time",
-            updatedAt: new Date(),
-          })
-          .where(eq(affiliateInvoice.id, placeholder.id))
-        console.log("✅ Updated placeholder:", placeholder.id)
-      } else {
-        await db.insert(affiliateInvoice).values({
-          paymentProvider: "stripe",
-          subscriptionId,
-          customerId: availableId,
-          amount: amount.toString(),
-          currency: "USD",
-          rawAmount,
-          rawCurrency,
-          commission: commission.toString(),
-          paidAmount: "0.00",
-          unpaidAmount: commission.toFixed(2),
-          affiliateLinkId: affiliateLinkRecord.id,
-          reason: isSubscription ? "subscription_create" : "one_time",
-        })
-        console.log("✅ Created fresh invoice.")
-      }
+      console.log("✅ Created fresh invoice.")
 
       // 3. SEPARATE LOGIC FOR EXPIRATION (ONLY)
       if (subscriptionId) {
