@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card"
 import { PaddleImageProvider } from "@/provider/PaddleImageProvider"
 import { PaddleImageDialog } from "@/components/ui-custom/PaddleImageDialog"
 
-const WEBHOOK_URL = "https://refearnapp.com/api/webhooks/paddle"
+const WEBHOOK_URL = "https://origin.refearnapp.com/api/webhooks/paddle"
 
 export default function PaddleIntegration({
   orgId,
