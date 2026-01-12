@@ -197,7 +197,6 @@ export async function POST(req: NextRequest) {
       const invoice = event.data.object as Stripe.Invoice
       const invoiceCreatedDate = new Date(invoice.created * 1000)
 
-      // Standardizing subscription ID retrieval
       const subscriptionId = invoice.parent?.subscription_details
         ?.subscription as string
       const customerId = invoice.customer as string
@@ -211,37 +210,52 @@ export async function POST(req: NextRequest) {
             invoiceCreatedDate
           )
           if (isExpired) {
-            console.warn(
-              "❌ Subscription commission period expired:",
-              subscriptionId
-            )
-            break // Falls through to the final NextResponse.json
+            console.warn("❌ Subscription expired — skipping:", subscriptionId)
+            break
           }
         }
 
-        // 2. THE FIX: Find the most recent record for this customer (any reason)
-        // This ensures we find the original affiliateLinkId even for renewals.
-        const latestRecord = await db.query.affiliateInvoice.findFirst({
-          where: (table, { eq }) => eq(table.customerId, customerId),
-          orderBy: (table, { desc }) => [desc(table.createdAt)],
+        // 2. QUERY A: Find the historical record with valid data
+        // We look for the specific subscriptionId and exclude the empty placeholders
+        const historicalRecord = await db.query.affiliateInvoice.findFirst({
+          where: (table, { eq, and, notInArray }) =>
+            and(
+              eq(table.subscriptionId, subscriptionId),
+              eq(table.customerId, customerId),
+              notInArray(table.reason, [
+                "placeholder_from_charge",
+                "placeholder_from_subscription",
+              ])
+            ),
         })
 
-        if (!latestRecord || !latestRecord.affiliateLinkId) {
+        if (!historicalRecord || !historicalRecord.affiliateLinkId) {
           console.warn(
-            "❌ No affiliate link history found for customer:",
-            customerId
+            "❌ No historical affiliate link found for sub:",
+            subscriptionId
           )
-          // FIX: Use return NextResponse.json instead of just return
           return NextResponse.json(
             { error: "No history found" },
             { status: 200 }
           )
         }
 
-        // 3. Get Organization Data
-        const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-          where: (link, { eq }) => eq(link.id, latestRecord.affiliateLinkId!),
+        // 3. QUERY B: Find the current placeholder created by the charge event
+        const placeholder = await db.query.affiliateInvoice.findFirst({
+          where: (table, { eq, and }) =>
+            and(
+              eq(table.customerId, customerId),
+              eq(table.reason, "placeholder_from_charge")
+            ),
+          orderBy: (table, { desc }) => [desc(table.createdAt)],
         })
+
+        // 4. Get Org Data using the Affiliate ID from the history
+        const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
+          where: (link, { eq }) =>
+            eq(link.id, historicalRecord.affiliateLinkId!),
+        })
+
         if (!affiliateLinkRecord) break
 
         const organizationRecord = await getOrganizationById(
@@ -249,33 +263,27 @@ export async function POST(req: NextRequest) {
         )
         if (!organizationRecord) break
 
-        // 4. Identify if we should UPDATE or INSERT
-        // We ONLY update if the record found is a placeholder from the recent charge
-        const placeholderId =
-          latestRecord.reason === "placeholder_from_charge" ||
-          latestRecord.reason === "placeholder_from_subscription"
-            ? latestRecord.id
-            : null
-
+        // 5. Final Calculations
         const total = String(invoice.total_excluding_tax ?? 0)
         const currency = invoice.currency
         const commissionType = organizationRecord.commissionType ?? "percentage"
         const commissionValue = organizationRecord.commissionValue ?? "0.00"
 
-        // 5. Final Update or Insert
+        // 6. CALL UTILITY
+        // We update the placeholder (Query B) using the affiliate info (Query A)
         await invoicePaidUpdate(
           total,
           currency,
           customerId,
           subscriptionId || "",
-          latestRecord.affiliateLinkId,
+          historicalRecord.affiliateLinkId,
           commissionType,
           commissionValue,
-          placeholderId
+          placeholder?.id || null
         )
 
         console.log(
-          `✅ Handled ${reason} for customer: ${customerId}. Merged: ${!!placeholderId}`
+          `✅ Handled ${reason}. Mapped affiliate from ${historicalRecord.id} to placeholder ${placeholder?.id || "new"}`
         )
       }
       break
