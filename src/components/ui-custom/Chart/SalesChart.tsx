@@ -43,6 +43,8 @@ import { getTeamOrganizationKpiTimeSeries } from "@/app/(organization)/organizat
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { cn } from "@/lib/utils"
 import { getResponsiveCardHeight } from "@/util/GetResponsiveSelectWidth"
+import { getOrganizationCurrency } from "@/lib/server/getOrganizationCurrency"
+import { formatCurrency } from "@/util/Formatter"
 
 interface ChartDailyMetricsProps {
   orgId: string
@@ -75,6 +77,12 @@ export function ChartDailyMetrics({
     {
       enabled: !!(affiliate && orgId && !isPreview),
     }
+  )
+  const { data: currency = "USD" } = useAppQuery(
+    ["org-currency", orgId],
+    getOrganizationCurrency,
+    [orgId],
+    { enabled: !!orgId }
   )
   const fetchFn = isTeam
     ? getTeamOrganizationKpiTimeSeries
@@ -131,13 +139,19 @@ export function ChartDailyMetrics({
     visits: (affiliate && chartPrimaryColor) || "#60A5FA",
     sales: (affiliate && chartSecondaryColor) || "#A78BFA",
     conversionRate: (affiliate && chartTertiaryColor) || "#5EEAD4",
+    amount: "#F59E0B",
   }
+  const symbol = formatCurrency(0, currency).replace(/[0.,\s]/g, "")
   const chartConfig: ChartConfig = {
     visits: { label: "Visits", color: "var(--chart-1)" },
     sales: { label: "Sales", color: "var(--chart-2)" },
     conversionRate: {
       label: "Conversion Rate (%)",
       color: "var(--chart-3)",
+    },
+    amount: {
+      label: `${affiliate ? "Commission" : "Revenue"} (${symbol})`,
+      color: "var(--chart-4)",
     },
   }
 
@@ -180,7 +194,7 @@ export function ChartDailyMetrics({
                   (affiliate && cardHeaderDescriptionTextColor) || undefined,
               }}
             >
-              Visits, Sales, Conversion Rate, and{" "}
+              Visits, Sales, Conversion Rate and commission over time
               {affiliate ? "Commission" : "Revenue"}
             </CardDescription>
           </div>

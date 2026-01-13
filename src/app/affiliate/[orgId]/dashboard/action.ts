@@ -11,6 +11,7 @@ import { getAffiliateKpiStatsAction } from "@/lib/server/getAffiliateKpiStats"
 import { getOrganization } from "@/lib/server/getOrganization"
 import { ExchangeRate } from "@/util/ExchangeRate"
 import { handleAction } from "@/lib/handleAction"
+import { getOrgCurrencyAffiliate } from "@/lib/server/getOrgCurrencyAffiliate"
 
 export async function getAffiliateKpiStats(
   orgId: string,
@@ -47,6 +48,8 @@ export async function getAffiliateKpiTimeSeries(
 ): Promise<ActionResult<AffiliateKpiTimeSeries[]>> {
   return handleAction("getAffiliateKpiTimeSeries", async () => {
     const decoded = await getAffiliateOrganization(orgId)
+    const currency = await getOrgCurrencyAffiliate(orgId)
+    const rate = await ExchangeRate(currency)
     const { linkIds } = await getAffiliateLinks(decoded)
     if (!linkIds.length) return { ok: true, data: [] }
 
@@ -55,8 +58,11 @@ export async function getAffiliateKpiTimeSeries(
       year,
       month
     )
-
-    return { ok: true, data }
+    const AffiliateKpiTimeSeries = data.map((item) => ({
+      ...item,
+      amount: item.amount * rate,
+    }))
+    return { ok: true, data: AffiliateKpiTimeSeries }
   })
 }
 

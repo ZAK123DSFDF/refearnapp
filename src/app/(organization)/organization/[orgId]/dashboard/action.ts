@@ -7,11 +7,8 @@ import { OrganizationKpiTimeSeries } from "@/lib/types/affiliateChartStats"
 import { getTimeSeriesData } from "@/lib/server/getTimeSeriesData"
 import { OrganizationReferrerStat } from "@/lib/types/affiliateReferrerStat"
 import { getReferrerStats } from "@/lib/server/getReferrerStats"
-import { AffiliateStats } from "@/lib/types/affiliateStats"
-import { getTopAffiliatesByConversionRate } from "@/lib/server/getTopAffiliateByConversionRate"
 import { getOrganizationKpiStatsAction } from "@/lib/server/getOrganizationKpiStats"
 import { ExchangeRate } from "@/util/ExchangeRate"
-import { convertedCurrency } from "@/util/ConvertedCurrency"
 import { handleAction } from "@/lib/handleAction"
 
 export async function getOrganizationKpiStats(
@@ -44,6 +41,7 @@ export async function getOrganizationKpiTimeSeries(
 ): Promise<ActionResult<OrganizationKpiTimeSeries[]>> {
   return handleAction("fetching Organization KPI Time Series", async () => {
     const org = await getOrgAuth(orgId)
+    const rate = await ExchangeRate(org.currency)
     const { linkIds } = await getOrgAffiliateLinks(org, orgId)
     if (!linkIds.length) return { ok: true, data: [] }
     const data = await getTimeSeriesData<OrganizationKpiTimeSeries>(
@@ -51,7 +49,11 @@ export async function getOrganizationKpiTimeSeries(
       year,
       month
     )
-    return { ok: true, data }
+    const organizationKpiTimeSeries = data.map((item) => ({
+      ...item,
+      amount: item.amount * rate,
+    }))
+    return { ok: true, data: organizationKpiTimeSeries }
   })
 }
 export async function getOrganizationReferrer(
@@ -64,24 +66,5 @@ export async function getOrganizationReferrer(
     const { linkIds } = await getOrgAffiliateLinks(org, orgId)
     const referrerStats = await getReferrerStats(linkIds, year, month)
     return { ok: true, data: referrerStats }
-  })
-}
-export async function getTopAffiliates(
-  orgId: string,
-  year?: number,
-  month?: number
-): Promise<ActionResult<AffiliateStats[]>> {
-  return handleAction("fetching Top Affiliates", async () => {
-    const org = await getOrgAuth(orgId)
-    const TopAffiliateStats = (await getTopAffiliatesByConversionRate(
-      orgId,
-      year,
-      month
-    )) as AffiliateStats[]
-    const converted = await convertedCurrency<AffiliateStats>(
-      org.currency,
-      TopAffiliateStats
-    )
-    return { ok: true, data: converted }
   })
 }
