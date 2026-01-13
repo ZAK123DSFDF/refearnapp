@@ -153,33 +153,37 @@ export default function PricingClient({
         <Tabs
           value={activeTab}
           onValueChange={(v) => setActiveTab(v as BillingType)}
-          className="w-full flex flex-col items-center"
+          className="mb-12 flex w-full flex-col items-center gap-6 px-2"
         >
-          <TabsList className="flex justify-center gap-4 px-4 mb-8 py-10 bg-gray-100 rounded-xl">
+          <TabsList className="relative flex w-full max-w-[340px] items-center justify-center rounded-2xl border border-border bg-gray-200/50 p-1 h-14 md:max-w-md md:h-16 md:p-1.5">
+            <div className="absolute -top-4 -left-2 z-10 md:-left-6">
+              <span className="inline-block -rotate-12 transform rounded-lg border-2 border-white bg-yellow-400 px-3 py-1 text-[10px] font-black tracking-wider text-black uppercase shadow-lg md:text-xs">
+                Special Offer
+              </span>
+            </div>
             <TabsTrigger
               value="PURCHASE"
               className={cn(
                 getResponsiveTabSize(1),
-                "font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2",
+                "flex flex-1 items-center justify-center rounded-xl px-3 py-2.5 text-xs font-bold whitespace-nowrap transition-all md:px-8 md:py-3 md:text-base",
+                "data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md text-slate-600",
                 activeTab === "PURCHASE"
-                  ? "bg-primary text-white shadow-md scale-[1.02]"
-                  : "text-gray-700 hover:bg-gray-200/60 hover:scale-[1.03]"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-slate-600"
               )}
             >
               One-Time{" "}
-              <span className="text-xs bg-yellow-400 text-black px-2 py-0.5 rounded-md">
-                Special Offer
-              </span>
             </TabsTrigger>
 
             <TabsTrigger
               value="SUBSCRIPTION"
               className={cn(
                 getResponsiveTabSize(1),
-                "font-medium rounded-lg transition-all duration-200",
+                "flex flex-1 items-center justify-center rounded-xl px-3 py-2.5 text-xs font-bold whitespace-nowrap transition-all md:px-8 md:py-3 md:text-base",
+                "data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md text-slate-600",
                 activeTab === "SUBSCRIPTION"
-                  ? "bg-primary text-white shadow-md scale-[1.02]"
-                  : "text-gray-700 hover:bg-gray-200/60 hover:scale-[1.03]"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-slate-600"
               )}
             >
               Subscription

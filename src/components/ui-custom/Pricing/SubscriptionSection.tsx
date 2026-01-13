@@ -24,21 +24,22 @@ export function SubscriptionSection({
   return (
     <>
       {/* Monthly / Yearly Switch (always visible) */}
-      <div className="flex justify-center mb-6">
+      <div className="flex justify-center mb-6 animate-fade-in">
         <Tabs
           value={subscriptionCycle}
           onValueChange={(v) => setSubscriptionCycle(v as SubscriptionCycle)}
-          className="bg-gray-100 rounded-xl px-4 py-3"
+          className="flex justify-center mb-12"
         >
-          <TabsList className="flex gap-4">
+          <TabsList className="border-border inline-flex rounded-xl border bg-white/50 p-1 text-xs md:text-sm h-auto">
             <TabsTrigger
               value="MONTHLY"
               className={cn(
                 getResponsiveTabSize(0.85),
-                "font-medium transition-all duration-200 rounded-lg",
+                "rounded-lg px-4 py-1.5 font-semibold whitespace-nowrap transition-all",
+                "data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-slate-500",
                 subscriptionCycle === "MONTHLY"
-                  ? "bg-primary text-white shadow-md scale-[1.02]"
-                  : "text-gray-700 hover:text-black hover:bg-gray-200/50"
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-slate-500"
               )}
             >
               Monthly
@@ -48,22 +49,21 @@ export function SubscriptionSection({
               value="YEARLY"
               className={cn(
                 getResponsiveTabSize(0.85),
-                "font-medium transition-all duration-200 rounded-lg flex items-center justify-center gap-2",
-                subscriptionCycle === "YEARLY"
-                  ? "bg-primary text-white shadow-md scale-[1.02]"
-                  : "text-gray-700 hover:text-black hover:bg-gray-200/50"
+                "flex items-center gap-1 rounded-lg px-4 py-1.5 font-semibold whitespace-nowrap transition-all",
+                "data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm text-slate-500 hover:text-slate-700"
               )}
             >
               Yearly
-              {subscriptionCycle === "YEARLY" ? (
-                <span className="text-xs bg-green-400 text-black font-semibold px-2 py-0.5 rounded-md">
-                  Save 16%
-                </span>
-              ) : (
-                <span className="text-xs text-green-600 font-semibold">
-                  Save 16%
-                </span>
-              )}
+              <span
+                className={cn(
+                  "shrink-0 rounded-md px-1.5 py-0.5 text-[9px] uppercase md:text-[10px] transition-colors",
+                  subscriptionCycle === "YEARLY"
+                    ? "bg-yellow-400 font-black text-black" // Active state colors
+                    : "bg-emerald-100 font-bold text-emerald-700" // Inactive state colors
+                )}
+              >
+                2 Months Free
+              </span>
             </TabsTrigger>
           </TabsList>
         </Tabs>

@@ -1,140 +1,198 @@
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 
 export function PricingCard({
   title,
   price,
-  oldPrice,
-  discount,
   features,
   buttonText,
   disabled,
   highlight,
-  onClick, // 👈 added
+  onClick,
   pendingMessage,
+  yearlySavings,
 }: {
   title: string
   price: string
-  oldPrice?: string | null
-  discount?: number | null
   features: string[]
   buttonText: string
   disabled?: boolean
   highlight?: boolean
-  onClick?: () => void // 👈 added
+  onClick?: () => void
   pendingMessage?: string | null
+  yearlySavings?: number | null // Pass this from PricingGrid
 }) {
   return (
-    <Card
+    <div
       className={cn(
-        "w-[300px] rounded-2xl transition-all duration-200 hover:scale-[1.02]",
+        "relative flex w-full max-w-[340px] flex-col p-8 text-left transition-all",
         highlight
-          ? "bg-zinc-900 text-white border border-primary shadow-xl"
-          : "bg-background"
+          ? "border-primary overflow-hidden rounded-[2rem] border-2 bg-slate-900 text-white shadow-2xl hover:scale-[1.02]"
+          : "border-border rounded-[2rem] border bg-white shadow-sm hover:shadow-md"
       )}
     >
-      <CardHeader className="text-center space-y-2">
-        <CardTitle
-          className={cn("text-2xl font-semibold", highlight && "text-white")}
-        >
-          {title}
-        </CardTitle>
+      {/* "Most Popular" Badge for Ultimate */}
+      {highlight && (
+        <div className="bg-primary absolute top-0 right-0 rounded-bl-xl px-4 py-1.5 text-[10px] font-black tracking-widest text-white uppercase">
+          Most Popular
+        </div>
+      )}
 
-        <div className="flex flex-col items-center justify-center relative">
-          {oldPrice && (
-            <span
-              className={cn(
-                "text-gray-400 line-through text-lg",
-                highlight && "text-gray-300/70"
-              )}
-            >
-              {oldPrice}
-            </span>
-          )}
-          <p
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="mb-2 flex items-center gap-2">
+          <div
             className={cn(
-              "text-3xl font-bold mt-1",
-              highlight && "text-primary-foreground"
+              "rounded-lg p-2",
+              highlight ? "bg-white/10" : "bg-slate-100"
             )}
           >
-            {price}
-          </p>
+            {/* Conditional Icon based on Title */}
+            {title === "Pro" ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-slate-600"
+              >
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+                <path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3" />
+                <path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-primary"
+              >
+                <path d="m13 2-2 10h9L7 22l2-10H0L13 2z" />
+              </svg>
+            )}
+          </div>
+          <h3
+            className={cn(
+              "text-2xl font-bold",
+              highlight ? "text-white" : "text-slate-900"
+            )}
+          >
+            {title}
+          </h3>
+        </div>
 
-          {discount && (
+        <div className="flex flex-col">
+          <div className="flex items-baseline gap-1">
             <span
               className={cn(
-                "absolute top-0 right-[-2] bg-green-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-md",
-                highlight && "bg-green-400 text-black"
+                "text-4xl font-bold tracking-tight animate-fade-in",
+                highlight ? "text-primary" : "text-slate-900"
               )}
             >
-              Save {discount}%
+              {price.split(" ")[0]}
             </span>
-          )}
+            <span
+              className={cn(
+                "text-sm font-medium",
+                highlight ? "text-slate-400" : "text-slate-500"
+              )}
+            >
+              {price.includes("/") ? "/ month" : "one-time"}
+            </span>
+          </div>
+
+          {/* Save / Year Logic (replaces discount badge) */}
+          <div
+            className={cn(
+              "mt-1 flex h-5 items-center gap-1 text-sm font-bold transition-opacity",
+              yearlySavings ? "opacity-100" : "opacity-0",
+              highlight ? "text-emerald-400" : "text-emerald-500"
+            )}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+            </svg>
+            <span>Save ${yearlySavings} / year</span>
+          </div>
         </div>
-      </CardHeader>
+      </div>
 
-      <Separator className={cn("my-3", highlight && "bg-white/20")} />
+      {/* Features Section */}
+      <ul
+        className={cn(
+          "mb-8 flex-grow space-y-4 text-sm",
+          highlight ? "text-white" : "text-slate-600"
+        )}
+      >
+        {features.map((f) => {
+          const isLimitedFeature =
+            f.includes("1 organization") || f.includes("3 team member")
+          const shouldShowCross = title === "Pro" && isLimitedFeature
 
-      <CardContent>
-        <ul className="text-sm space-y-2 text-left mx-auto max-w-xs">
-          {features.map((f) => {
-            const featuresToShowCrossForPro = [
-              "1 organization",
-              "Up to 3 team member invitations",
-            ]
-
-            const shouldShowCross =
-              title === "Pro" &&
-              featuresToShowCrossForPro.some((crossFeature) =>
-                f.includes(crossFeature)
-              )
-
-            return (
-              <li
-                key={f}
+          return (
+            <li key={f} className="flex items-start gap-2">
+              <span
                 className={cn(
-                  "flex items-center gap-2",
-                  highlight
-                    ? "text-gray-100"
-                    : shouldShowCross
-                      ? "text-red-500"
-                      : "text-muted-foreground"
+                  highlight && !shouldShowCross ? "text-primary" : ""
                 )}
               >
-                <span>{shouldShowCross ? "❌" : "✔️"}</span>
-                <span>{f}</span>
-              </li>
-            )
-          })}
-        </ul>
-      </CardContent>
+                {shouldShowCross ? "❌" : "✔️"}
+              </span>
+              <span
+                className={cn(
+                  shouldShowCross && !highlight && "text-red-500/80"
+                )}
+              >
+                {f}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
 
-      <CardFooter className="mt-6 flex flex-col">
-        <Button
+      {/* Button Section */}
+      <div className="flex flex-col gap-2">
+        <button
           disabled={disabled}
-          onClick={onClick} // 👈 attach it here
-          variant={highlight ? "secondary" : "default"}
+          onClick={onClick}
           className={cn(
-            "w-full font-medium",
-            disabled && "opacity-60 cursor-not-allowed"
+            "block w-full rounded-2xl py-4 text-center font-bold transition-all active:scale-95",
+            highlight
+              ? "bg-primary hover:bg-primary/90 shadow-primary/20 text-white shadow-lg"
+              : "bg-slate-900 text-white hover:bg-slate-800 hover:scale-[1.02]",
+            disabled && "opacity-50 cursor-not-allowed active:scale-100"
           )}
         >
           {buttonText}
-        </Button>
+        </button>
         {pendingMessage && (
-          <p className="text-sm text-yellow-600 mt-2 text-center">
+          <p className="text-[10px] text-yellow-500 text-center leading-tight">
             {pendingMessage}
           </p>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   )
 }

@@ -196,67 +196,23 @@ export function PricingGrid({
     }
     return "-"
   }
-
-  const getOldPrice = (tier: PlanInfo["plan"]) => {
-    if (tier === "FREE") return null
-    if (billingType === "SUBSCRIPTION") {
-      const monthlyPrice =
-        tier === "PRO"
-          ? Math.round(
-              PRICING_CONFIG.SUBSCRIPTION.PRO.MONTHLY *
-                PRICING_CONFIG.MARKUP_PERCENT
-            ) - 0.5
-          : Math.round(
-              PRICING_CONFIG.SUBSCRIPTION.ULTIMATE.MONTHLY *
-                PRICING_CONFIG.MARKUP_PERCENT
-            )
-      const yearlyPrice =
-        tier === "PRO"
-          ? Math.round(
-              (PRICING_CONFIG.SUBSCRIPTION.PRO.YEARLY *
-                PRICING_CONFIG.MARKUP_PERCENT) /
-                12
-            )
-          : Math.round(
-              (PRICING_CONFIG.SUBSCRIPTION.ULTIMATE.YEARLY *
-                PRICING_CONFIG.MARKUP_PERCENT) /
-                12
-            ) + 0.5
-      if (subscriptionCycle === "MONTHLY") return `$${monthlyPrice} / month`
-      if (subscriptionCycle === "YEARLY") {
-        return `$${yearlyPrice} / month`
-      }
-    } else {
-      const oldProPrice = Math.round(
-        PRICING_CONFIG.PURCHASE.PRO * PRICING_CONFIG.MARKUP_PERCENT
-      )
-      const oldUltimatePrice = Math.round(
-        PRICING_CONFIG.PURCHASE.ULTIMATE * PRICING_CONFIG.MARKUP_PERCENT
-      )
-      if (tier === "PRO") return `$${oldProPrice} one-time`
-      if (tier === "ULTIMATE") {
-        const proOwned =
-          (plan?.type === "PURCHASE" && plan.plan === "PRO") ||
-          (plan?.hasPendingPurchase && plan.pendingPurchaseTier === "PRO")
-
-        if (proOwned) {
-          const discountedOld = oldUltimatePrice - oldProPrice
-          return `$${discountedOld} one-time`
-        }
-
-        return `${oldUltimatePrice} one-time`
-      }
+  const getYearlySavings = (tier: PlanInfo["plan"]) => {
+    if (
+      billingType !== "SUBSCRIPTION" ||
+      subscriptionCycle !== "YEARLY" ||
+      tier === "FREE"
+    ) {
+      return null
     }
-    return null
-  }
 
-  const getDiscountPercent = (oldPrice?: string | null, newPrice?: string) => {
-    if (!oldPrice || !newPrice) return null
-    const oldNum = parseFloat(oldPrice.replace(/[^0-9.]/g, ""))
-    const newNum = parseFloat(newPrice.replace(/[^0-9.]/g, ""))
-    if (!oldNum || !newNum) return null
-    const percent = Math.round(((oldNum - newNum) / oldNum) * 100)
-    return percent > 0 ? percent : null
+    const config =
+      tier === "PRO"
+        ? PRICING_CONFIG.SUBSCRIPTION.PRO
+        : PRICING_CONFIG.SUBSCRIPTION.ULTIMATE
+    const totalMonthlyCost = config.MONTHLY * 12
+    const savings = totalMonthlyCost - config.YEARLY
+
+    return savings > 0 ? savings : null
   }
   function getDialogMessage(
     plan: PlanInfo | null,
@@ -363,12 +319,11 @@ Proceed?`
         <PricingCard
           title="Pro"
           price={getPrice("PRO")}
-          oldPrice={getOldPrice("PRO")}
-          discount={getDiscountPercent(getOldPrice("PRO"), getPrice("PRO"))}
           features={featuresList.filter((f) => f.pro).map((f) => f.name)}
           buttonText={
             dashboard ? getButtonText("PRO", billingType) : "Start 14-Day Trial"
           }
+          yearlySavings={getYearlySavings("PRO")}
           disabled={isDisabled("PRO")}
           pendingMessage={
             plan?.hasPendingPurchase && plan.pendingPurchaseTier === "PRO"
@@ -381,11 +336,7 @@ Proceed?`
         <PricingCard
           title="Ultimate"
           price={getPrice("ULTIMATE")}
-          oldPrice={getOldPrice("ULTIMATE")}
-          discount={getDiscountPercent(
-            getOldPrice("ULTIMATE"),
-            getPrice("ULTIMATE")
-          )}
+          yearlySavings={getYearlySavings("ULTIMATE")}
           pendingMessage={
             plan?.hasPendingPurchase && plan.pendingPurchaseTier === "ULTIMATE"
               ? "This one-time payment will be applied when your subscription ends."

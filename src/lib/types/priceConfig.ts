@@ -16,7 +16,7 @@ interface PricingConfig {
 export const PRICING_CONFIG: PricingConfig = {
   SUBSCRIPTION: {
     PRO: { MONTHLY: 25, YEARLY: 252 },
-    ULTIMATE: { MONTHLY: 40, YEARLY: 403 },
+    ULTIMATE: { MONTHLY: 40, YEARLY: 396 },
   },
   PURCHASE: {
     PRO: 199,
