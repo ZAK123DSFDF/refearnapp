@@ -47,7 +47,8 @@ export async function getOrganizationKpiTimeSeries(
     const data = await getTimeSeriesData<OrganizationKpiTimeSeries>(
       linkIds,
       year,
-      month
+      month,
+      false
     )
     const organizationKpiTimeSeries = data.map((item) => ({
       ...item,

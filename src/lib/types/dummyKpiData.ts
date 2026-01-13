@@ -7,6 +7,7 @@ import {
   Wallet,
   XCircle,
 } from "lucide-react"
+import { AffiliateKpiStats } from "@/lib/types/affiliateKpiStats"
 
 export const initialKpiData = [
   {
@@ -66,20 +67,17 @@ export const initialKpiData = [
     bg: "bg-red-100",
   },
 ]
-export const dummyAffiliateKpiCardStats = [
-  {
-    affiliateId: "aff1",
-    name: "John Doe",
-    email: "John@gmail.com",
-    totalLinks: 41,
-    totalVisitors: 1403,
-    totalSales: 98,
-    totalCommission: 4150,
-    totalCommissionPaid: 2200,
-    totalCommissionUnpaid: 1950,
-    currency: "USD",
-  },
-]
+export const getDummyAffiliateStats = (
+  currency: string = "USD"
+): AffiliateKpiStats => ({
+  totalLinks: 45,
+  totalVisitors: 1250,
+  totalSales: 84,
+  totalCommission: 3200.5,
+  totalCommissionPaid: 2100.0,
+  totalCommissionUnpaid: 1100.5,
+  currency: currency,
+})
 export const months = [
   "January",
   "February",

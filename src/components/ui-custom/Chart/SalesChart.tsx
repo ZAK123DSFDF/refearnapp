@@ -194,8 +194,8 @@ export function ChartDailyMetrics({
                   (affiliate && cardHeaderDescriptionTextColor) || undefined,
               }}
             >
-              Visits, Sales, Conversion Rate and commission over time
-              {affiliate ? "Commission" : "Revenue"}
+              Daily traffic, conversion trends, and{" "}
+              {affiliate ? "commissions" : "revenue"} summary.
             </CardDescription>
           </div>
         </div>

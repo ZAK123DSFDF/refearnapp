@@ -3,7 +3,7 @@
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import MonthSelect from "@/components/ui-custom/MonthSelect"
 import {
-  dummyAffiliateKpiCardStats,
+  getDummyAffiliateStats,
   initialKpiData,
 } from "@/lib/types/dummyKpiData"
 import React, { useEffect, useState } from "react"
@@ -36,6 +36,7 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
 import { getTeamOrganizationKpiStats } from "@/app/(organization)/organization/[orgId]/teams/dashboard/action"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
+import { getOrganizationCurrency } from "@/lib/server/getOrganizationCurrency"
 
 interface CardsProps {
   orgId: string
@@ -126,10 +127,23 @@ const Cards = ({
       return () => clearTimeout(timer)
     }
   }, [isPreview])
+  const { data: currency = "USD" } = useAppQuery(
+    ["org-currency", orgId],
+    getOrganizationCurrency,
+    [orgId],
+    { enabled: !!orgId }
+  )
+  const displayCurrency = React.useMemo(() => {
+    const dataCurrency = affiliate
+      ? (affiliateSearchData?.[0] as AffiliateKpiStats)?.currency
+      : (organizationSearchData?.[0] as OrganizationKpiStats)?.currency
+
+    return dataCurrency || currency
+  }, [affiliate, affiliateSearchData, organizationSearchData, currency])
   const displayData = React.useMemo(() => {
     if (isPreview) {
       if (previewSimulation === "empty") return []
-      return mapAffiliateStats(dummyAffiliateKpiCardStats[0]) || initialKpiData
+      return mapAffiliateStats(getDummyAffiliateStats(displayCurrency))
     }
 
     if (isFiltering) {
@@ -143,6 +157,7 @@ const Cards = ({
 
     return filteredData
   }, [isPreview, isFiltering, searchPending, searchData, filteredData])
+
   const colorTypes = ["Primary", "Secondary", "Tertiary"] as const
   const colorPairs = affiliate ? affiliateColorPairs : organizationColorPairs
 
@@ -244,7 +259,7 @@ const Cards = ({
               displayData.map(({ label, value, icon: Icon }, index) => {
                 const colorIndex = index % colorPairs.length
                 const defaultColorPair = colorPairs[colorIndex]
-
+                const currentCurrency = displayCurrency
                 if (!affiliate) {
                   return (
                     <div
@@ -278,9 +293,7 @@ const Cards = ({
                               {formatValue(
                                 label,
                                 value as number,
-                                (
-                                  organizationSearchData?.[0] as OrganizationKpiStats
-                                )?.currency
+                                currentCurrency
                               )}
                             </div>
                           </div>
@@ -292,9 +305,7 @@ const Cards = ({
                             {formatValue(
                               label,
                               value as number,
-                              (
-                                organizationSearchData?.[0] as OrganizationKpiStats
-                              )?.currency
+                              currentCurrency
                             )}
                           </div>
                         </PopoverContent>
@@ -420,8 +431,7 @@ const Cards = ({
                             {formatValue(
                               label,
                               value as number,
-                              (affiliateSearchData?.[0] as AffiliateKpiStats)
-                                ?.currency
+                              currentCurrency
                             )}
                           </div>
                         </div>
@@ -445,12 +455,7 @@ const Cards = ({
                             color: affiliate && popOverPrimaryTextColor,
                           }}
                         >
-                          {formatValue(
-                            label,
-                            value as number,
-                            (affiliateSearchData?.[0] as AffiliateKpiStats)
-                              ?.currency
-                          )}
+                          {formatValue(label, value as number, currentCurrency)}
                         </div>
                       </PopoverContent>
                     </Popover>

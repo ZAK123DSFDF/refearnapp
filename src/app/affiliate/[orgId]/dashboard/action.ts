@@ -56,7 +56,8 @@ export async function getAffiliateKpiTimeSeries(
     const data = await getTimeSeriesData<AffiliateKpiTimeSeries>(
       linkIds,
       year,
-      month
+      month,
+      true
     )
     const AffiliateKpiTimeSeries = data.map((item) => ({
       ...item,
