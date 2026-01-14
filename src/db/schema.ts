@@ -456,11 +456,6 @@ export const exchangeRate = pgTable(
   },
   (t) => [primaryKey({ columns: [t.baseCurrency, t.targetCurrency] })]
 )
-export const githubActionTest = pgTable("github_action_test", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  status: text("status").notNull().default("success"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-})
 export const affiliateLink = pgTable(
   "affiliate_link",
   {
