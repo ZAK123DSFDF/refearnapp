@@ -1,0 +1,57 @@
+name: Database Operations
+
+on:
+  # 1. Automatic: Run migrations on every push to main to keep schema in sync
+  push:
+    branches: [main]
+    paths:
+      - 'src/db/schema.ts'
+      - 'drizzle/**'
+
+  # 2. Manual: Trigger Reset/Seed from the GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target Environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+
+jobs:
+  database-tasks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install
+
+      # Always run migrations first to ensure the table structures match the code
+      - name: Auto Migrate Schema
+        env:
+          DATABASE_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+        run: bun drizzle-kit migrate
+
+      # Only run the Reset/Seed sequence if the user clicked "Run Workflow" manually
+      - name: Manual Reset and Seed
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          DATABASE_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+          UPSTASH_REDIS_REST_URL: ${{ github.event.inputs.target == 'prod' && secrets.PROD_REDIS_URL || secrets.DEV_REDIS_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ github.event.inputs.target == 'prod' && secrets.PROD_REDIS_TOKEN || secrets.DEV_REDIS_TOKEN }}
+          MODE: ${{ github.event.inputs.target }}
+        run: |
+          echo "🚀 Starting Reset and Seed sequence for ${{ github.event.inputs.target }}..."
+          bun src/db/reset.ts
+          bun src/db/currencySeed.ts
+          bun src/db/seeds/seedFun1.ts
+          echo "✅ Database operation successful."

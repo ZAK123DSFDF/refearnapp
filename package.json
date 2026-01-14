@@ -8,7 +8,7 @@
     "build:embed": "rollup -c",
     "start": "next start",
     "lint": "next lint",
-    "db:reset": "npx drizzle-kit generate && npx drizzle-kit migrate && bun src/db/currencySeed.ts && bun src/db/seeds/seedFun1.ts",
+    "db:reset": "bun src/db/reset.ts npx drizzle-kit generate && npx drizzle-kit migrate && bun src/db/currencySeed.ts && bun src/db/seeds/seedFun1.ts",
     "build-and-sync": "next build && npx inline-assets out/index.html -o \"D:/code-files/apps/landing-pages/refearnapp-landing/index.html\" && xcopy /E /I /Y public\\images \"D:/code-files/apps/landing-pages/refearnapp-landing/images\"",
     "plan:upgrade": "bun src/db/userPlanSeed.ts",
     "maildev": "maildev --smtp 1025 --web 1080",

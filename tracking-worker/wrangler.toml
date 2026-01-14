@@ -4,3 +4,15 @@ compatibility_date = "2024-01-01"
 
 [triggers]
 crons = ["*/5 * * * *", "0 0 * * *"]
+
+# Production settings (default)
+[vars]
+ENVIRONMENT = "production"
+MAIN_APP_URL = "https://origin.refearnapp.com"
+
+# Development settings
+[env.dev]
+name = "tracking-worker-dev"
+[env.dev.vars]
+ENVIRONMENT = "development"
+MAIN_APP_URL = "https://origin.refearnapp.com"
