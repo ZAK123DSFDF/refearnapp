@@ -4,7 +4,8 @@ import { useEffect, useState } from "react"
 import { initializePaddle, Paddle } from "@paddle/paddle-js"
 import { paddleConfig } from "@/util/PaddleConfig"
 import { PlanInfo } from "@/lib/types/planInfo"
-import { getOrganizationToken } from "@/lib/server/getOrganizationToken" // 👈 assuming you already have this type
+import { getOrganizationToken } from "@/lib/server/getOrganizationToken"
+import { decodeJwt } from "@/util/Jwt" // 👈 assuming you already have this type
 
 type SubscriptionCycle = "MONTHLY" | "YEARLY"
 
@@ -24,7 +25,7 @@ type CheckoutParams =
       initial?: boolean
     }
 type ApplyingReason = "PURCHASE" | "CANCEL" | "UPGRADE"
-export function usePaddleCheckout() {
+function usePaddleCheckout() {
   const [paddle, setPaddle] = useState<Paddle>()
   const [showApplyingDialog, setShowApplyingDialog] =
     useState<null | ApplyingReason>(null)
@@ -89,12 +90,15 @@ export function usePaddleCheckout() {
       return
     }
     const organizationToken = await getOrganizationToken()
+    const decoded = decodeJwt(organizationToken)
+    const stableUserId = decoded?.id
     setInitialCheckout(!!params.initial)
     setCheckoutClosed(false)
     paddle.Checkout.open({
       items: [{ priceId, quantity: params.quantity ?? 1 }],
       customData: {
         organizationToken,
+        ...(stableUserId && { revenuecat_app_user_id: stableUserId }),
       },
       settings: {
         displayMode: "overlay",
@@ -105,3 +109,5 @@ export function usePaddleCheckout() {
 
   return { openCheckout, showApplyingDialog, setShowApplyingDialog }
 }
+
+export default usePaddleCheckout
