@@ -8,6 +8,10 @@ const client = new currencyapi(process.env.CURRENCY_API_KEY!)
 
 async function fetchAndStoreExchangeRates() {
   const res = await client.latest({ base_currency: "USD", type: "fiat" })
+  // Add this safety check
+  if (!res || !res.meta || !res.data) {
+    throw new Error(`Currency API failed: ${JSON.stringify(res)}`)
+  }
   const now = new Date(res.meta.last_updated_at)
 
   for (const [code, info] of Object.entries(res.data)) {

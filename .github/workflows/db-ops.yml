@@ -49,6 +49,7 @@ jobs:
           SUPABASE_DATABASE_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
           UPSTASH_REDIS_REST_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_REDIS_URL || secrets.DEV_REDIS_URL }}
           UPSTASH_REDIS_REST_TOKEN: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_REDIS_TOKEN || secrets.DEV_REDIS_TOKEN }}
+          CURRENCY_API_KEY: ${{ secrets.CURRENCY_API_KEY }}
           MODE: ${{ github.event.inputs.target }}
         run: |
           echo "🚀 Starting Reset and Seed sequence for ${{ github.event.inputs.target }}..."
