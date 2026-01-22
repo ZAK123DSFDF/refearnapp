@@ -27,19 +27,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-WHQRG09NZ7"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-WHQRG09NZ7"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-WHQRG09NZ7');
           `}
-      </Script>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        </Script>
         <QueryProvider>{children}</QueryProvider>
         <Toaster />
       </body>
