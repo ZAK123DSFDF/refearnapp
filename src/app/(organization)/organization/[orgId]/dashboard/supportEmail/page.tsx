@@ -5,7 +5,6 @@ import { requireOrganizationWithOrg } from "@/lib/server/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 import SupportEmail from "@/components/pages/Support-email"
-import { getUserData } from "@/app/(organization)/organization/[orgId]/dashboard/profile/action"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
