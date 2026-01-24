@@ -94,14 +94,14 @@ const SupportEmail = ({
             <TabsList className="grid w-full grid-cols-2 bg-slate-200/50">
               <TabsTrigger
                 value="feedback"
-                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
               >
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Feedback
               </TabsTrigger>
               <TabsTrigger
                 value="support"
-                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white transition-all"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all"
               >
                 <LifeBuoy className="w-4 h-4 mr-2" />
                 Support
@@ -135,7 +135,7 @@ const SupportEmail = ({
                   <Button
                     type="submit"
                     disabled={sendMutation.isPending && tab === "feedback"}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 shadow-lg shadow-blue-200"
+                    className="w-full bg-primary text-primary-foreground font-semibold py-6 shadow-lg shadow-blue-200"
                   >
                     {sendMutation.isPending && tab === "feedback" ? (
                       <>
@@ -175,7 +175,7 @@ const SupportEmail = ({
                   <Button
                     type="submit"
                     disabled={sendMutation.isPending && tab === "support"}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 shadow-lg shadow-blue-200"
+                    className="w-full bg-primary text-primary-foreground font-semibold py-6 shadow-lg shadow-blue-200"
                   >
                     {sendMutation.isPending && tab === "support" ? (
                       <>
