@@ -8,9 +8,10 @@ export async function GET(req: Request) {
   const orgId = url.searchParams.get("orgId") || undefined
   const rememberMe = url.searchParams.get("rememberMe") === "true"
   const page = url.searchParams.get("page") || "login"
+  const txn = url.searchParams.get("txn") || undefined
   const baseUrl = await getBaseUrl()
   const state = encodeURIComponent(
-    JSON.stringify({ type, orgId, rememberMe, baseUrl, page })
+    JSON.stringify({ type, orgId, rememberMe, baseUrl, page, txn })
   )
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID!,

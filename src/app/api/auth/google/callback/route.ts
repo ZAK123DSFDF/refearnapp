@@ -14,6 +14,7 @@ import {
 } from "@/db/schema"
 import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/assignFreeTrial"
+import { assignLifetimePurchase } from "@/lib/server/assignLifetimePurchase"
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
@@ -25,7 +26,7 @@ export async function GET(req: Request) {
     const code = url.searchParams.get("code")
     const stateRaw = url.searchParams.get("state") || ""
     const state = JSON.parse(decodeURIComponent(stateRaw || "{}"))
-
+    const txnId = state.txn
     if (!code) throw new Error("Missing code from Google")
 
     const client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
@@ -170,7 +171,11 @@ export async function GET(req: Request) {
             providerAccountId: googleSub,
             emailVerified: new Date(),
           })
-          await assignFreeTrialSubscription(createdUser.id)
+          if (txnId) {
+            await assignLifetimePurchase(createdUser.id, txnId)
+          } else {
+            await assignFreeTrialSubscription(createdUser.id)
+          }
         }
       }
 

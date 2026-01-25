@@ -27,11 +27,13 @@ export function GoogleButton({
     googleIconColor,
   } = useAtomValue(googleButtonCustomizationAtom)
   const type = isTeam ? "team" : affiliate ? "affiliate" : "organization"
+  const urlParams = new URLSearchParams(window.location.search)
+  const txnId = urlParams.get("txn")
   const handleClick = () => {
     if (isPreview) {
       window.open("https://www.google.com", "_blank")
     } else {
-      window.location.href = `/api/auth/google?type=${type}&orgId=${orgId}&rememberMe=${rememberMe}&page=${page}`
+      window.location.href = `/api/auth/google?type=${type}&orgId=${orgId}&rememberMe=${rememberMe}&page=${page}&txn=${txnId || ""}`
     }
   }
   const buttonStyles = affiliate

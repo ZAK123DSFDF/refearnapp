@@ -50,6 +50,8 @@ const Signup = ({
 }: Props) => {
   const [previewLoading, setPreviewLoading] = useState(false)
   const { customNotesSignup } = useAtomValue(notesCustomizationAtom)
+  const urlParams = new URLSearchParams(window.location.search)
+  const txnId = urlParams.get("txn")
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -160,7 +162,7 @@ const Signup = ({
     } else {
       const email = data.email.trim().toLowerCase()
       if (emailCache.shouldSkip(email)) return
-      normalMutation.mutate(data)
+      normalMutation.mutate({ ...data, transactionId: txnId })
     }
   }
   return (

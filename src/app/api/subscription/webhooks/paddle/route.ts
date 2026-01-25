@@ -1,6 +1,6 @@
 import { EventName, Paddle } from "@paddle/paddle-node-sdk"
 import { NextResponse } from "next/server"
-import { purchase, subscription } from "@/db/schema"
+import { organization, purchase, subscription } from "@/db/schema"
 import { db } from "@/db/drizzle"
 import { eq } from "drizzle-orm"
 import { decodeOrgFromCustomData } from "@/util/DecodeOrgFromCustomData"
@@ -295,6 +295,63 @@ export async function POST(req: Request) {
         console.log(
           `🧹 Subscription canceled → reset to FREE for ${decodedOrg.id}`
         )
+      }
+    }
+    if (eventType === EventName.AdjustmentUpdated) {
+      const status = data.status
+      const action = data.action
+      const transactionId = data.transactionId
+      if (status === "approved" && action === "refund") {
+        // 🎯 Find purchase directly via the transaction ID
+        const existingPurchase = await db.query.purchase.findFirst({
+          where: eq(purchase.id, transactionId),
+        })
+
+        if (!existingPurchase) {
+          console.log(
+            `⚠️ Refund for unknown transaction ${transactionId}. Skipping.`
+          )
+          return NextResponse.json({ ok: true })
+        }
+
+        const userId = existingPurchase.userId
+
+        // Fetch user's organization to get the activeOrgId for Redis sync
+        const userOrg = await db.query.organization.findFirst({
+          where: eq(organization.userId, userId),
+        })
+
+        if (existingPurchase.isActive) {
+          console.log(
+            `🚫 Refunded ACTIVE purchase. Downgrading ${userId} to FREE.`
+          )
+
+          await db.delete(purchase).where(eq(purchase.id, transactionId))
+
+          await db
+            .update(subscription)
+            .set({
+              plan: "FREE",
+              price: null,
+              expiresAt: new Date(),
+              updatedAt: new Date(),
+            })
+            .where(eq(subscription.userId, userId))
+
+          if (userOrg) {
+            await syncOrgDataToRedisLinks(userOrg.id, {
+              ownerId: userId,
+              planType: "FREE",
+              paymentType: "SUBSCRIPTION",
+              expiresAt: new Date().toISOString(),
+            })
+          }
+        } else {
+          console.log(
+            `🗑️ Refunded INACTIVE purchase. Deleting record ${transactionId}.`
+          )
+          await db.delete(purchase).where(eq(purchase.id, transactionId))
+        }
       }
     }
   } catch (error) {

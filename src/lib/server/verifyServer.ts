@@ -15,6 +15,7 @@ import { db } from "@/db/drizzle"
 import { getBaseUrl } from "@/lib/server/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/assignFreeTrial"
+import { assignLifetimePurchase } from "@/lib/server/assignLifetimePurchase"
 
 type VerifyServerProps = {
   token: string
@@ -44,7 +45,7 @@ export const VerifyServer = async ({
   const baseUrl = await getBaseUrl()
   try {
     const decoded = jwt.verify(token, process.env.SECRET_KEY!) as any
-
+    const transactionId = decoded.transactionId
     tokenType = (decoded.type as string).toLowerCase() as
       | "organization"
       | "affiliate"
@@ -98,7 +99,11 @@ export const VerifyServer = async ({
             .set({ emailVerified: new Date() })
             .where(eq(account.id, userAccount.id))
         }
-        await assignFreeTrialSubscription(sessionPayload.id)
+        if (transactionId) {
+          await assignLifetimePurchase(sessionPayload.id, transactionId)
+        } else {
+          await assignFreeTrialSubscription(sessionPayload.id)
+        }
       } else {
         const affiliateAcc = await db.query.affiliateAccount.findFirst({
           where: (aa, { and, eq }) =>

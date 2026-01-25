@@ -22,7 +22,8 @@ export const SignupServer = async ({
   name,
   email,
   password,
-}: CreateUserPayload): Promise<MutationData> => {
+  transactionId,
+}: CreateUserPayload & { transactionId?: string }): Promise<MutationData> => {
   return handleAction("Signup Server", async () => {
     if (!email || !password || !name) {
       throw {
@@ -81,6 +82,7 @@ export const SignupServer = async ({
           type: existingUser.type,
           orgIds,
           activeOrgId: orgIds[0] || null,
+          transactionId: transactionId || null,
         },
         process.env.SECRET_KEY as string,
         { expiresIn: "15m" }
@@ -127,6 +129,7 @@ export const SignupServer = async ({
         email: newUser.email,
         role: newUser.role,
         type: newUser.type,
+        transactionId: transactionId || null,
       },
       process.env.SECRET_KEY as string,
       { expiresIn: "15m" }
