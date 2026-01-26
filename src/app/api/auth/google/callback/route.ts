@@ -133,7 +133,7 @@ export async function GET(req: Request) {
       })
 
       let appUser: any = null
-
+      let isBrandNewUser = false
       if (linkedAccount) {
         // linkedAccount.userId -> fetch user
         appUser = await db.query.user.findFirst({
@@ -153,6 +153,9 @@ export async function GET(req: Request) {
             emailVerified: new Date(),
           })
           appUser = existingUserByEmail
+          if (txnId) {
+            await assignLifetimePurchase(existingUserByEmail.id, txnId)
+          }
         } else {
           // create user + provider account
           const [createdUser] = await db
@@ -165,18 +168,21 @@ export async function GET(req: Request) {
             })
             .returning()
           appUser = createdUser
+          isBrandNewUser = true
           await db.insert(account).values({
             userId: createdUser.id,
             provider: "google",
             providerAccountId: googleSub,
             emailVerified: new Date(),
           })
+          if (appUser) {
+            if (txnId) {
+              await assignLifetimePurchase(appUser.id, txnId)
+            } else if (isBrandNewUser) {
+              await assignFreeTrialSubscription(appUser.id)
+            }
+          }
         }
-      }
-      if (txnId && appUser) {
-        await assignLifetimePurchase(appUser.id, txnId)
-      } else if (!linkedAccount && !appUser) {
-        await assignFreeTrialSubscription(appUser.id)
       }
       // Now gather orgIds for the user (like your other login flow)
       const orgs = await db.query.organization.findMany({

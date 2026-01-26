@@ -158,7 +158,7 @@ export default function PricingClient({
           <TabsList className="relative flex w-full max-w-[340px] items-center justify-center rounded-2xl border border-border bg-gray-200/50 p-1 h-14 md:max-w-md md:h-16 md:p-1.5">
             <div className="absolute -top-4 -left-2 z-10 md:-left-6">
               <span className="inline-block -rotate-12 transform rounded-lg border-2 border-white bg-yellow-400 px-3 py-1 text-[10px] font-black tracking-wider text-black uppercase shadow-lg md:text-xs">
-                Special Offer
+                LIMITED TIME OFFER
               </span>
             </div>
             <TabsTrigger
