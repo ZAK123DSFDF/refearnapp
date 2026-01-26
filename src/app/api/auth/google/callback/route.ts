@@ -171,14 +171,13 @@ export async function GET(req: Request) {
             providerAccountId: googleSub,
             emailVerified: new Date(),
           })
-          if (txnId) {
-            await assignLifetimePurchase(createdUser.id, txnId)
-          } else {
-            await assignFreeTrialSubscription(createdUser.id)
-          }
         }
       }
-
+      if (txnId && appUser) {
+        await assignLifetimePurchase(appUser.id, txnId)
+      } else if (!linkedAccount && !appUser) {
+        await assignFreeTrialSubscription(appUser.id)
+      }
       // Now gather orgIds for the user (like your other login flow)
       const orgs = await db.query.organization.findMany({
         where: (org, { eq }) => eq(org.userId, appUser.id),

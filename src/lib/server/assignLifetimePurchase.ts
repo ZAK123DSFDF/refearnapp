@@ -3,7 +3,6 @@ import { purchase } from "@/db/schema"
 // 1. Alias the types from the Paddle SDK
 import {
   Paddle,
-  Environment,
   type Transaction as PaddleTransaction,
 } from "@paddle/paddle-node-sdk"
 import { paddleConfig } from "@/util/PaddleConfig"
@@ -17,40 +16,39 @@ export async function assignLifetimePurchase(userId: string, txnId: string) {
 
   try {
     const transaction: PaddleTransaction = await paddle.transactions.get(txnId)
+    if (transaction.status !== "completed") return
 
-    if (transaction.status !== "completed") {
-      console.error("Transaction not completed")
-      return
-    }
-
-    // 💰 totalPaid remains as cents (e.g., 19900 or 29900)
     const totalPaid = parseFloat(transaction.details?.totals?.total || "0")
+    let tier: "PRO" | "ULTIMATE" = totalPaid >= 29900 ? "ULTIMATE" : "PRO"
 
-    let tier: "PRO" | "ULTIMATE" = "PRO"
+    // 🔍 Check current subscription status
+    const currentSub = await db.query.subscription.findFirst({
+      where: (s, { eq }) => eq(s.userId, userId),
+    })
 
-    // ✅ Match logic to cent values
-    if (totalPaid >= 29900) {
-      tier = "ULTIMATE"
-    } else if (totalPaid >= 19900) {
-      tier = "PRO"
-    } else {
-      console.error("Payment amount invalid:", totalPaid)
-      return
+    // 🧠 Logic: If user has a higher-tier active subscription,
+    // we store this purchase as INACTIVE for now.
+    let isActive = true
+    if (currentSub && currentSub.plan === "ULTIMATE" && tier === "PRO") {
+      const isSubActive = currentSub.expiresAt
+        ? currentSub.expiresAt.getTime() > Date.now()
+        : true
+      if (isSubActive) {
+        isActive = false // Store as pending
+      }
     }
 
     await db.insert(purchase).values({
       id: txnId,
       userId,
       tier,
-      price: totalPaid.toString(), // Saves "19900" or "29900"
+      price: totalPaid.toString(),
       currency: transaction.currencyCode || "USD",
       priceId: transaction.items[0]?.price?.id || "manual",
-      isActive: true,
+      isActive: isActive,
     })
 
-    console.log(
-      `Successfully assigned ${tier} to ${userId} (Cents: ${totalPaid})`
-    )
+    console.log(`💾 Assigned ${tier} (Active: ${isActive}) to user ${userId}`)
   } catch (error) {
     console.error("Paddle Transaction Error:", error)
   }
