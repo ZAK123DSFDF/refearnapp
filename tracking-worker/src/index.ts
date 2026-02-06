@@ -24,17 +24,20 @@ export default {
 			'/robots.txt',
 			'/sitemap-index.xml',
 			'/sitemap-0.xml',
+			'/sitemap.xml',
 		];
 
 		// 2. CHECK IF ROUTE BELONGS TO ASTRO
 		const isHome = url.pathname === '/';
 		const isExplicitAsset = publicAssets.includes(url.pathname);
-
+		const isLegalPage = ['/terms', '/privacy-policy', '/refund-policy'].includes(url.pathname);
+		const isToolPage = url.pathname.startsWith('/tools/');
+		const isComparePage = url.pathname.startsWith('/alternative/');
 		// Astro compiled files (JS/CSS) always live here.
 		// Your Vercel app likely doesn't use this specific folder name.
 		const isCompiledAsset = url.pathname.startsWith('/_astro/');
 
-		if (isHome || isExplicitAsset || isCompiledAsset) {
+		if (isHome || isExplicitAsset || isLegalPage || isToolPage || isComparePage || isCompiledAsset) {
 			const resp = await fetch(`${PAGES_URL}${url.pathname}${url.search}`);
 			const newResp = new Response(resp.body, resp);
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
