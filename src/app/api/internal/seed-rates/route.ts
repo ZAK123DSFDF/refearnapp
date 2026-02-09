@@ -1,26 +1,42 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 //@ts-ignore
 import currencyapi from "@everapi/currencyapi-js"
 import { db } from "@/db/drizzle"
 import { exchangeRate } from "@/db/schema"
+import { handleRoute } from "@/lib/handleRoute"
+import { AppError } from "@/lib/exceptions"
 
-export async function POST(req: NextRequest) {
+export const POST = handleRoute("Update Exchange Rates", async (req) => {
   // 1. Security Check
   const secret = req.headers.get("x-internal-secret")
   if (secret !== process.env.INTERNAL_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    throw new AppError({
+      error: "UNAUTHORIZED",
+      toast: "Invalid internal secret",
+      status: 401,
+    })
   }
 
-  try {
-    const client = new currencyapi(process.env.CURRENCY_API_KEY!)
-    const res = await client.latest({ base_currency: "USD", type: "fiat" })
-    const now = new Date(res.meta.last_updated_at)
+  const client = new currencyapi(process.env.CURRENCY_API_KEY!)
+  const res = await client.latest({ base_currency: "USD", type: "fiat" })
 
-    // 2. Database Update Logic
-    for (const [code, info] of Object.entries(res.data)) {
-      const rate = (info as { value: any }).value.toString()
+  if (!res?.data) {
+    throw new AppError({
+      error: "API_ERROR",
+      toast: "Failed to fetch data from Currency API",
+      status: 502,
+    })
+  }
 
-      await db
+  const now = new Date(res.meta.last_updated_at)
+
+  // 2. Database Update Logic
+  // Using Promise.all to make these updates run in parallel (faster)
+  await Promise.all(
+    Object.entries(res.data).map(async ([code, info]: [string, any]) => {
+      const rate = info.value.toString()
+
+      return db
         .insert(exchangeRate)
         .values({
           baseCurrency: "USD",
@@ -35,11 +51,11 @@ export async function POST(req: NextRequest) {
             fetchedAt: now,
           },
         })
-    }
+    })
+  )
 
-    return NextResponse.json({ success: true, message: "Rates updated" })
-  } catch (error: any) {
-    console.error("❌ Seed Error:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-}
+  return NextResponse.json({
+    ok: true,
+    toast: "Exchange rates updated successfully",
+  })
+})

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
 import { getUploadFile } from "@/lib/server/getUploadFile"
+import { handleRoute } from "@/lib/handleRoute"
 
 const s3Client = new S3Client({
   region: "auto",
@@ -11,30 +12,31 @@ const s3Client = new S3Client({
   },
 })
 
-export async function POST(request: Request) {
-  try {
-    const result = await getUploadFile(request)
-    if (result instanceof NextResponse) return result
-    const { buffer, type, uploadPath } = result
+export const POST = handleRoute("Image Upload", async (request) => {
+  // 1. Extract file data
+  const result = await getUploadFile(request)
 
-    // upload directly to R2
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME,
-        Key: uploadPath,
-        Body: buffer,
-        ContentType: type,
-      })
-    )
+  // If getUploadFile returns an early error response, we pass it through
+  if (result instanceof Response) return result
 
-    const fileUrl = `${process.env.R2_ACCESS_URL}/${uploadPath}`
+  const { buffer, type, uploadPath } = result
 
-    return NextResponse.json({
-      message: "Image uploaded successfully",
-      url: fileUrl,
+  // 2. Upload to Cloudflare R2
+  // If this fails (network/auth), handleRoute catches it
+  await s3Client.send(
+    new PutObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: uploadPath,
+      Body: buffer,
+      ContentType: type,
     })
-  } catch (err) {
-    console.error("Image upload failed:", err)
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 })
-  }
-}
+  )
+
+  const fileUrl = `${process.env.R2_ACCESS_URL}/${uploadPath}`
+
+  return NextResponse.json({
+    ok: true,
+    toast: "Image uploaded successfully",
+    url: fileUrl,
+  })
+})

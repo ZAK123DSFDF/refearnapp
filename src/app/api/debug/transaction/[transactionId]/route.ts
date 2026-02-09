@@ -1,28 +1,33 @@
 import { db } from "@/db/drizzle"
 import { affiliateInvoice } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
+import { handleRoute } from "@/lib/handleRoute"
+import { AppError } from "@/lib/exceptions"
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ transactionId: string }> }
-) {
-  const { transactionId } = await params
+type Params = { transactionId: string }
 
-  const authHeader = request.headers.get("x-refearn-debug-secret")
-  if (authHeader !== process.env.DEBUG_SECRET) {
-    return new Response("Unauthorized", { status: 401 })
-  }
+export const GET = handleRoute<Params>(
+  "Debug Get Invoice",
+  async (request, params) => {
+    const { transactionId } = params
 
-  try {
+    // 1. Auth check
+    const authHeader = request.headers.get("x-refearn-debug-secret")
+    if (authHeader !== process.env.DEBUG_SECRET) {
+      throw new AppError({ error: "Unauthorized", status: 401 })
+    }
+
+    // 2. Fetch Invoice
     const invoice = await db.query.affiliateInvoice.findFirst({
       where: eq(affiliateInvoice.transactionId, transactionId),
     })
 
     if (!invoice) {
-      return NextResponse.json({ error: "Invoice not found" }, { status: 404 })
+      throw new AppError({ error: "Invoice not found", status: 404 })
     }
 
+    // 3. Return Data
     return NextResponse.json({
       id: invoice.transactionId,
       customer_id: invoice.customerId,
@@ -30,8 +35,5 @@ export async function GET(
       amount: invoice.amount,
       currency: "USD",
     })
-  } catch (error) {
-    console.error("Debug API Error:", error)
-    return NextResponse.json({ error: "Database error" }, { status: 500 })
   }
-}
+)

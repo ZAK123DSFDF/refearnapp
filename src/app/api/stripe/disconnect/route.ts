@@ -3,14 +3,20 @@ import Stripe from "stripe"
 import { organizationStripeAccount } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { db } from "@/db/drizzle"
+import { handleRoute } from "@/lib/handleRoute"
+import { AppError } from "@/lib/exceptions"
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-08-27.basil",
 })
 
-export async function POST(req: Request) {
-  const { orgId } = (await req.json()) as any
+export const POST = handleRoute("Stripe Deauthorize", async (req) => {
+  const { orgId } = (await req.json()) as { orgId?: string }
   if (!orgId) {
-    return NextResponse.json({ error: "Missing orgId" }, { status: 400 })
+    throw new AppError({
+      error: "MISSING_ORG_ID",
+      toast: "Organization ID is required",
+      status: 400,
+    })
   }
 
   const record = await db.query.organizationStripeAccount.findFirst({
@@ -18,7 +24,11 @@ export async function POST(req: Request) {
   })
 
   if (!record) {
-    return NextResponse.json({ error: "Account not found" }, { status: 404 })
+    throw new AppError({
+      error: "NOT_FOUND",
+      toast: "No Stripe account connected for this organization",
+      status: 404,
+    })
   }
 
   await stripe.oauth.deauthorize({
@@ -33,4 +43,4 @@ export async function POST(req: Request) {
     )
 
   return NextResponse.json({ success: true })
-}
+})
