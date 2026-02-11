@@ -8,10 +8,10 @@ import { OrgIdProps } from "@/lib/types/organization/orgId"
 import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import React from "react"
-import { getTeamData } from "@/app/(organization)/organization/[orgId]/teams/dashboard/profile/action"
 import TeamDashboardSidebar from "@/components/TeamDashboardSidebar"
-import { orgTeamInfo } from "@/app/(organization)/organization/[orgId]/teams/dashboard/settings/action"
 import { ErrorCard } from "@/components/ui-custom/ErrorCard"
+import { getTeamData } from "@/lib/server/team/getTeamData"
+import { getTeamOrgSettings } from "@/lib/server/team/getTeamOrgSettings"
 interface OrganizationDashboardLayoutProps extends OrgIdProps {
   children: React.ReactNode
 }
@@ -23,7 +23,7 @@ export default async function DashboardLayout({
   await requireTeamWithOrg(orgId)
   const teamResponse = await getTeamData(orgId)
   const team = teamResponse.ok ? teamResponse.data : null
-  const orgResponse = await orgTeamInfo(orgId)
+  const orgResponse = await getTeamOrgSettings(orgId)
   if (!orgResponse.ok) {
     return <ErrorCard message={orgResponse.error || "Something went wrong"} />
   }

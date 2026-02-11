@@ -59,7 +59,9 @@ const ResetPasswordPage = async ({ searchParams, params }: Props) => {
     )
   }
 
-  return <ResetPassword orgId={orgId} affiliate userId={sessionPayload.id} />
+  return (
+    <ResetPassword orgId={orgId} affiliate userId={sessionPayload.data.id} />
+  )
 }
 
 export default ResetPasswordPage

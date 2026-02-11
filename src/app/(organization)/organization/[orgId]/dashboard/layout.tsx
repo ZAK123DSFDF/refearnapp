@@ -10,9 +10,9 @@ import { getValidatedOrgFromParams } from "@/util/getValidatedOrgFromParams"
 import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 import { requireOrganizationWithOrg } from "@/lib/server/auth/authGuards"
 import { getUserOrgs } from "@/lib/server/organization/getUserOrgs"
-import { getUserData } from "@/app/(organization)/organization/[orgId]/dashboard/profile/action"
 import React from "react"
 import { SubscriptionStatusBanner } from "@/components/ui-custom/SubscriptionStatusBanner"
+import { getUserData } from "@/lib/server/organization/getUserProfile"
 interface OrganizationDashboardLayoutProps extends OrgIdProps {
   children: React.ReactNode
 }

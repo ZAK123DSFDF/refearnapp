@@ -34,7 +34,7 @@ export default function CustomizationPage({
   const [mainTab, setMainTab] = useState("sidebar")
   const [selectedPage, setSelectedPage] = useState("dashboard")
   const [tab, setTab] = useState("login")
-  const { domain } = useActiveDomain(orgId)
+  const { domainName } = useActiveDomain(orgId)
   useVerifyTeamSession(orgId, isTeam)
   const authHasChanges = useAtomValue(authHasChangesAtom)
   const dashboardHasChanges = useAtomValue(dashboardHasChangesAtom)
@@ -321,7 +321,7 @@ export default function CustomizationPage({
 
                 <DashboardCustomization
                   orgId={orgId}
-                  domain={domain}
+                  domain={domainName}
                   selectedPage={selectedPage}
                   setSelectedPage={setSelectedPage}
                 />
@@ -340,7 +340,7 @@ export default function CustomizationPage({
                 <AuthCustomization
                   orgId={orgId}
                   setMainTab={setMainTab}
-                  domain={domain}
+                  domain={domainName}
                   tab={tab}
                   setTab={setTab}
                 />

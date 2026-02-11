@@ -16,7 +16,6 @@ import { getBaseUrl } from "@/lib/server/affiliate/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/organization/assignFreeTrial"
 import { assignLifetimePurchase } from "@/lib/server/organization/assignLifetimePurchase"
-import { AppError } from "@/lib/exceptions"
 import { handleAction } from "@/lib/handleAction"
 
 type VerifyServerProps = {
@@ -34,44 +33,52 @@ type SessionPayload = {
   activeOrgId?: string
   orgId?: string
 }
+
 export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
-  return handleAction("VerifyServer", async () => {
+  return handleAction("Verify Server Token", async () => {
+    let tokenType: "organization" | "affiliate"
+    let tokenRole: "owner" | "team" | null = null
+    let orgIds: string[]
+    let activeOrgId: string | undefined
+    let orgId: string | undefined
     const baseUrl = await getBaseUrl()
-    let decoded: any
 
-    // Initial verification to extract context for error redirects
-    try {
-      decoded = jwt.verify(token, process.env.SECRET_KEY!) as any
-    } catch (err) {
-      // If the token is totally unreadable, we still need to know where to redirect
-      throw new AppError({
-        status: 401,
-        toast: "Invalid or expired token",
-      })
-    }
-
+    // Verification and Data Extraction
+    const decoded = jwt.verify(token, process.env.SECRET_KEY!) as any
     const transactionId = decoded.transactionId
-    const tokenType = (decoded.type as string).toLowerCase() as
+    tokenType = (decoded.type as string).toLowerCase() as
       | "organization"
       | "affiliate"
-    const tokenRole = decoded.role
-      ? (decoded.role.toLowerCase() as "owner" | "team")
-      : null
-    const orgIds = decoded.orgIds || []
-    const activeOrgId = decoded.activeOrgId
-    const orgId = decoded.orgId || decoded.organizationId
+
+    if (decoded.role) {
+      tokenRole = decoded.role.toLowerCase() as "owner" | "team"
+    }
+
+    orgIds = decoded.orgIds || []
+    activeOrgId = decoded.activeOrgId
+    orgId = decoded.orgId || decoded.organizationId
 
     const sessionPayload: SessionPayload = {
       id: decoded.id,
       email: decoded.email,
       type: decoded.type,
       role: decoded.role,
-      orgIds,
-      activeOrgId: activeOrgId || undefined,
-      orgId: orgId || undefined,
+      orgIds: decoded.orgIds || [],
+      activeOrgId: decoded.activeOrgId || undefined,
+      orgId: decoded.orgId || decoded.organizationId || undefined,
     }
 
-    // 🧠 Step 1: Signup / Email Verification Logic
+    // Role Logic
+    if (tokenRole === "team" && tokenType === "organization") {
+      sessionPayload.orgId = orgId
+    } else if (tokenType === "organization") {
+      sessionPayload.orgIds = orgIds
+      sessionPayload.activeOrgId = activeOrgId
+    } else {
+      sessionPayload.orgId = orgId
+    }
+
+    // Signup Logic
     if (mode === "signup") {
       if (tokenRole === "team" && tokenType === "organization") {
         const teamAccRecord = await db.query.teamAccount.findFirst({
@@ -81,6 +88,7 @@ export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
               eq(ta.provider, "credentials")
             ),
         })
+
         if (teamAccRecord) {
           await db
             .update(teamAccount)
@@ -120,11 +128,10 @@ export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
       }
     }
 
-    // 🧠 Step 2: Change Email Logic
+    // Change Email Logic
     if (mode === "changeEmail") {
       const newEmail = decoded.newEmail
-      if (!newEmail)
-        throw new AppError({ status: 400, toast: "Missing new email in token" })
+      if (!newEmail) throw new Error("Missing new email in token")
 
       if (tokenRole === "team" && tokenType === "organization") {
         await db
@@ -145,21 +152,19 @@ export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
       sessionPayload.email = newEmail
     }
 
-    // 🧠 Step 3: Session Cookie Generation
+    // Session and Cookie Management
     const cookieStore = await cookies()
     const sessionToken = jwt.sign(sessionPayload, process.env.SECRET_KEY!, {
       expiresIn: decoded.rememberMe ? "30d" : "1d",
     })
 
-    const cookieName =
-      tokenRole === "team" && tokenType === "organization"
-        ? `teamToken-${sessionPayload.orgId}`
-        : tokenType === "organization"
-          ? "organizationToken"
-          : `affiliateToken-${sessionPayload.orgId}`
-
     cookieStore.set({
-      name: cookieName,
+      name:
+        tokenRole === "team" && tokenType === "organization"
+          ? `teamToken-${sessionPayload.orgId}`
+          : tokenType === "organization"
+            ? "organizationToken"
+            : `affiliateToken-${sessionPayload.orgId}`,
       value: sessionToken,
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -167,8 +172,7 @@ export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
       maxAge: decoded.rememberMe ? 30 * 24 * 60 * 60 : undefined,
     })
 
-    // 🧠 Step 4: Final Redirect Computation
-    const affRedirect = buildAffiliateUrl({
+    const finalRedirect = buildAffiliateUrl({
       path: "email-verified",
       organizationId: sessionPayload.orgId,
       baseUrl,
@@ -177,15 +181,23 @@ export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
 
     return {
       ok: true,
-      toast: "Email verified successfully",
       redirectUrl:
-        tokenRole === "team" && tokenType === "organization"
+        finalRedirect ||
+        (tokenRole === "team" && tokenType === "organization"
           ? `/organization/${sessionPayload.orgId}/teams/email-verified`
           : tokenType === "organization"
             ? "/email-verified"
-            : affRedirect,
+            : finalRedirect),
+      mode,
       tokenType,
       tokenRole,
+      orgIds,
+      activeOrgId:
+        tokenRole === "team" && tokenType === "organization"
+          ? sessionPayload.orgId
+          : tokenType === "organization"
+            ? sessionPayload.activeOrgId
+            : sessionPayload.orgId,
     }
   })
 }

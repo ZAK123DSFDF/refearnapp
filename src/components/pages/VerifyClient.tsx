@@ -70,7 +70,7 @@ export default function VerifyClient({
     )
   }
 
-  if (isError || data?.success === false) {
+  if (isError || !data?.ok) {
     return (
       <ErrorState
         affiliate={affiliate}

@@ -5,7 +5,6 @@ import { requireTeamWithOrg } from "@/lib/server/auth/authGuards"
 import { Metadata } from "next"
 import { buildMetadata } from "@/util/BuildMetadata"
 import SupportEmail from "@/components/pages/Support-email"
-import { getTeamData } from "@/app/(organization)/organization/[orgId]/teams/dashboard/profile/action"
 export async function generateMetadata({
   params,
 }: OrgIdProps): Promise<Metadata> {
