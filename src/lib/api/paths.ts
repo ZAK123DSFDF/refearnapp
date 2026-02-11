@@ -1,6 +1,10 @@
 import { withQuery } from "@/lib/api/utils"
 import { OrderDir, OrderBy } from "@/lib/types/analytics/orderTypes"
 
+// =============================================================================
+// 🤳 AFFILIATE DASHBOARD PATHS
+// =============================================================================
+
 export const GET_AFFILIATE_KPI_PATH = (
   orgId: string,
   year?: number,
@@ -34,6 +38,10 @@ export const GET_AFFILIATE_PAYMENT = (orgId: string, year?: number) =>
   withQuery(`/api/affiliate/${orgId}/dashboard/payment`, { year })
 export const GET_AFFILIATE_PAYMENT_METHOD_PATH = (orgId: string) =>
   `/api/affiliate/${orgId}/dashboard/profile/payment-method`
+
+// =============================================================================
+// 🏢 ORGANIZATION (OWNER) DASHBOARD PATHS
+// =============================================================================
 
 export const GET_ORG_AFFILIATES_STATS_PATH = (
   orgId: string,
@@ -124,6 +132,10 @@ export const GET_ORG_TEAM_MEMBERS_PATH = (
 ) => withQuery(`/api/organization/${orgId}/dashboard/teams`, query)
 export const GET_ACTIVE_DOMAIN_PATH = (orgId: string) =>
   `/api/organization/${orgId}/domain/active`
+
+// =============================================================================
+// 👥 TEAM (STAFF) DASHBOARD PATHS
+// =============================================================================
 
 export const GET_TEAM_AFFILIATES_STATS_PATH = (
   orgId: string,
