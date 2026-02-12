@@ -61,7 +61,7 @@ export function OrgHeader({
 
   const AppName = (
     <h1 className={`${sidebar ? "text-lg" : "text-2xl"} font-bold`}>
-      <span style={{ color: headerColor }}>Refearn</span>
+      <span>Refearn</span>
       <span style={{ color: "#3B82F6" }}>App</span>
     </h1>
   )
