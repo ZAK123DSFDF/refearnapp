@@ -23,7 +23,7 @@ export const GET = handleRoute(
       totalAffiliates: row?.totalAffiliates ?? 0,
       totalLinks: row?.totalLinks ?? 0,
       totalVisitors: row?.totalVisitors ?? 0,
-      totalSales: row.sales ?? 0,
+      totalSales: row?.sales ?? 0,
       totalCommission: (row?.commission ?? 0) * rate,
       totalCommissionPaid: (row?.paid ?? 0) * rate,
       totalCommissionUnpaid: (row?.unpaid ?? 0) * rate,

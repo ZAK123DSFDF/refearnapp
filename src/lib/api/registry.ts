@@ -43,6 +43,7 @@ import {
   GET_ORG_WEBHOOK_KEY_PATH,
   GET_TEAM_AFFILIATES_STATS_PATH,
   GET_TEAM_DOMAIN_MANAGE_PATH,
+  GET_TEAM_KPI_PATH,
   GET_TEAM_PAYOUTS_BULK_PATH,
   GET_TEAM_PAYOUTS_PATH,
   GET_TEAM_PAYOUTS_UNPAID_PATH,
@@ -190,7 +191,7 @@ export const API_CONFIG = {
         },
         analytics: {
           kpi: {
-            path: GET_TEAM_REFERRERS_PATH,
+            path: GET_TEAM_KPI_PATH,
             response: {} as ActionResult<OrganizationKpiStats[]>,
           },
           referrers: {
