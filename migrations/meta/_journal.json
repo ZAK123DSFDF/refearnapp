@@ -8,6 +8,13 @@
       "when": 1770993859873,
       "tag": "0000_spicy_albert_cleary",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770994156603,
+      "tag": "0001_brainy_elektra",
+      "breakpoints": true
     }
   ]
 }

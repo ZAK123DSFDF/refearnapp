@@ -92,6 +92,17 @@ export const affiliateInvoiceReasonEnum = pgEnum("affiliate_invoice_reason", [
   "trial_start",
 ])
 export const providerEnum = pgEnum("provider", ["credentials", "google"])
+export const testStatusEnum = pgEnum("test_status", [
+  "PENDING",
+  "SUCCESS",
+  "FAILED",
+])
+export const migrationTest = pgTable("migration_test", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  status: testStatusEnum("status").default("PENDING"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
 export const user = pgTable(
   "user",
   {
