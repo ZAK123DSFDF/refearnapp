@@ -35,11 +35,11 @@ jobs:
       - name: Install Dependencies
         run: bun install
 
-      # Always run migrations first.
-      # Logic: If manual, use the 'target' input. If auto-push, default to 'dev'.
+      # Fixed Indentation and Logic
+      # This ensures 'main' branch pushes go to PROD
       - name: Auto Migrate Schema
         env:
-          SUPABASE_DATABASE_URL: ${{ (github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
+          SUPABASE_DATABASE_URL: ${{ (github.ref == 'refs/heads/main' || github.event.inputs.target == 'prod') && secrets.PROD_DATABASE_URL || secrets.DEV_DATABASE_URL }}
         run: bun drizzle-kit migrate
 
       # Only run the Reset/Seed sequence if the user clicked "Run Workflow" manually

@@ -1,5 +1,5 @@
 {
-  "id": "432af72f-9185-4862-ad10-1723b9b097ec",
+  "id": "72017ad8-a2a6-49fc-a762-5377e9699ad8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1086,47 +1086,6 @@
           ]
         }
       },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.migration_test": {
-      "name": "migration_test",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "status": {
-          "name": "status",
-          "type": "test_status",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'PENDING'"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -3110,15 +3069,6 @@
       "values": [
         "FEEDBACK",
         "SUPPORT"
-      ]
-    },
-    "public.test_status": {
-      "name": "test_status",
-      "schema": "public",
-      "values": [
-        "PENDING",
-        "SUCCESS",
-        "FAILED"
       ]
     },
     "public.value_type": {
