@@ -313,7 +313,7 @@ export const websiteDomain = pgTable(
 export const organizationStripeAccount = pgTable(
   "organization_stripe_account",
   {
-    stripeAccountId: text("stripe_account_id").primaryKey(),
+    stripeAccountId: text("stripe_account_id").notNull(),
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -322,11 +322,8 @@ export const organizationStripeAccount = pgTable(
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    index("organization_stripe_account_org_id_created_at_idx").on(
-      table.orgId,
-      table.createdAt
-    ),
-    index("organization_stripe_account_created_at_idx").on(table.createdAt),
+    primaryKey({ columns: [table.stripeAccountId, table.orgId] }),
+    index("organization_stripe_account_org_id_idx").on(table.orgId),
   ]
 )
 export const organizationPaddleAccount = pgTable(
