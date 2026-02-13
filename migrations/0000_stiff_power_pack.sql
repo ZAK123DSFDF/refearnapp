@@ -14,6 +14,7 @@ CREATE TYPE "public"."purchase_tier" AS ENUM('PRO', 'ULTIMATE');--> statement-br
 CREATE TYPE "public"."referral_param_enum" AS ENUM('ref', 'via', 'aff');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('OWNER', 'ADMIN', 'TEAM');--> statement-breakpoint
 CREATE TYPE "public"."support_type" AS ENUM('FEEDBACK', 'SUPPORT');--> statement-breakpoint
+CREATE TYPE "public"."value_type" AS ENUM('PERCENTAGE', 'FLAT_FEE');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -162,7 +163,8 @@ CREATE TABLE "organization_paddle_account" (
 );
 --> statement-breakpoint
 CREATE TABLE "organization_stripe_account" (
-	"stripe_account_id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"stripe_account_id" text NOT NULL,
 	"org_id" text NOT NULL,
 	"email" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -182,6 +184,27 @@ CREATE TABLE "payout_reference_periods" (
 	"month" integer NOT NULL,
 	"year" integer NOT NULL,
 	CONSTRAINT "payout_reference_periods_ref_id_month_year_pk" PRIMARY KEY("ref_id","month","year")
+);
+--> statement-breakpoint
+CREATE TABLE "promotion_codes" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"code" varchar(255) NOT NULL,
+	"external_id" varchar(255) NOT NULL,
+	"stripe_coupon_id" varchar(255),
+	"provider" "provider" NOT NULL,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"discount_type" "value_type" NOT NULL,
+	"discount_value" numeric(10, 2) NOT NULL,
+	"currency" varchar(3) DEFAULT 'USD' NOT NULL,
+	"commission_type" "value_type" DEFAULT 'PERCENTAGE' NOT NULL,
+	"commission_value" numeric(10, 2) NOT NULL,
+	"total_sales" integer DEFAULT 0 NOT NULL,
+	"total_revenue_generated" numeric(15, 2) DEFAULT '0.00' NOT NULL,
+	"affiliate_id" uuid,
+	"organization_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "promotion_codes_external_id_unique" UNIQUE("external_id")
 );
 --> statement-breakpoint
 CREATE TABLE "purchase" (
@@ -297,6 +320,8 @@ ALTER TABLE "organization_stripe_account" ADD CONSTRAINT "organization_stripe_ac
 ALTER TABLE "payout_reference" ADD CONSTRAINT "payout_reference_org_id_organization_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "payout_reference" ADD CONSTRAINT "payout_reference_affiliate_id_affiliate_id_fk" FOREIGN KEY ("affiliate_id") REFERENCES "public"."affiliate"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "payout_reference_periods" ADD CONSTRAINT "payout_reference_periods_ref_id_payout_reference_ref_id_fk" FOREIGN KEY ("ref_id") REFERENCES "public"."payout_reference"("ref_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "promotion_codes" ADD CONSTRAINT "promotion_codes_affiliate_id_affiliate_id_fk" FOREIGN KEY ("affiliate_id") REFERENCES "public"."affiliate"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "promotion_codes" ADD CONSTRAINT "promotion_codes_organization_id_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "purchase" ADD CONSTRAINT "purchase_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "subscription" ADD CONSTRAINT "subscription_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "support_message" ADD CONSTRAINT "support_message_org_id_organization_id_fk" FOREIGN KEY ("org_id") REFERENCES "public"."organization"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
@@ -327,11 +352,12 @@ CREATE INDEX "organization_auth_customization_created_at_idx" ON "organization_a
 CREATE INDEX "organization_dashboard_customization_created_at_idx" ON "organization_dashboard_customization" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "organization_paddle_account_org_id_created_at_idx" ON "organization_paddle_account" USING btree ("org_id","created_at");--> statement-breakpoint
 CREATE INDEX "organization_paddle_account_created_at_idx" ON "organization_paddle_account" USING btree ("created_at");--> statement-breakpoint
-CREATE INDEX "organization_stripe_account_org_id_created_at_idx" ON "organization_stripe_account" USING btree ("org_id","created_at");--> statement-breakpoint
-CREATE INDEX "organization_stripe_account_created_at_idx" ON "organization_stripe_account" USING btree ("created_at");--> statement-breakpoint
+CREATE UNIQUE INDEX "stripe_org_unique_idx" ON "organization_stripe_account" USING btree ("stripe_account_id","org_id");--> statement-breakpoint
 CREATE INDEX "payout_reference_org_id_created_at_idx" ON "payout_reference" USING btree ("org_id","created_at");--> statement-breakpoint
 CREATE INDEX "payout_reference_affiliate_id_created_at_idx" ON "payout_reference" USING btree ("affiliate_id","created_at");--> statement-breakpoint
 CREATE INDEX "payout_reference_created_at_idx" ON "payout_reference" USING btree ("created_at");--> statement-breakpoint
+CREATE INDEX "promotion_codes_external_id_idx" ON "promotion_codes" USING btree ("external_id");--> statement-breakpoint
+CREATE INDEX "promotion_codes_organization_id_idx" ON "promotion_codes" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "purchase_user_id_created_at_idx" ON "purchase" USING btree ("user_id","created_at");--> statement-breakpoint
 CREATE INDEX "purchase_created_at_idx" ON "purchase" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "subscription_user_id_created_at_idx" ON "subscription" USING btree ("user_id","created_at");--> statement-breakpoint

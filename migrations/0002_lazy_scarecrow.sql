@@ -1,1 +1,0 @@
-DROP TABLE "github_action_test" CASCADE;
