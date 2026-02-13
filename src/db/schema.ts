@@ -12,6 +12,7 @@ import {
   numeric,
   varchar,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { createId } from "@paralleldrive/cuid2"
 import {
@@ -313,17 +314,19 @@ export const websiteDomain = pgTable(
 export const organizationStripeAccount = pgTable(
   "organization_stripe_account",
   {
+    id: uuid("id").primaryKey().defaultRandom(),
     stripeAccountId: text("stripe_account_id").notNull(),
+
     orgId: text("org_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
+
     email: text("email"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
-    primaryKey({ columns: [table.stripeAccountId, table.orgId] }),
-    index("organization_stripe_account_org_id_idx").on(table.orgId),
+    uniqueIndex("stripe_org_unique_idx").on(table.stripeAccountId, table.orgId),
   ]
 )
 export const organizationPaddleAccount = pgTable(
