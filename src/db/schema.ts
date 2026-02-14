@@ -35,6 +35,7 @@ export const paymentProviderEnum = pgEnum("payment_provider", [
   "stripe",
   "paddle",
 ])
+export const valueTypeEnum = pgEnum("value_type", ["PERCENTAGE", "FLAT_FEE"])
 export const referralParamEnum = pgEnum("referral_param_enum", [
   "ref",
   "via",
@@ -545,6 +546,55 @@ export const affiliateInvoice = pgTable(
     ),
     index("affiliate_invoice_transaction_id_idx").on(table.transactionId),
     index("affiliate_invoice_created_at_idx").on(table.createdAt),
+  ]
+)
+export const promotionCodes = pgTable(
+  "promotion_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    code: varchar("code", { length: 255 }).notNull(),
+    externalId: varchar("external_id", { length: 255 }).notNull(),
+    stripeCouponId: varchar("stripe_coupon_id", { length: 255 }),
+    provider: paymentProviderEnum("provider").notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    discountType: valueTypeEnum("discount_type").notNull(),
+    discountValue: numeric("discount_value", {
+      precision: 10,
+      scale: 2,
+    }).notNull(),
+    currency: varchar("currency", { length: 3 }).default("USD").notNull(),
+    commissionType: valueTypeEnum("commission_type")
+      .default("PERCENTAGE")
+      .notNull(),
+    commissionValue: numeric("commission_value", {
+      precision: 10,
+      scale: 2,
+    }).notNull(),
+    totalSales: integer("total_sales").default(0).notNull(),
+    totalRevenueGenerated: numeric("total_revenue_generated", {
+      precision: 15,
+      scale: 2,
+    })
+      .default("0.00")
+      .notNull(),
+    affiliateId: uuid("affiliate_id").references(() => affiliate.id, {
+      onDelete: "set null",
+    }),
+    isSeenByAffiliate: boolean("is_seen_by_affiliate").default(false).notNull(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    deletedAt: timestamp("deleted_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("promotion_codes_external_id_idx").on(table.externalId),
+    index("promotion_codes_organization_id_idx").on(table.organizationId),
+    uniqueIndex("promo_org_unique_idx").on(
+      table.externalId,
+      table.organizationId
+    ),
   ]
 )
 export const subscriptionExpiration = pgTable(
