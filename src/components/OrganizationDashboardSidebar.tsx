@@ -12,6 +12,7 @@ import {
   User,
   Globe,
   MailQuestion,
+  TicketPercent,
 } from "lucide-react"
 import {
   Sidebar,
@@ -79,6 +80,11 @@ const OrganizationDashboardSidebar = ({
       title: "Integration",
       url: `/organization/${orgId}/dashboard/integration`,
       icon: Layers,
+    },
+    {
+      title: "Coupons",
+      url: `/organization/${orgId}/dashboard/coupons`,
+      icon: TicketPercent,
     },
     {
       title: "Settings",

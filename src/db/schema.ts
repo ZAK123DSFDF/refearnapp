@@ -553,9 +553,9 @@ export const promotionCodes = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     code: varchar("code", { length: 255 }).notNull(),
-    externalId: varchar("external_id", { length: 255 }).notNull().unique(),
+    externalId: varchar("external_id", { length: 255 }).notNull(),
     stripeCouponId: varchar("stripe_coupon_id", { length: 255 }),
-    provider: providerEnum("provider").notNull(),
+    provider: paymentProviderEnum("provider").notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     discountType: valueTypeEnum("discount_type").notNull(),
     discountValue: numeric("discount_value", {
@@ -580,16 +580,21 @@ export const promotionCodes = pgTable(
     affiliateId: uuid("affiliate_id").references(() => affiliate.id, {
       onDelete: "set null",
     }),
+    isSeenByAffiliate: boolean("is_seen_by_affiliate").default(false).notNull(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
-
+    deletedAt: timestamp("deleted_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     index("promotion_codes_external_id_idx").on(table.externalId),
     index("promotion_codes_organization_id_idx").on(table.organizationId),
+    uniqueIndex("promo_org_unique_idx").on(
+      table.externalId,
+      table.organizationId
+    ),
   ]
 )
 export const subscriptionExpiration = pgTable(

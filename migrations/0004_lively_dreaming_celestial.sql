@@ -1,0 +1,2 @@
+ALTER TABLE "promotion_codes" DROP CONSTRAINT "promotion_codes_external_id_unique";--> statement-breakpoint
+CREATE UNIQUE INDEX "promo_org_unique_idx" ON "promotion_codes" USING btree ("external_id","organization_id");

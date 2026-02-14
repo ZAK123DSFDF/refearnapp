@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import crypto from "crypto"
 import { db } from "@/db/drizzle"
-import { affiliateInvoice, subscriptionExpiration } from "@/db/schema"
+import {
+  affiliateInvoice,
+  promotionCodes,
+  subscriptionExpiration,
+} from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { calculateTrialDays } from "@/util/CalculateTrialDays"
 import { convertToUSD } from "@/util/CurrencyConvert"
@@ -268,6 +272,57 @@ export const POST = handleRoute<Params>(
             })
             .where(eq(affiliateInvoice.id, invoice.id))
         }
+        break
+      }
+      case "discount.created": {
+        const discount = payload.data
+        const isCurrentlyActive =
+          discount.status === "active" && discount.enabled_for_checkout === true
+        let mappedType: "PERCENTAGE" | "FLAT_FEE" = "PERCENTAGE"
+        if (discount.type === "flat" || discount.type === "flat_per_seat") {
+          mappedType = "FLAT_FEE"
+        }
+
+        await db.insert(promotionCodes).values({
+          code: discount.code,
+          externalId: discount.id,
+          provider: "paddle",
+          isActive: isCurrentlyActive,
+          discountType: mappedType,
+          discountValue: discount.amount,
+          currency: discount.currency_code || "USD",
+          organizationId: orgId,
+          commissionValue: "0.00",
+          commissionType: "PERCENTAGE",
+        })
+
+        console.log(
+          `✅ Paddle Discount Created: ${discount.code} for Org: ${orgId}`
+        )
+        break
+      }
+      case "discount.updated": {
+        const discount = payload.data
+        const isCurrentlyActive =
+          discount.status === "active" && discount.enabled_for_checkout === true
+        let mappedType: "PERCENTAGE" | "FLAT_FEE" = "PERCENTAGE"
+        if (discount.type === "flat" || discount.type === "flat_per_seat") {
+          mappedType = "FLAT_FEE"
+        }
+        await db
+          .update(promotionCodes)
+          .set({
+            code: discount.code,
+            isActive: isCurrentlyActive,
+            discountType: mappedType,
+            discountValue: discount.amount,
+            currency: discount.currency_code || "USD",
+            updatedAt: new Date(),
+          })
+          .where(eq(promotionCodes.externalId, discount.id))
+        console.log(
+          `✅ Paddle Discount Updated: ${discount.id} | Status: ${discount.status} | Active: ${isCurrentlyActive}`
+        )
         break
       }
     }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { db } from "@/db/drizzle"
-import { affiliateInvoice } from "@/db/schema"
+import { affiliateInvoice, promotionCodes } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { convertToUSD } from "@/util/CurrencyConvert"
 import { getCurrencyDecimals } from "@/util/CurrencyDecimal"
@@ -293,6 +293,71 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           updatedAt: new Date(),
         })
         .where(eq(affiliateInvoice.id, invoice.id))
+      break
+    }
+    case "promotion_code.created": {
+      const promo = event.data.object as Stripe.PromotionCode
+      const connectedAccountId = event.account
+
+      if (!connectedAccountId) break
+      const linkedOrgs = await db.query.organizationStripeAccount.findMany({
+        where: (table, { eq }) => eq(table.stripeAccountId, connectedAccountId),
+      })
+
+      if (linkedOrgs.length === 0) break
+      const promoInserts = linkedOrgs.map((link) => ({
+        code: promo.code,
+        externalId: promo.id,
+        stripeCouponId: promo.coupon.id,
+        provider: "stripe" as const,
+        isActive: promo.active,
+        discountType: promo.coupon.amount_off
+          ? ("FLAT_FEE" as const)
+          : ("PERCENTAGE" as const),
+        discountValue:
+          promo.coupon.percent_off?.toString() ||
+          (promo.coupon.amount_off! / 100).toString(),
+        commissionValue: "0.00",
+        organizationId: link.orgId,
+      }))
+      await db
+        .insert(promotionCodes)
+        .values(promoInserts)
+        .onConflictDoUpdate({
+          target: [promotionCodes.externalId],
+          set: { updatedAt: new Date() },
+        })
+
+      break
+    }
+    case "promotion_code.updated": {
+      const promo = event.data.object as Stripe.PromotionCode
+      const connectedAccountId = event.account
+
+      if (!connectedAccountId) break
+      await db
+        .update(promotionCodes)
+        .set({
+          isActive: promo.active,
+          code: promo.code,
+          updatedAt: new Date(),
+        })
+        .where(eq(promotionCodes.externalId, promo.id))
+
+      break
+    }
+    case "coupon.deleted": {
+      const coupon = event.data.object as Stripe.Coupon
+      await db
+        .update(promotionCodes)
+        .set({
+          isActive: false,
+          deletedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(promotionCodes.stripeCouponId, coupon.id))
+
+      console.log(`✅ Soft-deleted all promo codes for coupon: ${coupon.id}`)
       break
     }
   }
