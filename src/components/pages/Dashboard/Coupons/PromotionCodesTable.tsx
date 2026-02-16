@@ -5,60 +5,71 @@ import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { TableTop } from "@/components/ui-custom/TableTop"
 import { TableView } from "@/components/ui-custom/TableView"
-import {
-  PromotionCodesColumns,
-  PromotionCodeDummy,
-} from "./PromotionCodesColumns"
+import { PromotionCodesColumns } from "./PromotionCodesColumns"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
 import { AssignAffiliateForm } from "@/components/ui-custom/AssignAffiliateForm"
+import { useQueryFilter } from "@/hooks/useQueryFilter"
+import { useAppQuery } from "@/hooks/useAppQuery"
+import { api } from "@/lib/apiClient"
+import PaginationControls from "@/components/ui-custom/PaginationControls"
+import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 
-const DUMMY_DATA: PromotionCodeDummy[] = [
-  {
-    id: "1",
-    code: "SAVE20",
-    status: "active",
-    affiliateName: null,
-    discountValue: "20",
-    discountType: "PERCENTAGE",
-  },
-  {
-    id: "2",
-    code: "WELCOME5",
-    status: "active",
-    affiliateName: "John Doe",
-    discountValue: "5",
-    discountType: "FLAT_FEE",
-    commissionValue: "30",
-    commissionType: "PERCENTAGE", // 👈 Added this to fix the "-"
-    durationValue: "12", // 👈 Added duration
-    durationUnit: "month",
-  },
-  {
-    id: "3",
-    code: "EXPIRED10",
-    status: "inactive",
-    affiliateName: null,
-    discountValue: "10",
-    discountType: "PERCENTAGE",
-  },
-]
-
-export default function PromotionCodesTable({ orgId }: { orgId: string }) {
+export default function PromotionCodesTable({
+  orgId,
+  isTeam = false,
+}: {
+  orgId: string
+  isTeam?: boolean
+}) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [selectedCode, setSelectedCode] =
-    React.useState<PromotionCodeDummy | null>(null)
+  const [selectedCode, setSelectedCode] = React.useState<any | null>(null)
 
-  const handleAssignClick = (code: PromotionCodeDummy) => {
+  // Verify Session
+  useVerifyTeamSession(orgId, isTeam)
+
+  // Manage Filters (Pagination/Search)
+  const { filters, setFilters } = useQueryFilter()
+
+  // 1. Fetch Live Data using your SDK
+  const {
+    data: searchData,
+    error: searchError,
+    isPending: searchPending,
+  } = useAppQuery(
+    [
+      isTeam ? "team-coupons" : "org-coupons",
+      orgId,
+      filters.offset,
+      filters.email,
+    ],
+    (id, query) =>
+      isTeam
+        ? api.organization.teams.dashboard.coupons([id, query])
+        : api.organization.dashboard.coupons([id, query]),
+    [
+      orgId,
+      {
+        offset: filters.offset,
+        code: filters.email, // Reusing email filter state for "search"
+      },
+    ] as const,
+    { enabled: !!orgId }
+  )
+
+  const handleAssignClick = (code: any) => {
     setSelectedCode(code)
     setIsModalOpen(true)
   }
 
   const columns = PromotionCodesColumns(handleAssignClick)
+  const tableData = searchData?.rows ?? []
+  const hasNext = searchData?.hasNext ?? false
 
   const table = useReactTable({
-    data: DUMMY_DATA,
+    data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
   })
 
   return (
@@ -78,35 +89,39 @@ export default function PromotionCodesTable({ orgId }: { orgId: string }) {
         </CardHeader>
         <CardContent>
           <TableTop
-            filters={{}}
+            filters={{ email: filters.email }}
             onOrderChange={() => {}}
-            onEmailChange={() => {}}
+            onEmailChange={(val) => setFilters({ email: val || undefined })}
             affiliate={false}
             table={table}
-            placeholder="Search codes..."
+            placeholder="Search coupon codes..."
           />
 
           <TableView
-            isPending={false}
+            isPending={searchPending}
+            error={searchError}
             table={table}
             affiliate={false}
             columns={columns}
-            tableEmptyText="No coupons found in your Stripe/Paddle account."
+            tableEmptyText="No coupons found in your account."
+          />
+
+          <PaginationControls
+            offset={filters.offset}
+            tableDataLength={tableData.length}
+            hasNext={hasNext}
+            setFilters={setFilters}
           />
         </CardContent>
       </Card>
 
-      {/* TODO: Add AssignAffiliateModal here */}
       <AppDialog
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         title={`Assign Coupon: ${selectedCode?.code}`}
         description="Connect this synced coupon to an affiliate and define the commission rules."
         confirmText="Save Assignment"
-        onConfirm={() => {
-          console.log("Saving assignment logic...")
-          setIsModalOpen(false)
-        }}
+        onConfirm={() => setIsModalOpen(false)}
         affiliate={false}
       >
         <AssignAffiliateForm />

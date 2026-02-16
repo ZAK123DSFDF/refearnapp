@@ -41,6 +41,12 @@ export const referralParamEnum = pgEnum("referral_param_enum", [
   "via",
   "aff",
 ])
+export const durationUnitEnum = pgEnum("duration_unit", [
+  "day",
+  "week",
+  "month",
+  "year",
+])
 export const payoutProviderEnum = pgEnum("payout_provider", [
   "paypal",
   "wise",
@@ -570,6 +576,12 @@ export const promotionCodes = pgTable(
       precision: 10,
       scale: 2,
     }).notNull(),
+    commissionDurationValue: integer("commission_duration_value")
+      .default(1)
+      .notNull(),
+    commissionDurationUnit: durationUnitEnum("commission_duration_unit")
+      .default("month")
+      .notNull(),
     totalSales: integer("total_sales").default(0).notNull(),
     totalRevenueGenerated: numeric("total_revenue_generated", {
       precision: 15,

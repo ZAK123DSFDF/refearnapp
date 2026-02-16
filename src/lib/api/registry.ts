@@ -37,6 +37,7 @@ import {
   GET_ORG_PAYOUTS_BULK_PATH,
   GET_ORG_PAYOUTS_PATH,
   GET_ORG_PAYOUTS_UNPAID_PATH,
+  GET_ORG_PROMOTION_CODES_PATH,
   GET_ORG_REFERRERS_PATH,
   GET_ORG_TEAM_MEMBERS_PATH,
   GET_ORG_TIME_SERIES_PATH,
@@ -47,6 +48,7 @@ import {
   GET_TEAM_PAYOUTS_BULK_PATH,
   GET_TEAM_PAYOUTS_PATH,
   GET_TEAM_PAYOUTS_UNPAID_PATH,
+  GET_TEAM_PROMOTION_CODES_PATH,
   GET_TEAM_REFERRERS_PATH,
   GET_TEAM_TIME_SERIES_PATH,
   GET_TEAM_WEBHOOK_KEY_PATH,
@@ -111,6 +113,13 @@ export const API_CONFIG = {
         path: GET_ORG_AFFILIATES_STATS_PATH,
         response: {} as ActionResult<{
           rows: AffiliateStats[]
+          hasNext: boolean
+        }>,
+      },
+      coupons: {
+        path: GET_ORG_PROMOTION_CODES_PATH,
+        response: {} as ActionResult<{
+          rows: any[]
           hasNext: boolean
         }>,
       },
@@ -186,6 +195,13 @@ export const API_CONFIG = {
           path: GET_TEAM_AFFILIATES_STATS_PATH,
           response: {} as ActionResult<{
             rows: AffiliateStats[]
+            hasNext: boolean
+          }>,
+        },
+        coupons: {
+          path: GET_TEAM_PROMOTION_CODES_PATH,
+          response: {} as ActionResult<{
+            rows: any[]
             hasNext: boolean
           }>,
         },

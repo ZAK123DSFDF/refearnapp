@@ -43,6 +43,10 @@ export const GET_AFFILIATE_PAYMENT_METHOD_PATH = (orgId: string) =>
 // 🏢 ORGANIZATION (OWNER) DASHBOARD PATHS
 // =============================================================================
 export const GET_ORG = (orgId: string) => `/api/organization/${orgId}/org`
+export const GET_ORG_PROMOTION_CODES_PATH = (
+  orgId: string,
+  query: { offset?: number; code?: string }
+) => withQuery(`/api/organization/${orgId}/dashboard/coupons`, query)
 export const GET_ORG_AFFILIATES_STATS_PATH = (
   orgId: string,
   query: {
@@ -139,6 +143,10 @@ export const GET_ORG_CURRENCY_PATH = (orgId: string) =>
 // 👥 TEAM (STAFF) DASHBOARD PATHS
 // =============================================================================
 
+export const GET_TEAM_PROMOTION_CODES_PATH = (
+  orgId: string,
+  query: { offset?: number; code?: string }
+) => withQuery(`/api/organization/${orgId}/teams/dashboard/coupons`, query)
 export const GET_TEAM_AFFILIATES_STATS_PATH = (
   orgId: string,
   query: {

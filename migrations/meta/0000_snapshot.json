@@ -1,5 +1,5 @@
 {
-  "id": "b9d04361-d476-4654-903c-6df9b0b2e7f8",
+  "id": "9d6276cf-0069-4fec-8b3b-1e303bcdf0cb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1853,6 +1853,21 @@
           "primaryKey": false,
           "notNull": true
         },
+        "commission_duration_value": {
+          "name": "commission_duration_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "commission_duration_unit": {
+          "name": "commission_duration_unit",
+          "type": "duration_unit",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'month'"
+        },
         "total_sales": {
           "name": "total_sales",
           "type": "integer",
@@ -3154,6 +3169,16 @@
         "DEFAULT",
         "CUSTOM_DOMAIN",
         "CUSTOM_SUBDOMAIN"
+      ]
+    },
+    "public.duration_unit": {
+      "name": "duration_unit",
+      "schema": "public",
+      "values": [
+        "day",
+        "week",
+        "month",
+        "year"
       ]
     },
     "public.payment_provider": {
