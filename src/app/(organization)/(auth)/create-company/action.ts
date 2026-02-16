@@ -94,12 +94,15 @@ export const CreateOrganization = async (
         data: existingDomain.domainName,
       })
     }
+    const commissionTypeMapped =
+      input.commissionType === "fixed" ? "FLAT_FEE" : "PERCENTAGE"
     const [newOrg] = await db
       .insert(organization)
       .values({
         ...input,
         websiteUrl: sanitizedWebsiteName,
         commissionValue: input.commissionValue.toFixed(2),
+        commissionType: commissionTypeMapped,
         userId: decoded.id,
         logoUrl: input.logoUrl || null,
       })

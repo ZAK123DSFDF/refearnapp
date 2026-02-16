@@ -58,7 +58,7 @@ export const getOrgData = async (
         | "week"
         | "month"
         | "year",
-      commissionType: org.commissionType as "percentage" | "fixed",
+      commissionType: org.commissionType as "PERCENTAGE" | "FLAT_FEE",
       commissionValue: String(org.commissionValue ?? "0.00"),
       commissionDurationValue: org.commissionDurationValue,
       commissionDurationUnit: org.commissionDurationUnit as

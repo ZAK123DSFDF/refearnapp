@@ -213,7 +213,7 @@ export default function Links({
                 <>
                   Share your links and earn{" "}
                   <strong>
-                    {orgData.commissionType === "percentage"
+                    {orgData.commissionType === "PERCENTAGE"
                       ? `${orgData.commissionValue}%`
                       : new Intl.NumberFormat("en-US", {
                           style: "currency",

@@ -65,8 +65,6 @@ export const POST = handleRoute("Paddle Webhook", async (req) => {
     const isSubscription = !!data.subscriptionId
 
     if (!isSubscription) {
-      // ONE-TIME PURCHASE logic
-      const isUpgrade = priceDesc.includes("ULTIMATE-ONE-TIME-UPGRADE")
       const existingSub = await db.query.subscription.findFirst({
         where: eq(subscription.userId, decodedOrg.id),
       })
