@@ -15,6 +15,8 @@ import {
   teamAccount,
   affiliatePayoutMethod,
   purchase,
+  promotionCodes,
+  referrals,
 } from "@/db/schema"
 import {
   account_seed,
@@ -27,7 +29,9 @@ import {
   organization_auth_customization_seed,
   organization_dashboard_customization_seed,
   organization_seed,
+  promotion_codes_seed,
   purchase_seed,
+  referrals_seed,
   team_account_seed,
   team_seed,
   user_seed,
@@ -53,7 +57,8 @@ async function seedFun() {
     await tx.insert(affiliateLink).values(affiliate_link_seed)
     await tx.insert(affiliateClick).values(affiliate_click_seed)
     await tx.insert(affiliateInvoice).values(affiliate_invoice_seed)
-
+    await tx.insert(promotionCodes).values(promotion_codes_seed)
+    await tx.insert(referrals).values(referrals_seed)
     // 5️⃣ Subscription & team
     await tx.insert(purchase).values(purchase_seed)
     await tx.insert(team).values(team_seed)

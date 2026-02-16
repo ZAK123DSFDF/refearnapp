@@ -171,6 +171,53 @@ export const organization_auth_customization_seed = [
     updatedAt: parseDate("2025-08-12 22:15:36.47"),
   }),
 ]
+export const promotion_codes_seed = affiliate_seed.flatMap((affiliate, idx) => {
+  const count = idx === 0 ? 25 : 2
+  return Array.from({ length: count }, (_, i) => ({
+    id: crypto.randomUUID(),
+    code: `PROMO_${i}_${affiliate.name.toUpperCase()}`,
+    externalId: `ext_${crypto.randomUUID().slice(0, 8)}_${i}`,
+    provider: "paddle" as const,
+    isActive: true,
+    discountType: "PERCENTAGE" as const,
+    discountValue: "10.00",
+    commissionType: "PERCENTAGE" as const,
+    commissionValue: "20.00",
+    affiliateId: affiliate.id,
+    organizationId: ORG_ID,
+    isSeenByAffiliate: i > 5,
+    createdAt: randomDateIn2025(),
+    updatedAt: new Date(),
+  }))
+})
+export const referrals_seed = affiliate_seed.flatMap((affiliate, idx) => {
+  const count = idx === 0 ? 60 : 5
+  const promo = promotion_codes_seed.find((p) => p.affiliateId === affiliate.id)
+  const link = affiliate_link_seed.find((l) => l.affiliateId === affiliate.id)
+
+  return Array.from({ length: count }, (_, i) => {
+    const isConverted = i % 3 === 0
+    const signedAt = randomDateIn2025()
+
+    return {
+      id: crypto.randomUUID(),
+      affiliateId: affiliate.id,
+      organizationId: ORG_ID,
+      signupEmail: `user_${i}_${affiliate.name}@example.com`,
+      promotionCodeId: i % 2 === 0 ? promo?.id : null,
+      affiliateLinkId: i % 2 !== 0 ? link?.id : null,
+      signedAt: signedAt,
+      convertedAt: isConverted
+        ? new Date(signedAt.getTime() + randomInt(1, 4) * 86400000)
+        : null,
+      totalRevenue: isConverted ? "150.00" : "0.00",
+      commissionEarned: isConverted ? "30.00" : "0.00",
+      isSeenByAffiliate: i >= 10,
+      createdAt: signedAt,
+      updatedAt: signedAt,
+    }
+  })
+})
 export const organization_dashboard_customization_seed = [
   buildDashboardCustomizationSeed({
     id: "tp7JLBb5",
