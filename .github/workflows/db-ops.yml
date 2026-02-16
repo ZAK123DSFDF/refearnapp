@@ -2,11 +2,11 @@ name: Database Operations
 
 on:
   # 1. Automatic: Run migrations on push to main
-  push:
-    branches: [main]
-    paths:
-      - 'src/db/schema.ts'
-      - 'migrations/**'
+#  push:
+#    branches: [main]
+#    paths:
+#      - 'src/db/schema.ts'
+#      - 'migrations/**'
 
   # 2. Manual: Trigger Reset/Seed from the GitHub Actions tab
   workflow_dispatch:

@@ -6,7 +6,6 @@ import {
   uuid,
   primaryKey,
   unique,
-  pgEnum,
   integer,
   jsonb,
   numeric,
@@ -26,69 +25,49 @@ import {
 } from "@/util/idGenerators"
 import { AuthCustomization } from "@/customization/Auth/defaultAuthCustomization"
 import { DashboardCustomization } from "@/customization/Dashboard/defaultDashboardCustomization"
-export const roleEnum = pgEnum("role", ["OWNER", "ADMIN", "TEAM"])
-export const accountTypeEnum = pgEnum("account_type", [
-  "ORGANIZATION",
-  "AFFILIATE",
-])
-export const paymentProviderEnum = pgEnum("payment_provider", [
-  "stripe",
-  "paddle",
-])
-export const valueTypeEnum = pgEnum("value_type", ["PERCENTAGE", "FLAT_FEE"])
-export const referralParamEnum = pgEnum("referral_param_enum", [
-  "ref",
-  "via",
-  "aff",
-])
-export const durationUnitEnum = pgEnum("duration_unit", [
-  "day",
-  "week",
-  "month",
-  "year",
-])
-export const payoutProviderEnum = pgEnum("payout_provider", [
-  "paypal",
-  "wise",
-  "payoneer",
-])
-export const supportTypeEnum = pgEnum("support_type", ["FEEDBACK", "SUPPORT"])
-export const purchaseReasonEnum = pgEnum("purchase_reason", [
-  "UPGRADE_NO_BILL",
-  "UPGRADE_PRORATED",
-  "DOWNGRADE_NO_BILL",
-  "DOWNGRADE_IMMEDIATE",
-  "CONVERT_TO_ONE_TIME",
-])
-export const planEnum = pgEnum("plan", ["FREE", "PRO", "ULTIMATE"])
+// --- 1. CORE AUTH & ACCESS ---
+export const ROLES = ["OWNER", "ADMIN", "TEAM"] as const
+export type Role = (typeof ROLES)[number]
 
-export const billingIntervalEnum = pgEnum("billing_interval", [
-  "MONTHLY",
-  "YEARLY",
-])
-export const purchaseTierEnum = pgEnum("purchase_tier", ["PRO", "ULTIMATE"])
-export const attributionModelEnum = pgEnum("attribution_model", [
-  "FIRST_CLICK",
-  "LAST_CLICK",
-])
-export const currencyEnum = pgEnum("currency", [
-  "USD",
-  "EUR",
-  "GBP",
-  "CAD",
-  "AUD",
-])
-export const dnsStatusEnum = pgEnum("dns_status", [
-  "Pending",
-  "Verified",
-  "Failed",
-])
-export const domainTypeEnum = pgEnum("domain_type", [
-  "DEFAULT",
-  "CUSTOM_DOMAIN",
-  "CUSTOM_SUBDOMAIN",
-])
-export const affiliateInvoiceReasonEnum = pgEnum("affiliate_invoice_reason", [
+export const ACCOUNT_TYPES = ["ORGANIZATION", "AFFILIATE"] as const
+export type AccountType = (typeof ACCOUNT_TYPES)[number]
+
+export const AUTH_PROVIDERS = ["credentials", "google"] as const
+export type AuthProvider = (typeof AUTH_PROVIDERS)[number]
+
+// --- 2. PAYMENT & BILLING ---
+export const PAYMENT_PROVIDERS = ["stripe", "paddle"] as const
+export type PaymentProvider = (typeof PAYMENT_PROVIDERS)[number]
+
+export const VALUE_TYPES = ["PERCENTAGE", "FLAT_FEE"] as const
+export type ValueType = (typeof VALUE_TYPES)[number]
+
+export const PLANS = ["FREE", "PRO", "ULTIMATE"] as const
+export type Plan = (typeof PLANS)[number]
+
+export const BILLING_INTERVALS = ["MONTHLY", "YEARLY"] as const
+export type BillingInterval = (typeof BILLING_INTERVALS)[number]
+
+export const PURCHASE_TIERS = ["PRO", "ULTIMATE"] as const
+export type PurchaseTier = (typeof PURCHASE_TIERS)[number]
+
+export const CURRENCIES = ["USD", "EUR", "GBP", "CAD", "AUD"] as const
+export type Currency = (typeof CURRENCIES)[number]
+
+// --- 3. AFFILIATE SPECIFIC ---
+export const REFERRAL_PARAMS = ["ref", "via", "aff"] as const
+export type ReferralParam = (typeof REFERRAL_PARAMS)[number]
+
+export const DURATION_UNITS = ["day", "week", "month", "year"] as const
+export type DurationUnit = (typeof DURATION_UNITS)[number]
+
+export const ATTRIBUTION_MODELS = ["FIRST_CLICK", "LAST_CLICK"] as const
+export type AttributionModel = (typeof ATTRIBUTION_MODELS)[number]
+
+export const PAYOUT_PROVIDERS = ["paypal", "wise", "payoneer"] as const
+export type PayoutProvider = (typeof PAYOUT_PROVIDERS)[number]
+
+export const AFFILIATE_INVOICE_REASONS = [
   "subscription_create",
   "subscription_update",
   "one_time",
@@ -96,16 +75,40 @@ export const affiliateInvoiceReasonEnum = pgEnum("affiliate_invoice_reason", [
   "manual_adjustment",
   "placeholder_from_charge",
   "trial_start",
-])
-export const providerEnum = pgEnum("provider", ["credentials", "google"])
+] as const
+export type AffiliateInvoiceReason = (typeof AFFILIATE_INVOICE_REASONS)[number]
+
+// --- 4. DOMAINS & DNS ---
+export const DNS_STATUSES = ["Pending", "Verified", "Failed"] as const
+export type DnsStatus = (typeof DNS_STATUSES)[number]
+
+export const DOMAIN_TYPES = [
+  "DEFAULT",
+  "CUSTOM_DOMAIN",
+  "CUSTOM_SUBDOMAIN",
+] as const
+export type DomainType = (typeof DOMAIN_TYPES)[number]
+
+// --- 5. SYSTEM & SUPPORT ---
+export const SUPPORT_TYPES = ["FEEDBACK", "SUPPORT"] as const
+export type SupportType = (typeof SUPPORT_TYPES)[number]
+
+export const PURCHASE_REASONS = [
+  "UPGRADE_NO_BILL",
+  "UPGRADE_PRORATED",
+  "DOWNGRADE_NO_BILL",
+  "DOWNGRADE_IMMEDIATE",
+  "CONVERT_TO_ONE_TIME",
+] as const
+export type PurchaseReason = (typeof PURCHASE_REASONS)[number]
 export const user = pgTable(
   "user",
   {
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    role: roleEnum("role").default("OWNER").notNull(),
-    type: accountTypeEnum("type").default("ORGANIZATION").notNull(),
+    role: text("role").$type<Role>().default("OWNER").notNull(),
+    type: text("type").$type<AccountType>().default("ORGANIZATION").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -115,7 +118,7 @@ export const supportMessage = pgTable(
   "support_message",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    type: supportTypeEnum("type").notNull(),
+    type: text("type").$type<SupportType>().notNull(),
     subject: text("subject").notNull(),
     message: text("message").notNull(),
     orgId: text("org_id").references(() => organization.id, {
@@ -142,8 +145,8 @@ export const team = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     email: text("email").notNull(),
-    role: roleEnum("role").default("TEAM").notNull(),
-    type: accountTypeEnum("type").default("ORGANIZATION").notNull(),
+    role: text("role").$type<Role>().default("TEAM").notNull(),
+    type: text("type").$type<AccountType>().default("ORGANIZATION").notNull(),
     organizationId: text("organization_id")
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
@@ -165,7 +168,7 @@ export const teamAccount = pgTable(
     teamId: uuid("team_id")
       .notNull()
       .references(() => team.id, { onDelete: "cascade" }),
-    provider: providerEnum("provider").notNull(),
+    provider: text("provider").$type<AuthProvider>().notNull(),
     providerAccountId: text("provider_account_id").notNull(),
     emailVerified: timestamp("email_verified"),
     password: text("password"),
@@ -187,7 +190,7 @@ export const account = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    provider: providerEnum("provider").notNull(),
+    provider: text("provider").$type<AuthProvider>().notNull(),
     providerAccountId: text("provider_account_id").notNull(),
     emailVerified: timestamp("email_verified"),
     password: text("password"),
@@ -208,9 +211,9 @@ export const subscription = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    plan: planEnum("plan").notNull().default("FREE"),
-    billingInterval: billingIntervalEnum("billing_interval"),
-    currency: text("currency").default("USD"),
+    plan: text("plan").$type<Plan>().notNull().default("FREE"),
+    billingInterval: text("billing_interval").$type<BillingInterval>(),
+    currency: text("currency").$type<Currency>().default("USD"),
     price: numeric("price", { precision: 10, scale: 2 }),
     priceId: text("price_id"),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
@@ -237,12 +240,12 @@ export const purchase = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    tier: purchaseTierEnum("tier").notNull(),
+    tier: text("tier").$type<PurchaseTier>().notNull(),
     price: numeric("price", { precision: 10, scale: 2 }).notNull(),
-    currency: text("currency").default("USD"),
+    currency: text("currency").$type<Currency>().default("USD"),
     priceId: text("price_id"),
     isActive: boolean("is_active").default(true),
-    reason: purchaseReasonEnum("reason"),
+    reason: text("reason").$type<PurchaseReason>(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   },
   (table) => [
@@ -265,20 +268,25 @@ export const organization = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    referralParam: referralParamEnum("referral_param").default("ref"),
+    referralParam: text("referral_param").$type<ReferralParam>().default("ref"),
     cookieLifetimeValue: integer("cookie_lifetime_value").default(30),
-    cookieLifetimeUnit: text("cookie_lifetime_unit").default("day"),
-    commissionType: text("commission_type").default("percentage"),
+    cookieLifetimeUnit: text("cookie_lifetime_unit")
+      .$type<DurationUnit>()
+      .default("day"),
+    commissionType: text("commission_type")
+      .$type<ValueType>()
+      .default("PERCENTAGE"),
     commissionValue: numeric("commission_value", {
       precision: 10,
       scale: 2,
     }).default("0.00"),
     commissionDurationValue: integer("commission_duration_value").default(1),
     commissionDurationUnit: text("commission_duration_unit").default("day"),
-    attributionModel: attributionModelEnum("attribution_model")
+    attributionModel: text("attribution_model")
+      .$type<AttributionModel>()
       .notNull()
       .default("LAST_CLICK"),
-    currency: currencyEnum("currency").notNull().default("USD"),
+    currency: text("currency").$type<Currency>().notNull().default("USD"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -300,12 +308,15 @@ export const websiteDomain = pgTable(
       .notNull()
       .references(() => organization.id, { onDelete: "cascade" }),
     domainName: text("domain_name").notNull().unique(),
-    type: domainTypeEnum("type").notNull().default("DEFAULT"),
+    type: text("type").$type<DomainType>().notNull().default("DEFAULT"),
     isPrimary: boolean("is_primary").notNull().default(false),
     isActive: boolean("is_active").notNull().default(false),
     isRedirect: boolean("is_redirect").notNull().default(false),
     isVerified: boolean("is_verified").notNull().default(false),
-    dnsStatus: dnsStatusEnum("dns_status").notNull().default("Pending"),
+    dnsStatus: text("dns_status")
+      .$type<DnsStatus>()
+      .notNull()
+      .default("Pending"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -395,7 +406,7 @@ export const affiliate = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: text("name").notNull(),
     email: text("email").notNull(),
-    type: accountTypeEnum("type").default("AFFILIATE").notNull(),
+    type: text("type").$type<AccountType>().default("AFFILIATE").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     organizationId: text("organization_id")
@@ -416,7 +427,7 @@ export const affiliateAccount = pgTable(
     affiliateId: uuid("affiliate_id")
       .notNull()
       .references(() => affiliate.id, { onDelete: "cascade" }),
-    provider: providerEnum("provider").notNull(),
+    provider: text("provider").$type<AuthProvider>().notNull(),
     providerAccountId: text("provider_account_id").notNull(),
     emailVerified: timestamp("email_verified"),
     password: text("password"),
@@ -439,7 +450,7 @@ export const affiliatePayoutMethod = pgTable(
       .notNull()
       .references(() => affiliate.id, { onDelete: "cascade" }),
 
-    provider: payoutProviderEnum("provider").notNull(),
+    provider: text("provider").$type<PayoutProvider>().notNull(),
     accountIdentifier: text("account_identifier").notNull(),
     isDefault: boolean("is_default").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -521,12 +532,14 @@ export const affiliateInvoice = pgTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => generateAffiliatePaymentLinkId()),
-    paymentProvider: paymentProviderEnum("payment_provider").notNull(),
+    paymentProvider: text("payment_provider")
+      .$type<PaymentProvider>()
+      .notNull(),
     transactionId: text("transaction_id"),
     subscriptionId: text("subscription_id"),
     customerId: text("customer_id").notNull(),
     amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
-    currency: currencyEnum("currency").notNull(),
+    currency: text("currency").$type<Currency>().notNull(),
     rawAmount: numeric("raw_amount", { precision: 10, scale: 2 }).default("0"),
     rawCurrency: text("raw_currency").default("USD"),
     commission: numeric("commission", { precision: 10, scale: 2 }).notNull(),
@@ -540,7 +553,10 @@ export const affiliateInvoice = pgTable(
     unpaidAmount: numeric("unpaid_amount", { precision: 10, scale: 2 })
       .default("0")
       .notNull(),
-    reason: affiliateInvoiceReasonEnum("reason").notNull().default("one_time"),
+    reason: text("reason")
+      .$type<AffiliateInvoiceReason>()
+      .notNull()
+      .default("one_time"),
     refundedAt: timestamp("refunded_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -561,15 +577,16 @@ export const promotionCodes = pgTable(
     code: varchar("code", { length: 255 }).notNull(),
     externalId: varchar("external_id", { length: 255 }).notNull(),
     stripeCouponId: varchar("stripe_coupon_id", { length: 255 }),
-    provider: paymentProviderEnum("provider").notNull(),
+    provider: text("provider").$type<PaymentProvider>().notNull(),
     isActive: boolean("is_active").default(true).notNull(),
-    discountType: valueTypeEnum("discount_type").notNull(),
+    discountType: text("discount_type").$type<ValueType>().notNull(),
     discountValue: numeric("discount_value", {
       precision: 10,
       scale: 2,
     }).notNull(),
     currency: varchar("currency", { length: 3 }).default("USD").notNull(),
-    commissionType: valueTypeEnum("commission_type")
+    commissionType: text("commission_type")
+      .$type<ValueType>()
       .default("PERCENTAGE")
       .notNull(),
     commissionValue: numeric("commission_value", {
@@ -579,7 +596,8 @@ export const promotionCodes = pgTable(
     commissionDurationValue: integer("commission_duration_value")
       .default(1)
       .notNull(),
-    commissionDurationUnit: durationUnitEnum("commission_duration_unit")
+    commissionDurationUnit: text("commission_duration_unit")
+      .$type<DurationUnit>()
       .default("month")
       .notNull(),
     totalSales: integer("total_sales").default(0).notNull(),

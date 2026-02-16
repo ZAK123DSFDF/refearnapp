@@ -1,5 +1,5 @@
 {
-  "id": "9d6276cf-0069-4fec-8b3b-1e303bcdf0cb",
+  "id": "5b0a054e-8e3a-4315-b2ed-ab519eca0f68",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -23,8 +23,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "provider",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -145,8 +144,7 @@
         },
         "type": {
           "name": "type",
-          "type": "account_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'AFFILIATE'"
@@ -280,8 +278,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "provider",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -511,8 +508,7 @@
         },
         "payment_provider": {
           "name": "payment_provider",
-          "type": "payment_provider",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -542,8 +538,7 @@
         },
         "currency": {
           "name": "currency",
-          "type": "currency",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -589,8 +584,7 @@
         },
         "reason": {
           "name": "reason",
-          "type": "affiliate_invoice_reason",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'one_time'"
@@ -839,8 +833,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "payout_provider",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1138,8 +1131,7 @@
         },
         "referral_param": {
           "name": "referral_param",
-          "type": "referral_param_enum",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "default": "'ref'"
@@ -1163,7 +1155,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "default": "'percentage'"
+          "default": "'PERCENTAGE'"
         },
         "commission_value": {
           "name": "commission_value",
@@ -1188,16 +1180,14 @@
         },
         "attribution_model": {
           "name": "attribution_model",
-          "type": "attribution_model",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'LAST_CLICK'"
         },
         "currency": {
           "name": "currency",
-          "type": "currency",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'USD'"
@@ -1807,8 +1797,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "payment_provider",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1821,8 +1810,7 @@
         },
         "discount_type": {
           "name": "discount_type",
-          "type": "value_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -1841,8 +1829,7 @@
         },
         "commission_type": {
           "name": "commission_type",
-          "type": "value_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'PERCENTAGE'"
@@ -1862,8 +1849,7 @@
         },
         "commission_duration_unit": {
           "name": "commission_duration_unit",
-          "type": "duration_unit",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'month'"
@@ -2027,8 +2013,7 @@
         },
         "tier": {
           "name": "tier",
-          "type": "purchase_tier",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -2060,8 +2045,7 @@
         },
         "reason": {
           "name": "reason",
-          "type": "purchase_reason",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -2288,16 +2272,14 @@
         },
         "plan": {
           "name": "plan",
-          "type": "plan",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'FREE'"
         },
         "billing_interval": {
           "name": "billing_interval",
-          "type": "billing_interval",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -2488,8 +2470,7 @@
         },
         "type": {
           "name": "type",
-          "type": "support_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -2622,16 +2603,14 @@
         },
         "role": {
           "name": "role",
-          "type": "role",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'TEAM'"
         },
         "type": {
           "name": "type",
-          "type": "account_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'ORGANIZATION'"
@@ -2772,8 +2751,7 @@
         },
         "provider": {
           "name": "provider",
-          "type": "provider",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -2894,16 +2872,14 @@
         },
         "role": {
           "name": "role",
-          "type": "role",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'OWNER'"
         },
         "type": {
           "name": "type",
-          "type": "account_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'ORGANIZATION'"
@@ -2979,8 +2955,7 @@
         },
         "type": {
           "name": "type",
-          "type": "domain_type",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'DEFAULT'"
@@ -3015,8 +2990,7 @@
         },
         "dns_status": {
           "name": "dns_status",
-          "type": "dns_status",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "'Pending'"
@@ -3104,171 +3078,7 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.account_type": {
-      "name": "account_type",
-      "schema": "public",
-      "values": [
-        "ORGANIZATION",
-        "AFFILIATE"
-      ]
-    },
-    "public.affiliate_invoice_reason": {
-      "name": "affiliate_invoice_reason",
-      "schema": "public",
-      "values": [
-        "subscription_create",
-        "subscription_update",
-        "one_time",
-        "refund",
-        "manual_adjustment",
-        "placeholder_from_charge",
-        "trial_start"
-      ]
-    },
-    "public.attribution_model": {
-      "name": "attribution_model",
-      "schema": "public",
-      "values": [
-        "FIRST_CLICK",
-        "LAST_CLICK"
-      ]
-    },
-    "public.billing_interval": {
-      "name": "billing_interval",
-      "schema": "public",
-      "values": [
-        "MONTHLY",
-        "YEARLY"
-      ]
-    },
-    "public.currency": {
-      "name": "currency",
-      "schema": "public",
-      "values": [
-        "USD",
-        "EUR",
-        "GBP",
-        "CAD",
-        "AUD"
-      ]
-    },
-    "public.dns_status": {
-      "name": "dns_status",
-      "schema": "public",
-      "values": [
-        "Pending",
-        "Verified",
-        "Failed"
-      ]
-    },
-    "public.domain_type": {
-      "name": "domain_type",
-      "schema": "public",
-      "values": [
-        "DEFAULT",
-        "CUSTOM_DOMAIN",
-        "CUSTOM_SUBDOMAIN"
-      ]
-    },
-    "public.duration_unit": {
-      "name": "duration_unit",
-      "schema": "public",
-      "values": [
-        "day",
-        "week",
-        "month",
-        "year"
-      ]
-    },
-    "public.payment_provider": {
-      "name": "payment_provider",
-      "schema": "public",
-      "values": [
-        "stripe",
-        "paddle"
-      ]
-    },
-    "public.payout_provider": {
-      "name": "payout_provider",
-      "schema": "public",
-      "values": [
-        "paypal",
-        "wise",
-        "payoneer"
-      ]
-    },
-    "public.plan": {
-      "name": "plan",
-      "schema": "public",
-      "values": [
-        "FREE",
-        "PRO",
-        "ULTIMATE"
-      ]
-    },
-    "public.provider": {
-      "name": "provider",
-      "schema": "public",
-      "values": [
-        "credentials",
-        "google"
-      ]
-    },
-    "public.purchase_reason": {
-      "name": "purchase_reason",
-      "schema": "public",
-      "values": [
-        "UPGRADE_NO_BILL",
-        "UPGRADE_PRORATED",
-        "DOWNGRADE_NO_BILL",
-        "DOWNGRADE_IMMEDIATE",
-        "CONVERT_TO_ONE_TIME"
-      ]
-    },
-    "public.purchase_tier": {
-      "name": "purchase_tier",
-      "schema": "public",
-      "values": [
-        "PRO",
-        "ULTIMATE"
-      ]
-    },
-    "public.referral_param_enum": {
-      "name": "referral_param_enum",
-      "schema": "public",
-      "values": [
-        "ref",
-        "via",
-        "aff"
-      ]
-    },
-    "public.role": {
-      "name": "role",
-      "schema": "public",
-      "values": [
-        "OWNER",
-        "ADMIN",
-        "TEAM"
-      ]
-    },
-    "public.support_type": {
-      "name": "support_type",
-      "schema": "public",
-      "values": [
-        "FEEDBACK",
-        "SUPPORT"
-      ]
-    },
-    "public.value_type": {
-      "name": "value_type",
-      "schema": "public",
-      "values": [
-        "PERCENTAGE",
-        "FLAT_FEE"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},
