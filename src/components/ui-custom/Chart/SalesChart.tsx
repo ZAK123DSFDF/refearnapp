@@ -77,7 +77,10 @@ export function ChartDailyMetrics({
   )
   const { data: currency = "USD" } = useAppQuery(
     ["org-currency", orgId],
-    (id) => api.organization.currency([id]),
+    (id) => {
+      const context = affiliate ? "affiliate" : isTeam ? "team" : "admin"
+      return api.organization.currency([id, context])
+    },
     [orgId] as const,
     { enabled: !!orgId }
   )

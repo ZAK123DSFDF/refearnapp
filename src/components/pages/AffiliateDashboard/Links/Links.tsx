@@ -70,7 +70,10 @@ export default function Links({
   }, [filters, isPreview])
   const { data: orgData } = useAppQuery(
     ["organization-settings", orgId],
-    (id) => api.organization.org([id]),
+    (id) => {
+      const context = affiliate ? "affiliate" : "public"
+      return api.organization.org([id, context])
+    },
     [orgId] as const,
     { enabled: !!orgId }
   )

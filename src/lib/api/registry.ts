@@ -22,6 +22,7 @@ import {
   GET_ACTIVE_DOMAIN_PATH,
   GET_AFFILIATE_KPI_PATH,
   GET_AFFILIATE_LINKS_PATH,
+  GET_AFFILIATE_LOOKUP_PATH,
   GET_AFFILIATE_PAYMENT,
   GET_AFFILIATE_PAYMENT_METHOD_PATH,
   GET_AFFILIATE_REFERRERS_PATH,
@@ -42,6 +43,7 @@ import {
   GET_ORG_TEAM_MEMBERS_PATH,
   GET_ORG_TIME_SERIES_PATH,
   GET_ORG_WEBHOOK_KEY_PATH,
+  GET_PROMOTION_SETTINGS,
   GET_TEAM_AFFILIATES_STATS_PATH,
   GET_TEAM_DOMAIN_MANAGE_PATH,
   GET_TEAM_KPI_PATH,
@@ -99,6 +101,25 @@ export const API_CONFIG = {
       path: GET_ORG,
       response: {} as ActionResult<Organization>,
     },
+    affiliateLookup: {
+      path: GET_AFFILIATE_LOOKUP_PATH,
+      response: {} as ActionResult<{
+        rows: { id: string; name: string; email: string }[]
+        hasNext: boolean
+      }>,
+    },
+    promotionCodes: {
+      settings: {
+        path: GET_PROMOTION_SETTINGS,
+        response: {} as ActionResult<{
+          commissionType: "PERCENTAGE" | "FLAT_FEE"
+          commissionValue: string
+          commissionDurationValue: number
+          commissionDurationUnit: "day" | "week" | "month" | "year"
+          affiliateId: string | null
+        }>,
+      },
+    },
     domain: {
       active: {
         path: GET_ACTIVE_DOMAIN_PATH,
@@ -106,7 +127,8 @@ export const API_CONFIG = {
       },
     },
     currency: {
-      path: GET_ORG_CURRENCY_PATH,
+      path: (orgId: string, context?: "admin" | "team" | "affiliate") =>
+        GET_ORG_CURRENCY_PATH(orgId, context),
       response: {} as ActionResult<string>,
     },
     dashboard: {

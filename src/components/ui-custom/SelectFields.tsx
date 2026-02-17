@@ -22,6 +22,9 @@ type SelectFieldProps = {
   options: { value: string; label: string }[]
   affiliate: boolean
   icon?: React.ElementType
+  hasNext?: boolean
+  onLoadMore?: (e: React.MouseEvent) => void
+  isLoading?: boolean
 }
 
 export const SelectField = ({
@@ -32,6 +35,9 @@ export const SelectField = ({
   options,
   affiliate = false,
   icon: Icon,
+  hasNext,
+  onLoadMore,
+  isLoading,
 }: SelectFieldProps) => {
   return (
     <FormField
@@ -64,6 +70,18 @@ export const SelectField = ({
                       {opt.label}
                     </SelectItem>
                   ))}
+                  {hasNext && (
+                    <div className="p-2 border-t">
+                      <button
+                        type="button"
+                        disabled={isLoading}
+                        onClick={onLoadMore}
+                        className="w-full text-xs py-1 text-primary hover:underline font-medium"
+                      >
+                        {isLoading ? "Loading..." : "Load more affiliates..."}
+                      </button>
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>

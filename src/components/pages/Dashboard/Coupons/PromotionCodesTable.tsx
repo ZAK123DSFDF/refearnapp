@@ -122,8 +122,18 @@ export default function PromotionCodesTable({
         confirmText="Save Assignment"
         onConfirm={() => setIsModalOpen(false)}
         affiliate={false}
+        showFooter={false}
       >
-        <AssignAffiliateForm />
+        <AssignAffiliateForm
+          orgId={orgId}
+          isTeam={isTeam}
+          codeId={selectedCode?.id}
+          initialAffiliate={{
+            id: selectedCode?.affiliateId,
+            name: selectedCode?.affiliateName,
+            email: selectedCode?.affiliateEmail,
+          }}
+        />
       </AppDialog>
     </div>
   )

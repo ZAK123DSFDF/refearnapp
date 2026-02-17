@@ -42,7 +42,14 @@ export const GET_AFFILIATE_PAYMENT_METHOD_PATH = (orgId: string) =>
 // =============================================================================
 // 🏢 ORGANIZATION (OWNER) DASHBOARD PATHS
 // =============================================================================
-export const GET_ORG = (orgId: string) => `/api/organization/${orgId}/org`
+export const GET_AFFILIATE_LOOKUP_PATH = (
+  orgId: string,
+  query: { offset: number; context: "admin" | "team"; search?: string }
+) => withQuery(`/api/organization/${orgId}/affiliate-lookup`, query)
+export const GET_ORG = (
+  orgId: string,
+  context: "public" | "affiliate" | "admin" | "team" = "public"
+) => `/api/organization/${orgId}?context=${context}`
 export const GET_ORG_PROMOTION_CODES_PATH = (
   orgId: string,
   query: { offset?: number; code?: string }
@@ -128,6 +135,14 @@ export const GET_ORG_PAYOUTS_PATH = (
     `/api/organization/${orgId}/dashboard/payout/affiliatePayout`,
     query
   )
+export const GET_PROMOTION_SETTINGS = (
+  orgId: string,
+  codeId: string,
+  context: "admin" | "team"
+) =>
+  withQuery(`/api/organization/${orgId}/promotion-codes/${codeId}/settings`, {
+    context,
+  })
 export const GET_ORG_PAYOUTS_UNPAID_PATH = (orgId: string) =>
   `/api/organization/${orgId}/dashboard/payout/unpaid-months`
 export const GET_ORG_TEAM_MEMBERS_PATH = (
@@ -136,8 +151,11 @@ export const GET_ORG_TEAM_MEMBERS_PATH = (
 ) => withQuery(`/api/organization/${orgId}/dashboard/teams`, query)
 export const GET_ACTIVE_DOMAIN_PATH = (orgId: string) =>
   `/api/organization/${orgId}/domain/active`
-export const GET_ORG_CURRENCY_PATH = (orgId: string) =>
-  `/api/organization/${orgId}/currency`
+export const GET_ORG_CURRENCY_PATH = (
+  orgId: string,
+  context?: "admin" | "team" | "affiliate"
+) =>
+  `/api/organization/${orgId}/currency${context ? `?context=${context}` : ""}`
 
 // =============================================================================
 // 👥 TEAM (STAFF) DASHBOARD PATHS

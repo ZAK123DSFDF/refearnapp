@@ -23,7 +23,7 @@ const couponsPage = async ({ params }: OrgIdProps) => {
   await requireOrganizationWithOrg(orgId)
   return (
     <>
-      <PromotionCodesTable orgId={orgId} />
+      <PromotionCodesTable orgId={orgId} isTeam={false} />
     </>
   )
 }
