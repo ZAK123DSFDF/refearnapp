@@ -10,7 +10,7 @@ export const orgSettingsSchema = z.object({
   referralParam: z.enum(["ref", "via", "aff"]),
   cookieLifetimeValue: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid amount"),
   cookieLifetimeUnit: z.enum(["day", "week", "month", "year"]),
-  commissionType: z.enum(["percentage", "fixed"]),
+  commissionType: z.enum(["PERCENTAGE", "FLAT_FEE"]),
   commissionValue: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid amount"),
   commissionDurationValue: z
     .string()

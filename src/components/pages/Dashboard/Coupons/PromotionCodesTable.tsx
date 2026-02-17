@@ -13,6 +13,7 @@ import { api } from "@/lib/apiClient"
 import PaginationControls from "@/components/ui-custom/PaginationControls"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { useAppTable } from "@/hooks/useAppTable"
+import { useEffect } from "react"
 
 export default function PromotionCodesTable({
   orgId,
@@ -23,7 +24,10 @@ export default function PromotionCodesTable({
 }) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [selectedCode, setSelectedCode] = React.useState<any | null>(null)
-
+  const [selectedCodeId, setSelectedCodeId] = React.useState<string | null>(
+    null
+  )
+  const [selectedCodeRow, setSelectedCodeRow] = React.useState<any | null>(null)
   // Verify Session
   useVerifyTeamSession(orgId, isTeam)
 
@@ -55,12 +59,31 @@ export default function PromotionCodesTable({
     ] as const,
     { enabled: !!orgId }
   )
+  const { data: settings, isPending: isFetchingSettings } = useAppQuery(
+    ["promo-settings", orgId, selectedCodeId],
+    (orgId, codeId) =>
+      api.organization.promotionCodes.settings([
+        orgId,
+        codeId,
+        isTeam ? "team" : "admin",
+      ]),
+    [orgId, selectedCodeId!] as const, // The ! tells TS we handle the null via 'enabled'
+    { enabled: !!selectedCodeId }
+  )
+  useEffect(() => {
+    if (settings && selectedCodeId) {
+      setIsModalOpen(true)
+    }
+  }, [settings, selectedCodeId])
 
   const handleAssignClick = (code: any) => {
-    setSelectedCode(code)
-    setIsModalOpen(true)
+    setSelectedCodeId(code.id)
+    setSelectedCodeRow(code)
   }
-
+  const handleClose = () => {
+    setIsModalOpen(false)
+    setSelectedCodeId(null)
+  }
   const columns = PromotionCodesColumns(handleAssignClick)
   const tableData = searchData?.rows ?? []
   const hasNext = searchData?.hasNext ?? false
@@ -116,8 +139,8 @@ export default function PromotionCodesTable({
 
       <AppDialog
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
-        title={`Assign Coupon: ${selectedCode?.code}`}
+        onOpenChange={handleClose}
+        title={`Assign Coupon: ${selectedCodeRow?.code}`}
         description="Connect this synced coupon to an affiliate and define the commission rules."
         confirmText="Save Assignment"
         onConfirm={() => setIsModalOpen(false)}
@@ -127,12 +150,14 @@ export default function PromotionCodesTable({
         <AssignAffiliateForm
           orgId={orgId}
           isTeam={isTeam}
-          codeId={selectedCode?.id}
+          codeId={selectedCodeId!}
+          settings={settings}
           initialAffiliate={{
-            id: selectedCode?.affiliateId,
-            name: selectedCode?.affiliateName,
-            email: selectedCode?.affiliateEmail,
+            name: selectedCodeRow?.affiliateName,
+            email: selectedCodeRow?.affiliateEmail,
           }}
+          settingsLoading={isFetchingSettings}
+          onClose={handleClose}
         />
       </AppDialog>
     </div>

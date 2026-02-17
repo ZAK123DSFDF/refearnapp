@@ -61,7 +61,8 @@ export default function Settings({
       (orgData?.cookieLifetimeUnit as "day" | "week" | "month" | "year") ??
       "day",
     commissionType:
-      (orgData?.commissionType as "percentage" | "fixed") ?? "percentage",
+      (orgData?.commissionType?.toUpperCase() as "PERCENTAGE" | "FLAT_FEE") ??
+      "PERCENTAGE",
     commissionValue: String(Number(orgData.commissionValue ?? 0)),
     commissionDurationValue: String(orgData?.commissionDurationValue ?? "30"),
     commissionDurationUnit:
@@ -258,8 +259,8 @@ export default function Settings({
                     label="Commission Type"
                     placeholder="Commission Type"
                     options={[
-                      { value: "percentage", label: "Percentage" },
-                      { value: "fixed", label: "Fixed" },
+                      { value: "PERCENTAGE", label: "Percentage" },
+                      { value: "FLAT_FEE", label: "Flat Fee" },
                     ]}
                     icon={Coins}
                     affiliate={false}
@@ -271,7 +272,7 @@ export default function Settings({
                     placeholder="Commission Value"
                     type="number"
                     icon={
-                      form.watch("commissionType") === "percentage"
+                      form.watch("commissionType") === "PERCENTAGE"
                         ? Percent
                         : BadgeDollarSign
                     }

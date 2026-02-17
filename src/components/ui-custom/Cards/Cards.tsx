@@ -129,10 +129,7 @@ const Cards = ({
   }, [isPreview])
   const { data: currency = "USD" } = useAppQuery(
     ["org-currency", orgId],
-    (id) => {
-      const context = affiliate ? "affiliate" : isTeam ? "team" : "admin"
-      return api.organization.currency([id, context])
-    },
+    (id) => api.organization.currency([id]),
     [orgId] as const,
     { enabled: !!orgId }
   )

@@ -25,6 +25,7 @@ type SelectFieldProps = {
   hasNext?: boolean
   onLoadMore?: (e: React.MouseEvent) => void
   isLoading?: boolean
+  showDefault?: boolean
 }
 
 export const SelectField = ({
@@ -38,6 +39,7 @@ export const SelectField = ({
   hasNext,
   onLoadMore,
   isLoading,
+  showDefault = true,
 }: SelectFieldProps) => {
   return (
     <FormField
@@ -53,7 +55,10 @@ export const SelectField = ({
               {Icon && (
                 <Icon className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground pointer-events-none" />
               )}
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={showDefault ? field.value : undefined}
+              >
                 <SelectTrigger
                   affiliate={affiliate}
                   className={`w-full border ${Icon ? "pl-10" : ""}`}

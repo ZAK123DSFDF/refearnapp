@@ -1,5 +1,12 @@
 import { db } from "@/db/drizzle"
-import { organization } from "@/db/schema"
+import {
+  organization,
+  ValueType,
+  ReferralParam,
+  DurationUnit,
+  Currency,
+  AttributionModel,
+} from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { OrgData } from "@/lib/types/organization/organization"
@@ -10,47 +17,69 @@ export async function updateSettings(
   data: Partial<OrgData> & { id: string },
   opts?: { team?: boolean }
 ): Promise<void> {
-  console.log("data", data)
-  const updateData: Record<string, any> = {
-    ...(data.name && { name: data.name.trim() }),
-    ...(data.websiteUrl && {
-      websiteUrl: data.websiteUrl.trim().replace(/^https?:\/\//, ""),
-    }),
-    ...(data.description !== undefined && {
-      description:
-        typeof data.description === "string" ? data.description.trim() : "",
-    }),
-    ...(data.openGraphUrl !== undefined && {
-      openGraphUrl: data.openGraphUrl || null,
-    }),
-    ...(data.logoUrl !== undefined && { logoUrl: data.logoUrl || null }),
-    ...(data.referralParam && { referralParam: data.referralParam }),
-    ...(data.cookieLifetimeValue && {
-      cookieLifetimeValue: Math.round(Number(data.cookieLifetimeValue)),
-    }),
-    ...(data.cookieLifetimeUnit && {
-      cookieLifetimeUnit: data.cookieLifetimeUnit,
-    }),
-    ...(data.commissionType && { commissionType: data.commissionType }),
-    ...(data.commissionValue && {
-      commissionValue: Number(Number(data.commissionValue).toFixed(2)),
-    }),
-    ...(data.commissionDurationValue && {
-      commissionDurationValue: Math.round(Number(data.commissionDurationValue)),
-    }),
-    ...(data.commissionDurationUnit && {
-      commissionDurationUnit: data.commissionDurationUnit,
-    }),
-    ...(data.currency && { currency: data.currency }),
-    ...(data.attributionModel && { attributionModel: data.attributionModel }),
+  // Create an explicit, typed update object
+  // We use InferInsertModel but make everything optional
+  const updateData: Partial<typeof organization.$inferInsert> = {}
+
+  if (data.name) updateData.name = data.name.trim()
+
+  if (data.websiteUrl) {
+    updateData.websiteUrl = data.websiteUrl.trim().replace(/^https?:\/\//, "")
   }
-  // ✅ Only update org if there are changes
-  if (Object.keys(updateData).length > 0) {
-    await db
-      .update(organization)
-      .set(updateData)
-      .where(eq(organization.id, data.id))
+
+  if (data.description !== undefined) {
+    updateData.description = data.description?.trim() || ""
   }
+
+  if (data.openGraphUrl !== undefined)
+    updateData.openGraphUrl = data.openGraphUrl || null
+  if (data.logoUrl !== undefined) updateData.logoUrl = data.logoUrl || null
+
+  // ENFORCE UPPERCASE for Enums/Strict strings
+  if (data.commissionType) {
+    updateData.commissionType = data.commissionType.toUpperCase() as ValueType
+  }
+
+  if (data.referralParam)
+    updateData.referralParam = data.referralParam as ReferralParam
+  if (data.currency) updateData.currency = data.currency as Currency
+  if (data.attributionModel)
+    updateData.attributionModel = data.attributionModel as AttributionModel
+
+  // Handle Units
+  if (data.cookieLifetimeUnit)
+    updateData.cookieLifetimeUnit = data.cookieLifetimeUnit as DurationUnit
+  if (data.commissionDurationUnit)
+    updateData.commissionDurationUnit =
+      data.commissionDurationUnit as DurationUnit
+
+  // Numbers
+  if (data.cookieLifetimeValue !== undefined) {
+    updateData.cookieLifetimeValue = Math.round(
+      Number(data.cookieLifetimeValue)
+    )
+  }
+
+  if (data.commissionValue !== undefined) {
+    // commissionValue is a numeric/string in DB usually, Drizzle expects string for decimal
+    updateData.commissionValue = Number(data.commissionValue).toFixed(2)
+  }
+
+  if (data.commissionDurationValue !== undefined) {
+    updateData.commissionDurationValue = Math.round(
+      Number(data.commissionDurationValue)
+    )
+  }
+
+  if (Object.keys(updateData).length === 0) return
+
+  // Database Update
+  await db
+    .update(organization)
+    .set(updateData)
+    .where(eq(organization.id, data.id))
+
+  // Redis Sync
   const REDIS_ORG_FIELDS = new Set([
     "name",
     "websiteUrl",
@@ -66,13 +95,13 @@ export async function updateSettings(
   ])
 
   const redisUpdates = buildRedisUpdates(updateData, REDIS_ORG_FIELDS)
-
   if (Object.keys(redisUpdates).length > 0) {
     await syncOrgDataToRedisLinks(data.id, redisUpdates)
   }
-  if (opts?.team) {
-    revalidatePath(`/organization/${data.id}/teams/dashboard/settings`)
-  } else {
-    revalidatePath(`/organization/${data.id}/dashboard/settings`)
-  }
+
+  const path = opts?.team
+    ? `/organization/${data.id}/teams/dashboard/settings`
+    : `/organization/${data.id}/dashboard/settings`
+
+  revalidatePath(path)
 }

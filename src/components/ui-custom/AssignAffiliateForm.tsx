@@ -4,9 +4,9 @@ import React, { useEffect, useState, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import deepEqual from "fast-deep-equal"
+import deepEqual from "fast-deep-equal" // Import deepEqual
 import { Form } from "@/components/ui/form"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button" // Shadcn button
 import {
   Percent,
   DollarSign,
@@ -41,12 +41,16 @@ export function AssignAffiliateForm({
   orgId,
   isTeam,
   codeId,
+  settings,
+  settingsLoading,
   initialAffiliate,
   onClose, // Pass this from the dialog
 }: {
   orgId: string
   isTeam: boolean
   codeId: string
+  settings: any
+  settingsLoading: boolean
   initialAffiliate?: { id?: string; name?: string; email?: string }
   onClose?: () => void
 }) {
@@ -54,44 +58,27 @@ export function AssignAffiliateForm({
   const [activeAffiliate, setActiveAffiliate] = useState(initialAffiliate)
   const [options, setOptions] = useState<{ value: string; label: string }[]>([])
   const queryClient = useQueryClient()
-
-  // 1. Fetch current settings
-  const { data: settings, isPending: settingsLoading } = useAppQuery(
-    ["promo-settings", orgId, codeId],
-    (orgId, codeId) =>
-      api.organization.promotionCodes.settings([
-        orgId,
-        codeId,
-        isTeam ? "team" : "admin",
-      ]),
-    [orgId, codeId] as const,
-    { enabled: !!codeId && !!orgId }
-  )
-
-  // 2. Setup Form with default empty values
-  const form = useForm<AssignFormValues>({
-    resolver: zodResolver(assignSchema),
-    defaultValues: {
-      affiliateId: "",
-      commissionType: "PERCENTAGE",
-      commissionValue: "20",
-      durationValue: "12",
-      durationUnit: "month",
-    },
-  })
-
-  // 3. Define "Initial State" for comparison
   const memoizedDefaults = useMemo(() => {
     if (!settings) return null
+    const round = (val: any) => Math.round(Number(val) * 100) / 100
     return {
       affiliateId: settings.affiliateId || "",
       commissionType: settings.commissionType as "PERCENTAGE" | "FLAT_FEE",
-      commissionValue: String(settings.commissionValue),
+      commissionValue: String(round(settings.commissionValue)),
       durationValue: String(settings.commissionDurationValue),
       durationUnit: settings.commissionDurationUnit as any,
     }
   }, [settings])
-
+  const form = useForm<AssignFormValues>({
+    resolver: zodResolver(assignSchema),
+    defaultValues: {
+      affiliateId: settings?.affiliateId || "",
+      commissionType: settings?.commissionType || "PERCENTAGE",
+      commissionValue: String(settings?.commissionValue) || "20",
+      durationValue: String(settings?.commissionDurationValue) || "12",
+      durationUnit: settings?.commissionDurationUnit || "month",
+    },
+  })
   // Sync settings to form when they arrive
   useEffect(() => {
     if (memoizedDefaults) {
@@ -149,7 +136,7 @@ export function AssignAffiliateForm({
       setActiveAffiliate(undefined)
       return
     }
-    if (watchedAffiliateId === initialAffiliate?.id) {
+    if (watchedAffiliateId === settings?.affiliateId) {
       setActiveAffiliate(initialAffiliate)
       return
     }
@@ -207,7 +194,7 @@ export function AssignAffiliateForm({
       setOptions((prev) => (offset === 1 ? formatted : [...prev, ...formatted]))
     }
   }, [data, offset])
-
+  const currencyCode = settings?.currency || "USD"
   if (settingsLoading)
     return (
       <div className="p-10 text-center text-sm italic">
@@ -231,6 +218,7 @@ export function AssignAffiliateForm({
             label="Transfer Assignment To"
             options={options}
             hasNext={data?.hasNext}
+            showDefault={false}
             onLoadMore={(e) => {
               e.preventDefault()
               setOffset((p) => p + 1)
@@ -254,13 +242,13 @@ export function AssignAffiliateForm({
             }
             options={[
               { value: "PERCENTAGE", label: "Percentage (%)" },
-              { value: "FLAT_FEE", label: "Flat Fee ($)" },
+              { value: "FLAT_FEE", label: `Flat Fee (${currencyCode})` },
             ]}
           />
           <InputField
             control={form.control}
             name="commissionValue"
-            label="Commission Value"
+            label={`Commission Value (${currentValues.commissionType === "PERCENTAGE" ? "%" : currencyCode})`}
             placeholder="e.g. 20 for 20% or $20"
             type="number"
             affiliate={false}

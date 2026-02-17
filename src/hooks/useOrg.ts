@@ -5,10 +5,9 @@ import { api } from "@/lib/apiClient"
 import { Organization } from "@/lib/types/organization/orgAuth"
 
 export function useOrg(orgId?: string, affiliate?: boolean) {
-  const context = affiliate ? "affiliate" : "public"
   const { data, isPending, isError, error, refetch } = useAppQuery(
-    ["org", orgId, context],
-    (id) => api.organization.org([id, context]),
+    ["org", orgId],
+    (id) => api.organization.org([id]),
     [orgId!] as const,
     { enabled: !!affiliate && !!orgId }
   )

@@ -7,6 +7,7 @@ import { db } from "@/db/drizzle"
 import { promotionCodes } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 import { AppError } from "@/lib/exceptions"
+import { ExchangeRate } from "@/util/ExchangeRate"
 
 export const GET = handleRoute(
   "Get Promotion Code Settings",
@@ -14,14 +15,15 @@ export const GET = handleRoute(
     const { searchParams } = new URL(req.url)
     const context = searchParams.get("context") || "admin"
 
-    // 🛡️ Auth
-    if (context === "team") {
-      await getTeamAuthAction(orgId)
-    } else {
-      await getOrgAuth(orgId)
-    }
+    // 1. Auth & Get Org Data (which includes currency)
+    const org =
+      context === "team"
+        ? await getTeamAuthAction(orgId)
+        : await getOrgAuth(orgId)
 
-    // 🔍 Fetch specific fields needed for the form
+    // 2. Get Exchange Rate
+    const rate = await ExchangeRate(org.currency)
+
     const codeSettings = await db.query.promotionCodes.findFirst({
       where: and(
         eq(promotionCodes.id, codeId),
@@ -36,14 +38,21 @@ export const GET = handleRoute(
       },
     })
 
-    if (!codeSettings) {
-      throw new AppError({
-        status: 404,
-        error: "Promotion code not found",
-        toast: "Promotion code not found",
-      })
-    }
+    if (!codeSettings) throw new AppError({ status: 404, error: "Not found" })
 
-    return NextResponse.json({ ok: true, data: codeSettings })
+    // 3. Convert value for the UI
+    const convertedValue =
+      codeSettings.commissionType === "FLAT_FEE"
+        ? (Number(codeSettings.commissionValue) * rate).toString()
+        : codeSettings.commissionValue
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        ...codeSettings,
+        commissionValue: convertedValue,
+        currency: org.currency,
+      },
+    })
   }
 )

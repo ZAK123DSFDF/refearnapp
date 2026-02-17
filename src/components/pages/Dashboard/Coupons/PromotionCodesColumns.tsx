@@ -5,10 +5,16 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { UserPlus, Settings, Clock, Mail } from "lucide-react"
 import { PromotionCodeType } from "@/lib/types/organization/promotion"
+import { formatCurrency } from "@/util/Formatter"
+
+// Extended type to include the currency passed from the backend
+type PromotionCodeWithCurrency = PromotionCodeType & { currency?: string }
 
 export const PromotionCodesColumns = (
-  onAssign: (code: PromotionCodeType) => void
-): ColumnDef<PromotionCodeType>[] => [
+  onAssign: (code: PromotionCodeWithCurrency) => void,
+  isGlobalLoading?: boolean,
+  selectedId?: string | null
+): ColumnDef<PromotionCodeWithCurrency>[] => [
   {
     accessorKey: "code",
     header: "Coupon Code",
@@ -34,12 +40,14 @@ export const PromotionCodesColumns = (
     accessorKey: "discountValue",
     header: "Discount",
     cell: ({ row }) => {
-      const { discountValue, discountType } = row.original
+      const { discountValue, discountType, currency } = row.original
+      const isFlat = discountType === "FLAT_FEE"
+
       return (
         <span className="font-medium">
-          {discountType === "FLAT_FEE" ? "$" : ""}
-          {discountValue}
-          {discountType === "PERCENTAGE" ? "%" : ""}
+          {isFlat
+            ? formatCurrency(Number(discountValue), currency)
+            : `${discountValue}%`}
         </span>
       )
     },
@@ -48,21 +56,22 @@ export const PromotionCodesColumns = (
     accessorKey: "commissionValue",
     header: "Affiliate Commission",
     cell: ({ row }) => {
-      const { affiliateName, commissionValue, commissionType } = row.original
+      const { affiliateName, commissionValue, commissionType, currency } =
+        row.original
       if (!affiliateName || !commissionValue)
         return <span className="text-muted-foreground">-</span>
 
       return (
         <span className="font-medium text-green-600">
-          {commissionType === "FLAT_FEE" ? "$" : ""}
-          {commissionValue}
-          {commissionType === "PERCENTAGE" ? "%" : ""}
+          {commissionType === "FLAT_FEE"
+            ? formatCurrency(Number(commissionValue), currency)
+            : `${commissionValue}%`}
         </span>
       )
     },
   },
   {
-    accessorKey: "commissionDurationValue", // Fixed inconsistent key
+    accessorKey: "commissionDurationValue",
     header: "Duration",
     cell: ({ row }) => {
       const { affiliateName, commissionDurationValue, commissionDurationUnit } =
@@ -74,7 +83,8 @@ export const PromotionCodesColumns = (
         <div className="flex items-center gap-1.5 text-sm">
           <Clock className="h-3.5 w-3.5 text-muted-foreground" />
           <span className="capitalize">
-            {commissionDurationValue} {commissionDurationUnit}(s)
+            {commissionDurationValue} {commissionDurationUnit}
+            {Number(commissionDurationValue) !== 1 ? "s" : ""}
           </span>
         </div>
       )
@@ -97,8 +107,8 @@ export const PromotionCodesColumns = (
       return (
         <div className="flex flex-col">
           <span className="font-medium text-sm">{affiliateName}</span>
-          <span className="text-xs text-muted-foreground flex items-center gap-1">
-            <Mail className="h-3 w-3" />
+          <span className="text-xs text-muted-foreground flex items-center gap-1 truncate max-w-[150px]">
+            <Mail className="h-3 w-3 flex-shrink-0" />
             {affiliateEmail}
           </span>
         </div>
@@ -109,20 +119,25 @@ export const PromotionCodesColumns = (
     id: "actions",
     cell: ({ row }) => {
       const isAssigned = !!row.original.affiliateName
+      const isThisRowLoading = isGlobalLoading && selectedId === row.original.id
+
       return (
         <div className="text-right">
           <Button
             variant={isAssigned ? "outline" : "default"}
             size="sm"
             onClick={() => onAssign(row.original)}
-            className="gap-2"
+            disabled={isGlobalLoading}
+            className="gap-2 min-w-[90px]"
           >
-            {isAssigned ? (
+            {isThisRowLoading ? (
+              <span className="animate-spin">🌀</span>
+            ) : isAssigned ? (
               <Settings className="h-4 w-4" />
             ) : (
               <UserPlus className="h-4 w-4" />
             )}
-            {isAssigned ? "Edit" : "Assign"}
+            {isThisRowLoading ? "..." : isAssigned ? "Edit" : "Assign"}
           </Button>
         </div>
       )

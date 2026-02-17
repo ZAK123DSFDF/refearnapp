@@ -49,7 +49,7 @@ export const GET_AFFILIATE_LOOKUP_PATH = (
 export const GET_ORG = (
   orgId: string,
   context: "public" | "affiliate" | "admin" | "team" = "public"
-) => `/api/organization/${orgId}?context=${context}`
+) => `/api/organization/${orgId}/org?context=${context}`
 export const GET_ORG_PROMOTION_CODES_PATH = (
   orgId: string,
   query: { offset?: number; code?: string }
@@ -151,11 +151,8 @@ export const GET_ORG_TEAM_MEMBERS_PATH = (
 ) => withQuery(`/api/organization/${orgId}/dashboard/teams`, query)
 export const GET_ACTIVE_DOMAIN_PATH = (orgId: string) =>
   `/api/organization/${orgId}/domain/active`
-export const GET_ORG_CURRENCY_PATH = (
-  orgId: string,
-  context?: "admin" | "team" | "affiliate"
-) =>
-  `/api/organization/${orgId}/currency${context ? `?context=${context}` : ""}`
+export const GET_ORG_CURRENCY_PATH = (orgId: string) =>
+  `/api/organization/${orgId}/currency`
 
 // =============================================================================
 // 👥 TEAM (STAFF) DASHBOARD PATHS

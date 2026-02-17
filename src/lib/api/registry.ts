@@ -127,8 +127,7 @@ export const API_CONFIG = {
       },
     },
     currency: {
-      path: (orgId: string, context?: "admin" | "team" | "affiliate") =>
-        GET_ORG_CURRENCY_PATH(orgId, context),
+      path: GET_ORG_CURRENCY_PATH,
       response: {} as ActionResult<string>,
     },
     dashboard: {
