@@ -1,5 +1,6 @@
 import { db } from "@/db/drizzle"
 import { promotionCodes, affiliate } from "@/db/schema"
+import { PromotionCodeType } from "@/lib/types/organization/promotion"
 import { and, desc, eq, ilike, sql, isNull } from "drizzle-orm"
 
 export async function getPromotionCodesAction(
@@ -11,7 +12,7 @@ export async function getPromotionCodesAction(
     orderBy?: "code" | "createdAt" | "discountValue"
     orderDir?: "asc" | "desc"
   }
-) {
+): Promise<PromotionCodeType[]> {
   const whereConditions = [
     eq(promotionCodes.organizationId, orgId),
     isNull(promotionCodes.deletedAt),
@@ -26,11 +27,15 @@ export async function getPromotionCodesAction(
     .select({
       id: promotionCodes.id,
       code: promotionCodes.code,
-      status: sql<string>`CASE WHEN ${promotionCodes.isActive} THEN 'active' ELSE 'inactive' END`,
+      status: sql<
+        "active" | "inactive"
+      >`CASE WHEN ${promotionCodes.isActive} THEN 'active' ELSE 'inactive' END`,
       discountValue: promotionCodes.discountValue,
       discountType: promotionCodes.discountType,
       commissionValue: promotionCodes.commissionValue,
       commissionType: promotionCodes.commissionType,
+      commissionDurationValue: promotionCodes.commissionDurationValue,
+      commissionDurationUnit: promotionCodes.commissionDurationUnit,
       createdAt: promotionCodes.createdAt,
       affiliateName: affiliate.name,
       affiliateEmail: affiliate.email,

@@ -1,13 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import YearSelect from "@/components/ui-custom/YearSelect"
@@ -25,6 +18,7 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { TableView } from "@/components/ui-custom/TableView"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
 import { api } from "@/lib/apiClient"
+import { useAppTable } from "@/hooks/useAppTable"
 
 interface AffiliateCommissionTableProps {
   orgId: string
@@ -81,13 +75,9 @@ export default function AffiliateCommissionTable({
   }, [filters.year, isPreview, previewSimulation])
 
   const columns = paymentColumns(affiliate)
-  const table = useReactTable({
+  const { table } = useAppTable({
     data: isPreview ? (filteredData ?? []) : (yearSelectedData ?? []),
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   })
   return (
     <div className="flex flex-col gap-6">

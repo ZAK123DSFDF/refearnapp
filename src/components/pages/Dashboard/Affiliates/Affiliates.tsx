@@ -1,13 +1,6 @@
 "use client"
 
 import * as React from "react"
-import {
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import MonthSelect from "@/components/ui-custom/MonthSelect"
 import { TableTop } from "@/components/ui-custom/TableTop"
@@ -18,6 +11,7 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { TableView } from "@/components/ui-custom/TableView"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { api } from "@/lib/apiClient"
+import { useAppTable } from "@/hooks/useAppTable"
 
 interface AffiliatesTableProps {
   orgId: string
@@ -35,15 +29,8 @@ export default function AffiliatesTable({
   mode = "default",
   isTeam = false,
 }: AffiliatesTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
   useVerifyTeamSession(orgId, isTeam)
   const columns = AffiliatesColumns()
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
   const { filters, setFilters } = useQueryFilter()
   const {
     data: searchData,
@@ -82,23 +69,12 @@ export default function AffiliatesTable({
   )
   const tableData = searchData?.rows ?? []
   const hasNext = searchData?.hasNext ?? false
-  const table = useReactTable({
+  const { table } = useAppTable({
     data: tableData,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
     manualFiltering: true,
     manualPagination: true,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
   })
 
   return (

@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState } from "react"
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TableView } from "@/components/ui-custom/TableView"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
@@ -10,6 +9,7 @@ import {
   AffiliateCouponData,
 } from "@/components/pages/AffiliateDashboard/AffiliateCoupon/affiliateCouponColumns"
 import { AffiliateCouponDetails } from "@/components/ui-custom/AffiliateCouponDetails"
+import { useAppTable } from "@/hooks/useAppTable"
 
 const DUMMY_DATA: AffiliateCouponData[] = [
   {
@@ -37,10 +37,9 @@ export default function AffiliateCouponsTable({ orgId }: { orgId: string }) {
 
   const columns = affiliateCouponColumns(handleDetailsClick)
 
-  const table = useReactTable({
+  const { table } = useAppTable({
     data: DUMMY_DATA,
     columns,
-    getCoreRowModel: getCoreRowModel(),
   })
 
   return (

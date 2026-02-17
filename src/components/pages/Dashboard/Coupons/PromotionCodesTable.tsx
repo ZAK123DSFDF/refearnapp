@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { getCoreRowModel, useReactTable } from "@tanstack/react-table"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { TableTop } from "@/components/ui-custom/TableTop"
 import { TableView } from "@/components/ui-custom/TableView"
@@ -13,6 +12,7 @@ import { useAppQuery } from "@/hooks/useAppQuery"
 import { api } from "@/lib/apiClient"
 import PaginationControls from "@/components/ui-custom/PaginationControls"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
+import { useAppTable } from "@/hooks/useAppTable"
 
 export default function PromotionCodesTable({
   orgId,
@@ -65,10 +65,9 @@ export default function PromotionCodesTable({
   const tableData = searchData?.rows ?? []
   const hasNext = searchData?.hasNext ?? false
 
-  const table = useReactTable({
+  const { table } = useAppTable({
     data: tableData,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
   })
 

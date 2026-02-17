@@ -59,6 +59,7 @@ import { DomainRow } from "@/lib/types/organization/domainRow"
 import { PayoutResult } from "@/lib/types/organization/payoutResult"
 import { UnpaidMonth } from "@/lib/types/organization/unpaidMonth"
 import { TeamRow } from "@/lib/types/internal/teamsRow"
+import { PromotionCodeType } from "@/lib/types/organization/promotion"
 
 export const API_CONFIG = {
   affiliate: {
@@ -119,7 +120,7 @@ export const API_CONFIG = {
       coupons: {
         path: GET_ORG_PROMOTION_CODES_PATH,
         response: {} as ActionResult<{
-          rows: any[]
+          rows: PromotionCodeType[]
           hasNext: boolean
         }>,
       },
@@ -201,7 +202,7 @@ export const API_CONFIG = {
         coupons: {
           path: GET_TEAM_PROMOTION_CODES_PATH,
           response: {} as ActionResult<{
-            rows: any[]
+            rows: PromotionCodeType[]
             hasNext: boolean
           }>,
         },

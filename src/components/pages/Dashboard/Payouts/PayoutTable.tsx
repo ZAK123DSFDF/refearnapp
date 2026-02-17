@@ -1,13 +1,6 @@
 "use client"
 
 import * as React from "react"
-import {
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
 
 import { Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -45,6 +38,7 @@ import { useCachedValidation } from "@/hooks/useCachedValidation"
 import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
 import { api } from "@/lib/apiClient"
+import { useAppTable } from "@/hooks/useAppTable"
 
 interface AffiliatesTablePayoutProps {
   orgId: string
@@ -374,29 +368,13 @@ export default function PayoutTable({
     a.click()
     URL.revokeObjectURL(url)
   }
-
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
   const columns = PayoutColumns()
-  const table = useReactTable({
+  const { table } = useAppTable({
     data: tableData,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     manualSorting: true,
     manualFiltering: true,
     manualPagination: true,
-    getCoreRowModel: getCoreRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
   })
 
   return (

@@ -1,13 +1,6 @@
 "use client"
 
 import * as React from "react"
-import {
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { TableTop } from "@/components/ui-custom/TableTop"
 import { useQueryFilter } from "@/hooks/useQueryFilter"
@@ -23,7 +16,7 @@ import {
   verifyDomain,
 } from "@/app/(organization)/organization/[orgId]/dashboard/manageDomains/action"
 import { manageDomainsColumns } from "@/components/pages/Dashboard/manageDomains/manageDomainsColumns"
-import { useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import {
   createTeamDomains,
@@ -49,6 +42,7 @@ import {
 } from "@/hooks/useDomainActionDialog"
 import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
 import { api } from "@/lib/apiClient"
+import { useAppTable } from "@/hooks/useAppTable"
 interface AffiliatesTableManageDomainsProps {
   orgId: string
   affiliate: boolean
@@ -60,9 +54,6 @@ export function ManageDomainsTable({
   isTeam = false,
 }: AffiliatesTableManageDomainsProps) {
   useVerifyTeamSession(orgId, isTeam)
-  const [sorting] = useState<SortingState>([])
-  const [columnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection] = useState({})
   const [domainType, setDomainType] = useState<DomainInputType | null>(null)
   const [open, setOpen] = useState(false)
@@ -176,59 +167,56 @@ export function ManageDomainsTable({
   })
   const tableData = data?.rows ?? []
   const hasNext = data?.hasNext ?? false
+  const columns = useMemo(
+    () =>
+      manageDomainsColumns({
+        onToggleActive: (id, isActive, domainName) =>
+          setActionDialog({
+            domainId: id,
+            domainName,
+            type: isActive ? "deactivate" : "activate",
+          }),
 
-  const table = useReactTable({
+        onMakePrimary: (id, domainName) =>
+          setActionDialog({
+            domainId: id,
+            domainName,
+            type: "make-primary",
+          }),
+
+        onToggleRedirect: (id, isRedirect, domainName) =>
+          setActionDialog({
+            domainId: id,
+            domainName,
+            type: isRedirect ? "disable-redirect" : "enable-redirect",
+          }),
+
+        onDelete: (id, domainName) =>
+          setActionDialog({
+            domainId: id,
+            domainName,
+            type: "delete",
+          }),
+
+        onVerifyDns: (id) => {
+          const row = tableData.find((d) => d.id === id)
+          if (!row) return
+
+          setActionDialog({
+            type: "verify-dns",
+            domainId: id,
+            domainName: row.domainName,
+            domainType: row.type,
+          })
+        },
+      }),
+    [tableData]
+  )
+  const { table } = useAppTable({
     data: tableData,
-    columns: manageDomainsColumns({
-      onToggleActive: (id, isActive, domainName) =>
-        setActionDialog({
-          domainId: id,
-          domainName,
-          type: isActive ? "deactivate" : "activate",
-        }),
-
-      onMakePrimary: (id, domainName) =>
-        setActionDialog({
-          domainId: id,
-          domainName,
-          type: "make-primary",
-        }),
-
-      onToggleRedirect: (id, isRedirect, domainName) =>
-        setActionDialog({
-          domainId: id,
-          domainName,
-          type: isRedirect ? "disable-redirect" : "enable-redirect",
-        }),
-
-      onDelete: (id, domainName) =>
-        setActionDialog({
-          domainId: id,
-          domainName,
-          type: "delete",
-        }),
-
-      onVerifyDns: (id) => {
-        const row = tableData.find((d) => d.id === id)
-        if (!row) return
-
-        setActionDialog({
-          type: "verify-dns",
-          domainId: id,
-          domainName: row.domainName,
-          domainType: row.type,
-        })
-      },
-    }),
-    getCoreRowModel: getCoreRowModel(),
+    columns,
     manualPagination: true,
     manualFiltering: true,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
   })
 
   return (

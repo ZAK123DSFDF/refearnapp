@@ -1,13 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { createAffiliateLink } from "@/app/affiliate/[orgId]/dashboard/links/action"
@@ -34,6 +27,7 @@ import { TableView } from "@/components/ui-custom/TableView"
 import { previewSimulationAtom } from "@/store/PreviewSimulationAtom"
 import { useQueryClient } from "@tanstack/react-query"
 import { api } from "@/lib/apiClient"
+import { useAppTable } from "@/hooks/useAppTable"
 
 interface AffiliateLinkProps {
   orgId: string
@@ -174,13 +168,9 @@ export default function Links({
     }
   }
   const columns = useLinksColumns(affiliate, displayCurrency)
-  const table = useReactTable({
+  const { table } = useAppTable({
     data: isPreview ? (filteredPreviewData ?? []) : (searchData ?? []),
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   })
   return (
     <div className="flex flex-col gap-6">

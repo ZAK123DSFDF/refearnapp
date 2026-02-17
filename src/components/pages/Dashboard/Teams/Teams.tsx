@@ -4,12 +4,6 @@ import React, { useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TableView } from "@/components/ui-custom/TableView"
-import {
-  getCoreRowModel,
-  useReactTable,
-  ColumnFiltersState,
-  VisibilityState,
-} from "@tanstack/react-table"
 import { AppDialog } from "@/components/ui-custom/AppDialog"
 import { useAppMutation } from "@/hooks/useAppMutation"
 import { useForm } from "react-hook-form"
@@ -32,6 +26,7 @@ import { PlanInfo } from "@/lib/types/organization/planInfo"
 import { useRouter } from "next/navigation"
 import { handlePlanRedirect } from "@/util/HandlePlanRedirect"
 import { api } from "@/lib/apiClient"
+import { useAppTable } from "@/hooks/useAppTable"
 
 const inviteSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -62,9 +57,6 @@ export default function Teams({
   }>({ open: false, id: null, active: false })
   const [openInvite, setOpenInvite] = useState(false)
   const [upgradeDialog, setUpgradeDialog] = useState(false)
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = useState({})
   const queryClient = useQueryClient()
   const { filters, setFilters } = useQueryFilter()
   const router = useRouter()
@@ -144,20 +136,11 @@ export default function Teams({
   const tableData = searchData?.rows ?? []
   const hasNext = searchData?.hasNext ?? false
   const teamCount = tableData.length
-  const table = useReactTable({
+  const { table } = useAppTable({
     data: tableData,
     columns,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    getCoreRowModel: getCoreRowModel(),
     manualFiltering: true,
     manualPagination: true,
-    state: {
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
   })
   const handleInviteClick = () => {
     // 🧠 Block FREE plan users completely
