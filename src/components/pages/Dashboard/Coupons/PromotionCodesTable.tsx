@@ -14,6 +14,10 @@ import PaginationControls from "@/components/ui-custom/PaginationControls"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { useAppTable } from "@/hooks/useAppTable"
 import { useEffect } from "react"
+import {
+  COUPON_SORT_OPTIONS,
+  CouponSortKeys,
+} from "@/lib/types/organization/couponSortKeys"
 
 export default function PromotionCodesTable({
   orgId,
@@ -23,7 +27,6 @@ export default function PromotionCodesTable({
   isTeam?: boolean
 }) {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
-  const [selectedCode, setSelectedCode] = React.useState<any | null>(null)
   const [selectedCodeId, setSelectedCodeId] = React.useState<string | null>(
     null
   )
@@ -32,7 +35,9 @@ export default function PromotionCodesTable({
   useVerifyTeamSession(orgId, isTeam)
 
   // Manage Filters (Pagination/Search)
-  const { filters, setFilters } = useQueryFilter()
+  const { filters, setFilters } = useQueryFilter<CouponSortKeys>({
+    emailKey: "code",
+  })
 
   // 1. Fetch Live Data using your SDK
   const {
@@ -45,6 +50,8 @@ export default function PromotionCodesTable({
       orgId,
       filters.offset,
       filters.email,
+      filters.orderBy,
+      filters.orderDir,
     ],
     (id, query) =>
       isTeam
@@ -54,7 +61,9 @@ export default function PromotionCodesTable({
       orgId,
       {
         offset: filters.offset,
-        code: filters.email, // Reusing email filter state for "search"
+        code: filters.email,
+        orderBy: filters.orderBy === "none" ? undefined : filters.orderBy,
+        orderDir: filters.orderDir,
       },
     ] as const,
     { enabled: !!orgId }
@@ -110,12 +119,21 @@ export default function PromotionCodesTable({
           <CardTitle>Synced Coupons</CardTitle>
         </CardHeader>
         <CardContent>
-          <TableTop
-            filters={{ email: filters.email }}
-            onOrderChange={() => {}}
-            onEmailChange={(val) => setFilters({ email: val || undefined })}
+          <TableTop<any, CouponSortKeys>
+            filters={{
+              email: filters.email,
+              orderBy: filters.orderBy,
+              orderDir: filters.orderDir,
+            }}
+            onOrderChange={(orderBy, orderDir) =>
+              setFilters({ orderBy, orderDir })
+            }
+            onEmailChange={(val) =>
+              setFilters({ email: val || undefined, offset: 1 })
+            }
             affiliate={false}
             table={table}
+            orderOptions={COUPON_SORT_OPTIONS}
             placeholder="Search coupon codes..."
           />
 

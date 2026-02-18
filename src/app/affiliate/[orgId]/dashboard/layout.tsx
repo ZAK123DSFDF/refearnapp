@@ -11,6 +11,7 @@ import { CustomizationProvider } from "@/app/affiliate/[orgId]/dashboard/customi
 import { requireAffiliateWithOrg } from "@/lib/server/auth/authGuards"
 import React from "react"
 import { getAffiliateData } from "@/lib/server/affiliate/getAffiliateData"
+import { getUnseenCouponsCount } from "@/lib/server/affiliate/getUnseenCouponsCount"
 
 interface AffiliateDashboardLayoutProps extends OrgIdProps {
   children: React.ReactNode
@@ -28,6 +29,7 @@ export default async function DashboardLayout({
   }
 
   const affiliate = affiliateResponse.data
+  const unseenCouponsCount = await getUnseenCouponsCount(orgId, affiliate.id)
   return (
     <CustomizationProvider affiliate orgId={orgId}>
       <SidebarProvider affiliate orgId={orgId}>
@@ -35,6 +37,7 @@ export default async function DashboardLayout({
           affiliate
           orgId={orgId}
           AffiliateData={affiliate}
+          unseenCouponsCount={unseenCouponsCount}
         />
         <SidebarInset
           affiliate

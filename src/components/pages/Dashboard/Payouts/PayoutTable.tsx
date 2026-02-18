@@ -39,6 +39,7 @@ import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 import { FeatureDemo } from "@/components/ui-custom/FeatureDemo"
 import { api } from "@/lib/apiClient"
 import { useAppTable } from "@/hooks/useAppTable"
+import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
 
 interface AffiliatesTablePayoutProps {
   orgId: string
@@ -58,7 +59,7 @@ export default function PayoutTable({
   const [unpaidMonths, setUnpaidMonths] = useState<UnpaidMonth[]>([])
   const [selectedMonths, setSelectedMonths] = useState<UnpaidMonth[]>([])
   const [isUnpaidMode, setIsUnpaidMode] = useState(false)
-  const { filters, setFilters } = useQueryFilter()
+  const { filters, setFilters } = useQueryFilter<PayoutSortKeys>()
   const [unpaidOpen, setUnpaidOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const { showCustomToast } = useCustomToast()

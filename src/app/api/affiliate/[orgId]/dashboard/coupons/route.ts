@@ -1,40 +1,27 @@
+// @/app/api/organization/[orgId]/affiliate/coupons/route.ts
 import { NextResponse } from "next/server"
-import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { handleRoute } from "@/lib/handleRoute"
-import { getPromotionCodesAction } from "@/lib/server/organization/getPromotionCodesAction"
+import { getAffiliateCouponsAction } from "@/lib/server/affiliate/getAffiliateCouponsAction"
+import { getOrganization } from "@/lib/server/organization/getOrganization"
 import { ExchangeRate } from "@/util/ExchangeRate"
-import { CouponSortKeys } from "@/lib/types/organization/couponSortKeys"
+import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
 
 export const GET = handleRoute(
-  "Get Organization Promotion Codes",
+  "Get Affiliate Promotion Codes",
   async (req, { orgId }: { orgId: string }) => {
     const { searchParams } = new URL(req.url)
-
-    // 1. Extract and Parse Params
-    const code = searchParams.get("code") || undefined
     const offset = Number(searchParams.get("offset") || 1)
-
-    // Use the shared type for the cast
-    const orderBy =
-      (searchParams.get("orderBy") as CouponSortKeys) || "createdAt"
-    const orderDir = (searchParams.get("orderDir") as "asc" | "desc") || "desc"
-
     const PAGE_SIZE = 10
 
-    // 2. Auth and Context
-    const org = await getOrgAuth(orgId)
+    const decoded = await getAffiliateOrganization(orgId)
+    const org = await getOrganization(orgId)
     const rate = await ExchangeRate(org.currency)
 
-    // 3. Fetch Data
-    const rows = await getPromotionCodesAction(orgId, {
-      code,
+    const rows = await getAffiliateCouponsAction(orgId, decoded.id, {
       limit: PAGE_SIZE + 1,
       offset: (offset - 1) * PAGE_SIZE,
-      orderBy,
-      orderDir,
     })
 
-    // 4. Transform / Currency Conversion
     const convertedRows = rows.map((row) => ({
       ...row,
       discountValue:
@@ -48,7 +35,6 @@ export const GET = handleRoute(
       currency: org.currency,
     }))
 
-    // 5. Paginated Response
     return NextResponse.json({
       ok: true,
       data: {

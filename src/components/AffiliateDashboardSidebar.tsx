@@ -31,6 +31,7 @@ type Props = {
   currentPage?: string
   affiliate: boolean
   AffiliateData?: AffiliateData | null
+  unseenCouponsCount?: number
 }
 
 const AffiliateDashboardSidebar = ({
@@ -40,10 +41,12 @@ const AffiliateDashboardSidebar = ({
   currentPage,
   affiliate,
   AffiliateData,
+  unseenCouponsCount = 0,
 }: Props) => {
   const pathname = usePathname()
   useCloseSidebarOnNavigation()
   const { getPath } = useAffiliatePath(orgId)
+  const displayBadgeCount = isPreview ? 3 : unseenCouponsCount
   const items = [
     {
       title: "Dashboard",
@@ -59,6 +62,7 @@ const AffiliateDashboardSidebar = ({
       title: "Coupons",
       url: getPath("dashboard/coupons"),
       icon: Ticket,
+      badge: displayBadgeCount > 0 ? displayBadgeCount : null,
     },
     {
       title: "Payment",
@@ -174,6 +178,11 @@ const AffiliateDashboardSidebar = ({
                           <span className={cn(isActive && "font-medium")}>
                             {item.title}
                           </span>
+                          {item.badge && (
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+                              {item.badge}
+                            </span>
+                          )}
                         </button>
                       ) : (
                         <Link href={item.url}>
@@ -181,6 +190,11 @@ const AffiliateDashboardSidebar = ({
                           <span className={isPreview ? "text-sm" : ""}>
                             {item.title}
                           </span>
+                          {item.badge && (
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
+                              {item.badge}
+                            </span>
+                          )}
                         </Link>
                       )}
                     </SidebarMenuButton>

@@ -9,50 +9,62 @@ import {
 } from "@/components/ui/select"
 import { OrderDir, OrderBy } from "@/lib/types/analytics/orderTypes"
 import { cn } from "@/lib/utils"
-import {
-  ArrowDown,
-  ArrowDownUp,
-  ArrowUp,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react"
+import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useMemo } from "react"
 
-interface Props {
-  value: { orderBy?: OrderBy; orderDir?: OrderDir }
-  onChange: (orderBy?: OrderBy, orderDir?: OrderDir) => void
+interface Props<T extends string> {
+  value: { orderBy?: T; orderDir?: OrderDir }
+  onChange: (orderBy?: T, orderDir?: OrderDir) => void
   affiliate: boolean
-  mode?: "default" | "top"
+  options?: OrderBy[]
 }
 
-export default function OrderSelect({
+export default function OrderSelect<T extends string>({
   value,
   onChange,
   affiliate,
-  mode = "default",
-}: Props) {
+  options,
+}: Props<T>) {
   const isNone = !value.orderBy || value.orderBy === "none"
   const activeDir = value.orderDir ?? undefined
+  const ALL_OPTIONS: Record<OrderBy, string> = {
+    none: "None",
+    sales: "Sales",
+    commission: "Commission",
+    conversionRate: "Conversion Rate",
+    visits: "Visits",
+    name: "Name",
+    commissionPaid: "Commission Paid",
+    commissionUnpaid: "Commission Unpaid",
+    email: "Email",
+    code: "Coupon Code",
+    createdAt: "Date Created",
+  }
 
-  // Define all options
-  const allOptions: { value: OrderBy | "none"; label: string }[] = [
-    { value: "none", label: "None" },
-    { value: "sales", label: "Sales" },
-    { value: "commission", label: "Commission" },
-    { value: "conversionRate", label: "Conversion Rate" },
-    { value: "visits", label: "Visits" },
-    { value: "commissionPaid", label: "Commission Paid" },
-    { value: "commissionUnpaid", label: "Commission Unpaid" },
-    { value: "email", label: "Email" },
-  ]
+  const filteredOptions = useMemo(() => {
+    if (!options) {
+      const defaultKeys: OrderBy[] = [
+        "none",
+        "sales",
+        "commission",
+        "conversionRate",
+        "visits",
+        "email",
+        "commissionPaid",
+        "commissionUnpaid",
+      ]
+      return defaultKeys.map((key) => ({ value: key, label: ALL_OPTIONS[key] }))
+    }
+    const activeKeys = options.includes("none")
+      ? options
+      : (["none", ...options] as OrderBy[])
+    return activeKeys.map((key) => ({
+      value: key,
+      label: ALL_OPTIONS[key] || key.charAt(0).toUpperCase() + key.slice(1),
+    }))
+  }, [options])
 
-  // Filter if mode is "top"
-  const filteredOptions =
-    mode === "top"
-      ? allOptions.filter((o) =>
-          ["none", "visits", "sales", "conversionRate"].includes(o.value)
-        )
-      : allOptions
   const cycleDirection = () => {
     if (!activeDir) {
       onChange(value.orderBy, "asc")
@@ -62,16 +74,16 @@ export default function OrderSelect({
       onChange(value.orderBy, undefined)
     }
   }
+
   return (
     <div className="flex gap-2">
-      {/* Order By Select */}
       <Select
         value={value.orderBy ?? "none"}
-        onValueChange={(orderBy) => {
-          if (orderBy === "none") {
+        onValueChange={(val) => {
+          if (val === "none") {
             onChange(undefined, undefined)
           } else {
-            onChange(orderBy as OrderBy, undefined)
+            onChange(val as T, undefined)
           }
         }}
       >
@@ -98,9 +110,7 @@ export default function OrderSelect({
         )}
       >
         {!activeDir && (
-          <div className="flex flex-col items-center justify-center -space-y-1.5 text-muted-foreground">
-            <ArrowDownUp className="h-3.5 w-3.5" />
-          </div>
+          <ArrowDownUp className="h-3.5 w-3.5 text-muted-foreground" />
         )}
         {activeDir === "asc" && <ArrowUp className="h-3.5 w-3.5" />}
         {activeDir === "desc" && <ArrowDown className="h-3.5 w-3.5" />}

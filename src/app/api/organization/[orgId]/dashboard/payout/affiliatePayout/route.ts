@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { handleRoute } from "@/lib/handleRoute"
 import { getOrgAuth } from "@/lib/server/organization/GetOrgAuth"
 import { getAffiliatePayoutData } from "@/lib/server/affiliate/getAffiliatePayoutData"
-import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
+import { OrderDir } from "@/lib/types/analytics/orderTypes"
+import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
 export const GET = handleRoute(
   "Get Affiliate Payouts",
   async (req, { orgId }: { orgId: string }) => {
@@ -15,7 +16,7 @@ export const GET = handleRoute(
     const month = searchParams.get("month")
       ? Number(searchParams.get("month"))
       : undefined
-    const orderBy = (searchParams.get("orderBy") as OrderBy) || undefined
+    const orderBy = (searchParams.get("orderBy") as PayoutSortKeys) || undefined
     const orderDir = (searchParams.get("orderDir") as OrderDir) || undefined
     const offset = searchParams.get("offset")
       ? Number(searchParams.get("offset"))

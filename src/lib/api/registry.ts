@@ -25,6 +25,7 @@ import {
   GET_AFFILIATE_LOOKUP_PATH,
   GET_AFFILIATE_PAYMENT,
   GET_AFFILIATE_PAYMENT_METHOD_PATH,
+  GET_AFFILIATE_PROMOTION_CODES_PATH,
   GET_AFFILIATE_REFERRERS_PATH,
   GET_AFFILIATE_TIME_SERIES_PATH,
   GET_ORG,
@@ -62,6 +63,7 @@ import { PayoutResult } from "@/lib/types/organization/payoutResult"
 import { UnpaidMonth } from "@/lib/types/organization/unpaidMonth"
 import { TeamRow } from "@/lib/types/internal/teamsRow"
 import { PromotionCodeType } from "@/lib/types/organization/promotion"
+import { AffiliateCouponData } from "@/lib/types/affiliate/affiliateCouponData"
 
 export const API_CONFIG = {
   affiliate: {
@@ -83,6 +85,13 @@ export const API_CONFIG = {
       links: {
         path: GET_AFFILIATE_LINKS_PATH,
         response: {} as ActionResult<AffiliateLinkWithStats[]>,
+      },
+      coupons: {
+        path: GET_AFFILIATE_PROMOTION_CODES_PATH,
+        response: {} as ActionResult<{
+          rows: AffiliateCouponData[]
+          hasNext: boolean
+        }>,
       },
       payment: {
         path: GET_AFFILIATE_PAYMENT,

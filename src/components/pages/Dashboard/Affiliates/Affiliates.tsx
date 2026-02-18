@@ -12,6 +12,7 @@ import { TableView } from "@/components/ui-custom/TableView"
 import { useVerifyTeamSession } from "@/hooks/useVerifyTeamSession"
 import { api } from "@/lib/apiClient"
 import { useAppTable } from "@/hooks/useAppTable"
+import { OrderBy } from "@/lib/types/analytics/orderTypes"
 
 interface AffiliatesTableProps {
   orgId: string
@@ -20,6 +21,7 @@ interface AffiliatesTableProps {
   affiliate: boolean
   mode?: "default" | "top"
   isTeam?: boolean
+  orderOptions?: OrderBy[]
 }
 export default function AffiliatesTable({
   orgId,
@@ -28,6 +30,7 @@ export default function AffiliatesTable({
   affiliate = false,
   mode = "default",
   isTeam = false,
+  orderOptions,
 }: AffiliatesTableProps) {
   useVerifyTeamSession(orgId, isTeam)
   const columns = AffiliatesColumns()
@@ -113,10 +116,10 @@ export default function AffiliatesTable({
             onOrderChange={(orderBy, orderDir) =>
               setFilters({ orderBy, orderDir })
             }
+            orderOptions={orderOptions}
             onEmailChange={(email) => setFilters({ email: email || undefined })}
             affiliate={false}
             table={table}
-            mode={mode}
           />
 
           <TableView

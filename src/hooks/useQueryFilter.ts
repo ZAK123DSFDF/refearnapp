@@ -4,7 +4,7 @@ import { OrderBy } from "@/lib/types/analytics/orderTypes"
 
 type OrderDir = "asc" | "desc"
 
-export function useQueryFilter(
+export function useQueryFilter<TOrderBy extends string = OrderBy>(
   keys: {
     yearKey?: string
     monthKey?: string
@@ -34,7 +34,7 @@ export function useQueryFilter(
     () => ({
       year: params[yearKey] ? Number(params[yearKey]) : undefined,
       month: params[monthKey] ? Number(params[monthKey]) : undefined,
-      orderBy: (params[orderByKey] as OrderBy) ?? undefined,
+      orderBy: (params[orderByKey] as TOrderBy) ?? undefined,
       orderDir: (params[orderDirKey] as OrderDir) ?? undefined,
       offset: params[offsetKey] ? Number(params[offsetKey]) : undefined,
       email: params[emailKey] || undefined,
@@ -42,7 +42,8 @@ export function useQueryFilter(
     [params, yearKey, monthKey, orderByKey, orderDirKey, offsetKey, emailKey]
   )
 
-  const [filters, setFiltersState] = useState(initialFilters)
+  const [filters, setFiltersState] =
+    useState<typeof initialFilters>(initialFilters)
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
     null
   )

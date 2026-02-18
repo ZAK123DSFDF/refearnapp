@@ -7,34 +7,35 @@ import {
 import { Button } from "@/components/ui/button"
 import { ChevronDown, Settings2 } from "lucide-react"
 import { Table as ReactTable } from "@tanstack/react-table"
-import { OrderDir, OrderBy } from "@/lib/types/analytics/orderTypes"
+import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
 import OrderSelect from "@/components/ui-custom/OrderSelect"
 import { SearchInput } from "@/components/ui-custom/SearchInput"
 import { ReactNode } from "react"
 
-type TableProps<TData> = {
+type TableProps<TData, TOrder extends string> = {
   table: ReactTable<TData>
-  filters: { orderBy?: OrderBy; orderDir?: OrderDir; email?: string }
-  onOrderChange: (orderBy?: OrderBy, orderDir?: OrderDir) => void
+  filters: { orderBy?: TOrder; orderDir?: OrderDir; email?: string }
+  onOrderChange: (orderBy?: TOrder, orderDir?: OrderDir) => void
   onEmailChange: (email: string) => void
   affiliate: boolean
   mode?: "default" | "top"
   hideOrder?: boolean
   placeholder?: string
   rightActions?: ReactNode
+  orderOptions?: TOrder[]
 }
 
-export const TableTop = <TData,>({
+export const TableTop = <TData, TOrder extends string>({
   table,
   filters,
   onOrderChange,
   onEmailChange,
   affiliate,
-  mode = "default",
   hideOrder = false,
   placeholder = "Filter emails...",
   rightActions,
-}: TableProps<TData>) => {
+  orderOptions,
+}: TableProps<TData, TOrder>) => {
   const iconHiddenAt = hideOrder ? "md:hidden" : "lg:hidden"
   const textVisibleAt = hideOrder ? "hidden md:flex" : "hidden lg:flex"
 
@@ -85,7 +86,7 @@ export const TableTop = <TData,>({
           <SearchInput
             value={filters.email ?? ""}
             onChange={onEmailChange}
-            placeholder="Filter emails..."
+            placeholder={placeholder}
             className="w-full md:w-[240px]"
           />
 
@@ -94,7 +95,7 @@ export const TableTop = <TData,>({
               value={filters}
               onChange={onOrderChange}
               affiliate={affiliate}
-              mode={mode}
+              options={orderOptions as OrderBy[]}
             />
             {rightActions}
             <DropdownMenu>

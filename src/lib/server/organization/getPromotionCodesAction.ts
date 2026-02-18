@@ -1,7 +1,8 @@
 import { db } from "@/db/drizzle"
 import { promotionCodes, affiliate } from "@/db/schema"
 import { PromotionCodeType } from "@/lib/types/organization/promotion"
-import { and, desc, eq, ilike, sql, isNull } from "drizzle-orm"
+import { and, desc, asc, eq, ilike, sql, isNull } from "drizzle-orm"
+import { CouponSortKeys } from "@/lib/types/organization/couponSortKeys"
 
 export async function getPromotionCodesAction(
   orgId: string,
@@ -9,7 +10,7 @@ export async function getPromotionCodesAction(
     code?: string
     limit?: number
     offset?: number
-    orderBy?: "code" | "createdAt" | "discountValue"
+    orderBy?: CouponSortKeys
     orderDir?: "asc" | "desc"
   }
 ): Promise<PromotionCodeType[]> {
@@ -17,8 +18,6 @@ export async function getPromotionCodesAction(
     eq(promotionCodes.organizationId, orgId),
     isNull(promotionCodes.deletedAt),
   ]
-
-  // 2. Filter by code search
   if (opts?.code) {
     whereConditions.push(ilike(promotionCodes.code, `%${opts.code}%`))
   }
@@ -43,18 +42,37 @@ export async function getPromotionCodesAction(
     .from(promotionCodes)
     .leftJoin(affiliate, eq(promotionCodes.affiliateId, affiliate.id))
     .where(and(...whereConditions))
-
-  // 3. Handle Ordering
-  if (opts?.orderBy && opts.orderBy !== ("none" as any)) {
-    const column = promotionCodes[opts.orderBy]
-    query.orderBy(opts.orderDir === "asc" ? column : desc(column))
+  const direction = opts?.orderDir === "asc" ? asc : desc
+  const orderArray: any[] = []
+  const sortKey = opts?.orderBy
+  if (sortKey && sortKey !== ("none" as any)) {
+    if (sortKey === "name" || sortKey === "email") {
+      orderArray.push(
+        asc(
+          sql`CASE WHEN ${promotionCodes.affiliateId} IS NULL THEN 1 ELSE 0 END`
+        )
+      )
+      const col = sortKey === "name" ? affiliate.name : affiliate.email
+      orderArray.push(direction(col))
+    } else {
+      let col
+      switch (sortKey) {
+        case "code":
+          col = promotionCodes.code
+          break
+        case "createdAt":
+          col = promotionCodes.createdAt
+          break
+        default:
+          col = promotionCodes.createdAt
+      }
+      orderArray.push(direction(col))
+    }
   } else {
-    query.orderBy(desc(promotionCodes.createdAt))
+    orderArray.push(desc(promotionCodes.createdAt))
   }
-
-  // 4. Pagination
+  query.orderBy(...orderArray)
   if (opts?.limit) query.limit(opts.limit)
   if (opts?.offset) query.offset(opts.offset)
-
-  return query
+  return query as unknown as Promise<PromotionCodeType[]>
 }

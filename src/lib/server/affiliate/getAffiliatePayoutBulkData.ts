@@ -1,18 +1,19 @@
 import { getAffiliatePayoutBulkAction } from "@/lib/server/affiliate/getAffiliatePayoutBulk"
 import { AffiliatePayout } from "@/lib/types/affiliate/affiliateStats"
 import { convertedCurrency } from "@/util/ConvertedCurrency"
-import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
+import { OrderDir } from "@/lib/types/analytics/orderTypes"
 import { OrgAuthResult } from "@/lib/types/organization/orgAuth"
 import { ActionResult } from "@/lib/types/organization/response"
 import { PayoutResult } from "@/lib/types/organization/payoutResult"
 import { AppError } from "@/lib/exceptions"
+import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
 
 export async function getAffiliatePayoutBulkData(
   mode: "TABLE" | "EXPORT" = "TABLE",
   org: OrgAuthResult,
   orgId: string,
   months: { month: number; year: number }[],
-  orderBy?: OrderBy,
+  orderBy?: PayoutSortKeys,
   orderDir?: OrderDir,
   offset?: number,
   email?: string

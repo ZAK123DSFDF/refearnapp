@@ -2,8 +2,8 @@
 
 import React from "react"
 import { Copy, Ticket, Share2, TrendingUp } from "lucide-react"
-import { AffiliateCouponData } from "@/components/pages/AffiliateDashboard/AffiliateCoupon/affiliateCouponColumns"
 import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
+import { AffiliateCouponData } from "@/lib/types/affiliate/affiliateCouponData"
 
 interface AffiliateCouponDetailsProps {
   coupon: AffiliateCouponData
@@ -15,7 +15,7 @@ export function AffiliateCouponDetails({
   const { showCustomToast } = useCustomToast()
 
   const copyCode = (code: string) => {
-    navigator.clipboard.writeText(code)
+    navigator.clipboard.writeText(code).then(() => console.log("Copied"))
     showCustomToast({
       type: "success",
       title: "Code Copied!",

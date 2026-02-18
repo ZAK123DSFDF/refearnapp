@@ -4,7 +4,8 @@ import { getAffiliatesWithStatsAction } from "@/lib/server/affiliate/getAffiliat
 import { convertedCurrency } from "@/util/ConvertedCurrency"
 import { handleRoute } from "@/lib/handleRoute"
 import { AffiliateBasePayout } from "@/lib/types/affiliate/affiliateStats"
-import { OrderBy, OrderDir } from "@/lib/types/analytics/orderTypes"
+import { OrderDir } from "@/lib/types/analytics/orderTypes"
+import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
 
 export const GET = handleRoute(
   "Get Organization Affiliates Stats",
@@ -18,7 +19,7 @@ export const GET = handleRoute(
     const month = searchParams.get("month")
       ? Number(searchParams.get("month"))
       : undefined
-    const orderBy = (searchParams.get("orderBy") as OrderBy) || "none"
+    const orderBy = (searchParams.get("orderBy") as PayoutSortKeys) || "none"
     const orderDir = (searchParams.get("orderDir") as OrderDir) || "desc"
     const offset = searchParams.get("offset")
       ? Number(searchParams.get("offset"))

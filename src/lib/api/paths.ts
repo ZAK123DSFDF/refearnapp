@@ -11,6 +11,10 @@ export const GET_AFFILIATE_KPI_PATH = (
   month?: number
 ) =>
   withQuery(`/api/affiliate/${orgId}/dashboard/analytics/kpi`, { year, month })
+export const GET_AFFILIATE_PROMOTION_CODES_PATH = (
+  orgId: string,
+  query: { offset?: number }
+) => withQuery(`/api/affiliate/${orgId}/dashboard/coupons`, query)
 export const GET_AFFILIATE_REFERRERS_PATH = (
   orgId: string,
   year?: number,
