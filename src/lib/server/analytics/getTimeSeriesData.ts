@@ -1,22 +1,22 @@
 import { db } from "@/db/drizzle"
 import { and, inArray, sql } from "drizzle-orm"
-import { affiliateClick, affiliateInvoice } from "@/db/schema"
+import { affiliateClick, affiliateInvoice, referrals } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
+
 export async function getTimeSeriesData<T>(
   linkIds: string[],
   year?: number,
   month?: number,
-  isAffiliate: boolean = true // Add this flag
+  isAffiliate: boolean = true
 ) {
   const clickDay = sql<string>`(${affiliateClick.createdAt}::date)`
   const invoiceDay = sql<string>`(${affiliateInvoice.createdAt}::date)`
+  const referralDay = sql<string>`(${referrals.createdAt}::date)`
 
-  const [clicksAgg, salesAgg] = await Promise.all([
+  const [clicksAgg, salesAgg, referralsAgg] = await Promise.all([
+    // 1. Clicks (Visitors)
     db
-      .select({
-        day: clickDay,
-        visits: sql<number>`count(*)`.mapWith(Number),
-      })
+      .select({ day: clickDay, visits: sql<number>`count(*)`.mapWith(Number) })
       .from(affiliateClick)
       .where(
         buildWhereWithDate(
@@ -29,18 +29,15 @@ export async function getTimeSeriesData<T>(
       )
       .groupBy(clickDay),
 
+    // 2. Invoices (Sales/Value)
     db
       .select({
         day: invoiceDay,
         subscriptionId: affiliateInvoice.subscriptionId,
-        value: sql<number>`
-          coalesce(
-            sum(
-              case when ${affiliateInvoice.refundedAt} is null
-          then ${isAffiliate ? affiliateInvoice.commission : affiliateInvoice.amount}
-          else 0 end
-          ), 0
-          )`.mapWith(Number),
+        value:
+          sql<number>`coalesce(sum(case when ${affiliateInvoice.refundedAt} is null then ${isAffiliate ? affiliateInvoice.commission : affiliateInvoice.amount} else 0 end), 0)`.mapWith(
+            Number
+          ),
       })
       .from(affiliateInvoice)
       .where(
@@ -56,57 +53,78 @@ export async function getTimeSeriesData<T>(
         )
       )
       .groupBy(invoiceDay, affiliateInvoice.subscriptionId),
+
+    // 3. Referrals (Signups) - NEW
+    db
+      .select({
+        day: referralDay,
+        signups: sql<number>`count(*)`.mapWith(Number),
+      })
+      .from(referrals)
+      .where(
+        buildWhereWithDate(
+          [inArray(referrals.affiliateLinkId, linkIds)],
+          referrals,
+          year,
+          month,
+          true
+        )
+      )
+      .groupBy(referralDay),
   ])
 
+  // Initialize Map with signups field
   const byDay = new Map<
     string,
-    { visits: number; sales: number; value: number }
+    { visits: number; signups: number; sales: number; value: number }
   >()
 
-  // Process Clicks
-  for (const row of clicksAgg) {
-    const d = row.day
-    const curr = byDay.get(d) ?? { visits: 0, sales: 0, value: 0 }
-    curr.visits += row.visits
-    byDay.set(d, curr)
-  }
+  // Helper to get or init map entry
+  const getEntry = (d: string) =>
+    byDay.get(d) ?? { visits: 0, signups: 0, sales: 0, value: 0 }
 
-  const seenSubs = new Set<string>()
+  // Process Clicks
+  for (const row of clicksAgg)
+    byDay.set(row.day, { ...getEntry(row.day), visits: row.visits })
+
+  // Process Signups (New)
+  for (const row of referralsAgg)
+    byDay.set(row.day, { ...getEntry(row.day), signups: row.signups })
 
   // Process Sales
+  const seenSubs = new Set<string>()
   for (const row of salesAgg) {
-    const d = row.day
-    const curr = byDay.get(d) ?? { visits: 0, sales: 0, value: 0 }
-
-    // DYNAMIC LOGIC: Use revenue for Org/Team, Commission for Affiliates
+    const curr = getEntry(row.day)
     curr.value += row.value
-
-    if (row.subscriptionId === null) {
+    if (row.subscriptionId === null || !seenSubs.has(row.subscriptionId)) {
       curr.sales += 1
-    } else if (!seenSubs.has(row.subscriptionId)) {
-      curr.sales += 1
-      seenSubs.add(row.subscriptionId)
+      if (row.subscriptionId) seenSubs.add(row.subscriptionId)
     }
-    byDay.set(d, curr)
+    byDay.set(row.day, curr)
   }
 
   return Array.from(byDay.entries())
-    .filter(([_, v]) => v.visits > 0 || v.sales > 0 || v.value > 0)
     .map(([date, v]) => {
       const visitors = v.visits || 0
+      const signups = v.signups || 0
       const sales = v.sales || 0
 
-      let conversionRate = 0
-      if (visitors > 0)
-        conversionRate = Math.round((sales / visitors) * 10000) / 100
-      else if (sales > 0) conversionRate = 100
+      // 1. Click to Signup Rate (Visitors -> Signups)
+      const clickToSignupRate =
+        visitors > 0 ? Math.round((signups / visitors) * 10000) / 100 : 0
+
+      // 2. Signup to Paid Rate (Signups -> Sales)
+      const signupToPaidRate =
+        signups > 0 ? Math.round((sales / signups) * 10000) / 100 : 0
 
       return {
         createdAt: date,
-        visitors: visitors,
-        sales: sales,
+        visitors,
+        signups,
+        sales,
         amount: v.value,
-        conversionRate: conversionRate,
+        clickToSignupRate,
+        signupToPaidRate,
       }
     })
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt)) as T[]

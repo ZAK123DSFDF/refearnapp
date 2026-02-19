@@ -7,7 +7,7 @@ import {
   organization,
   affiliatePayoutMethod,
 } from "@/db/schema"
-import { and, desc, eq, ilike, sql } from "drizzle-orm"
+import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
 import { AffiliateStatsField } from "@/util/AffiliateStatFields"
 import {
@@ -50,63 +50,20 @@ export async function getAffiliatesWithStatsAction(
     email?: string
   }
 ) {
-  const selectedFields = buildAffiliateStatsSelect(opts)
-  const whereConditions = [eq(affiliate.organizationId, orgId)]
-  if (opts?.email) {
-    whereConditions.push(ilike(affiliate.email, `%${opts.email}%`))
-  }
-  const orderExpr = (() => {
-    if (!opts?.orderBy) return undefined
-    const conversionRateSql = sql`
-      CASE
-        WHEN COUNT(DISTINCT ${affiliateClick.id}) = 0 THEN 0
-        ELSE (
-          (
-            COUNT(DISTINCT ${affiliateInvoice.subscriptionId})
-            + COUNT(DISTINCT CASE 
-                WHEN ${affiliateInvoice.subscriptionId} IS NULL
-                AND ${affiliateInvoice.refundedAt} IS NULL
-                THEN ${affiliateInvoice.id} END
-              )
-          )::float / COUNT(DISTINCT ${affiliateClick.id})::float
-        ) * 100
-      END
-    `
-    const commissionSql = sql`COALESCE(SUM(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.commission} ELSE 0 END), 0)`
-    const salesSql = sql`
-      COUNT(DISTINCT ${affiliateInvoice.subscriptionId})
-      + COUNT(DISTINCT CASE 
-          WHEN ${affiliateInvoice.subscriptionId} IS NULL
-          AND ${affiliateInvoice.refundedAt} IS NULL
-          THEN ${affiliateInvoice.id} END
+  // 1. Isolated Click & Link Aggregation
+  const clickSq = db
+    .select({
+      affiliateId: affiliate.id,
+      clicks: sql`count(distinct ${affiliateClick.id})`.as("clicks"),
+      links: sql`
+        ARRAY_AGG(
+          DISTINCT ('https://' || ${organization.websiteUrl} || '?' || ${organization.referralParam} || '=' || ${affiliateLink.id})
         )
-    `
-    const visitsSql = sql`COUNT(DISTINCT ${affiliateClick.id})`
-    const commissionPaidSql = sql`COALESCE(SUM(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.paidAmount} ELSE 0 END), 0)`
-    const commissionUnpaidSql = sql`COALESCE(SUM(CASE WHEN ${affiliateInvoice.refundedAt} IS NULL THEN ${affiliateInvoice.unpaidAmount} ELSE 0 END), 0)`
-    const emailSql = affiliate.email
-    const orderByMap: Record<string, any> = {
-      conversionRate: conversionRateSql,
-      commission: commissionSql,
-      sales: salesSql,
-      visits: visitsSql,
-      commissionPaid: commissionPaidSql,
-      commissionUnpaid: commissionUnpaidSql,
-    }
-
-    const base = orderByMap[opts.orderBy] ?? emailSql
-    return opts.orderDir === "asc" ? base : desc(base)
-  })()
-  const chained = db
-    .select(selectedFields)
+      `.as("links"),
+    })
     .from(affiliate)
-    .leftJoin(
-      affiliateLink,
-      and(
-        eq(affiliateLink.affiliateId, affiliate.id),
-        eq(affiliateLink.organizationId, orgId)
-      )
-    )
+    .leftJoin(organization, eq(organization.id, orgId))
+    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
     .leftJoin(
       affiliateClick,
       buildWhereWithDate(
@@ -118,20 +75,163 @@ export async function getAffiliatesWithStatsAction(
         months
       )
     )
+    .where(eq(affiliate.organizationId, orgId))
+    .groupBy(affiliate.id, organization.websiteUrl, organization.referralParam)
+    .as("click_sq")
+
+  // 2. Isolated Sales & Commission Aggregation
+  const salesSqBase = db
+    .select({
+      affiliateId: affiliate.id,
+      salesCount: sql`count(distinct ${affiliateInvoice.id})`.as("sales_count"),
+      totalComm: sql`sum(${affiliateInvoice.commission})`.as("total_comm"),
+    })
+    .from(affiliate)
+    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
     .leftJoin(
       affiliateInvoice,
-      and(
-        sql`${affiliateInvoice.refundedAt} IS NULL`,
-        buildWhereWithDate(
-          [eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)],
-          affiliateInvoice,
-          year,
-          month,
-          false,
-          months
-        )
+      buildWhereWithDate(
+        [
+          eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+          isNull(affiliateInvoice.refundedAt),
+          sql`${affiliateInvoice.reason} in ('subscription_create', 'one_time')`,
+        ],
+        affiliateInvoice,
+        year,
+        month,
+        false,
+        months
       )
     )
+    .where(eq(affiliate.organizationId, orgId))
+    .groupBy(affiliate.id)
+    .as("sales_sq")
+
+  // 3. Isolated PAID Amount Aggregation
+  const paidSq = db
+    .select({
+      affiliateId: affiliate.id,
+      amount: sql`sum(${affiliateInvoice.paidAmount})`.as("paid_amount"),
+    })
+    .from(affiliate)
+    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(
+      affiliateInvoice,
+      buildWhereWithDate(
+        [
+          eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+          isNull(affiliateInvoice.refundedAt),
+          sql`${affiliateInvoice.paidAmount} > 0`,
+        ],
+        affiliateInvoice,
+        year,
+        month,
+        false,
+        months
+      )
+    )
+    .where(eq(affiliate.organizationId, orgId))
+    .groupBy(affiliate.id)
+    .as("paid_sq")
+
+  // 4. Isolated UNPAID Amount Aggregation
+  const unpaidSq = db
+    .select({
+      affiliateId: affiliate.id,
+      amount: sql`sum(${affiliateInvoice.unpaidAmount})`.as("unpaid_amount"),
+    })
+    .from(affiliate)
+    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(
+      affiliateInvoice,
+      buildWhereWithDate(
+        [
+          eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+          isNull(affiliateInvoice.refundedAt),
+          sql`${affiliateInvoice.unpaidAmount} > 0`,
+        ],
+        affiliateInvoice,
+        year,
+        month,
+        false,
+        months
+      )
+    )
+    .where(eq(affiliate.organizationId, orgId))
+    .groupBy(affiliate.id)
+    .as("unpaid_sq")
+
+  // 5. Final select fragments
+  const visitsSql = sql<number>`coalesce(${clickSq.clicks}, 0)`.mapWith(Number)
+  const salesCountSql =
+    sql<number>`coalesce(${salesSqBase.salesCount}, 0)`.mapWith(Number)
+  const commissionSql =
+    sql<number>`coalesce(${salesSqBase.totalComm}, 0)`.mapWith(Number)
+  const paidAmountSql = sql<number>`coalesce(${paidSq.amount}, 0)`.mapWith(
+    Number
+  )
+  const unpaidAmountSql = sql<number>`coalesce(${unpaidSq.amount}, 0)`.mapWith(
+    Number
+  )
+  const linksSql = sql<string[]>`${clickSq.links}`
+
+  const baseFields = buildAffiliateStatsSelect({
+    ...opts,
+    exclude: [
+      ...(opts?.exclude ?? []),
+      "visitors",
+      "sales",
+      "commission",
+      "paid",
+      "unpaid",
+      "conversionRate",
+      "links",
+    ] as ExcludableFields[],
+  })
+  const selectedFields = {
+    ...baseFields,
+    visitors: visitsSql,
+    sales: salesCountSql,
+    commission: commissionSql,
+    paid: paidAmountSql,
+    unpaid: unpaidAmountSql,
+    links: linksSql,
+    currency: organization.currency,
+    paypalEmail: affiliatePayoutMethod.accountIdentifier,
+    conversionRate:
+      sql<number>`((${salesCountSql})::float / nullif((${visitsSql}), 0)::float) * 100`.mapWith(
+        Number
+      ),
+  }
+
+  // 6. Sorting Logic
+  const orderExpr = (() => {
+    if (!opts?.orderBy) return undefined
+    const orderByMap: Record<string, any> = {
+      visits: visitsSql,
+      sales: salesCountSql,
+      commission: commissionSql,
+      commissionPaid: paidAmountSql,
+      commissionUnpaid: unpaidAmountSql,
+      email: affiliate.email,
+    }
+    const base = orderByMap[opts.orderBy] ?? affiliate.email
+    return opts.orderDir === "asc" ? base : desc(base)
+  })()
+
+  // 7. Execution
+  const whereConditions = [eq(affiliate.organizationId, orgId)]
+  if (opts?.email) {
+    whereConditions.push(ilike(affiliate.email, `%${opts.email}%`))
+  }
+
+  const chained = db
+    .select(selectedFields)
+    .from(affiliate)
+    .leftJoin(clickSq, eq(clickSq.affiliateId, affiliate.id))
+    .leftJoin(salesSqBase, eq(salesSqBase.affiliateId, affiliate.id))
+    .leftJoin(paidSq, eq(paidSq.affiliateId, affiliate.id))
+    .leftJoin(unpaidSq, eq(unpaidSq.affiliateId, affiliate.id))
     .leftJoin(organization, eq(organization.id, orgId))
     .leftJoin(
       affiliatePayoutMethod,
@@ -142,7 +242,7 @@ export async function getAffiliatesWithStatsAction(
       )
     )
     .where(and(...whereConditions))
-    .groupBy(affiliate.id, affiliate.email)
     .orderBy(...(orderExpr ? [orderExpr] : []), affiliate.id)
+
   return applyOptionalLimitAndOffset(chained, opts?.limit, opts?.offset)
 }

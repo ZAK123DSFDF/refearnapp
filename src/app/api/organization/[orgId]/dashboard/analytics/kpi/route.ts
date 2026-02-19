@@ -28,6 +28,10 @@ export const GET = handleRoute(
       totalAffiliates: row?.totalAffiliates ?? 0,
       totalLinks: row?.totalLinks ?? 0,
       totalVisitors: row?.totalVisitors ?? 0,
+      totalSignups: row?.totalSignups ?? 0,
+      totalPaidReferrals: row?.totalPaidReferrals ?? 0,
+      clickToSignupRate: row?.clickToSignupRate ?? 0,
+      signupToPaidRate: row?.signupToPaidRate ?? 0,
       totalSales: row?.sales ?? 0,
       totalCommission: (row?.commission ?? 0) * rate,
       totalCommissionPaid: (row?.paid ?? 0) * rate,
@@ -35,7 +39,7 @@ export const GET = handleRoute(
       totalAmount: (row?.amount ?? 0) * rate,
       currency: org.currency,
     }
-
+    console.log("data of organization", data)
     return NextResponse.json({ ok: true, data: [data] })
   }
 )

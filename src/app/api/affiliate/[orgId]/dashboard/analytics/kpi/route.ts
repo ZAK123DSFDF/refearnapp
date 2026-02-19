@@ -32,13 +32,16 @@ export const GET = handleRoute(
     const data = {
       totalLinks: row?.totalLinks ?? 0,
       totalVisitors: row?.totalVisitors ?? 0,
+      totalSignups: row?.totalSignups ?? 0,
+      totalPaidReferrals: row?.totalPaidReferrals ?? 0,
+      clickToSignupRate: row?.clickToSignupRate ?? 0,
+      signupToPaidRate: row?.signupToPaidRate ?? 0,
       totalSales: row?.sales ?? 0,
       totalCommission: (row?.commission ?? 0) * rate,
       totalCommissionPaid: (row?.paid ?? 0) * rate,
       totalCommissionUnpaid: (row?.unpaid ?? 0) * rate,
       currency: org.currency,
     }
-
     return NextResponse.json({ ok: true, data: [data] })
   }
 )
