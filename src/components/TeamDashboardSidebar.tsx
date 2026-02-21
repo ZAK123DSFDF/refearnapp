@@ -13,6 +13,7 @@ import {
   Globe,
   MailQuestion,
   MousePointerClick,
+  TicketPercent,
 } from "lucide-react"
 import {
   Sidebar,
@@ -74,6 +75,11 @@ const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
       title: "Referrals",
       url: `/organization/${orgId}/dashboard/referrals`,
       icon: MousePointerClick,
+    },
+    {
+      title: "Coupons",
+      url: `/organization/${orgId}/dashboard/coupons`,
+      icon: TicketPercent,
     },
     {
       title: "Settings",
