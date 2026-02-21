@@ -97,7 +97,12 @@ export const LoginAffiliateServer = async ({
       organizationId,
       baseUrl,
     })
-    await sendVerificationEmail(existingAffiliate.email, verifyUrl, "login")
+    await sendVerificationEmail(
+      existingAffiliate.email,
+      verifyUrl,
+      "login",
+      organizationId
+    )
     return {
       ok: true,
       toast: "Verification email sent",

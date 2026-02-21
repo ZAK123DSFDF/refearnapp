@@ -26,7 +26,9 @@ export async function updateSettings(
   if (data.websiteUrl) {
     updateData.websiteUrl = data.websiteUrl.trim().replace(/^https?:\/\//, "")
   }
-
+  if (data.supportEmail !== undefined) {
+    updateData.supportEmail = data.supportEmail?.trim().toLowerCase() || null
+  }
   if (data.description !== undefined) {
     updateData.description = data.description?.trim() || ""
   }
@@ -83,6 +85,7 @@ export async function updateSettings(
   const REDIS_ORG_FIELDS = new Set([
     "name",
     "websiteUrl",
+    "supportEmail",
     "referralParam",
     "cookieLifetimeValue",
     "cookieLifetimeUnit",

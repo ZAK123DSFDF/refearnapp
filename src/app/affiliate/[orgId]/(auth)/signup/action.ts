@@ -95,7 +95,12 @@ export const SignupAffiliateServer = async ({
         organizationId,
         baseUrl,
       })
-      await sendVerificationEmail(existingAffiliate.email, verifyUrl, "signup")
+      await sendVerificationEmail(
+        existingAffiliate.email,
+        verifyUrl,
+        "signup",
+        organizationId
+      )
       return {
         ok: true,
         toast: "Verification email sent",
@@ -152,7 +157,12 @@ export const SignupAffiliateServer = async ({
       partial: true,
     })
 
-    await sendVerificationEmail(newAffiliate.email, verifyUrl, "signup")
+    await sendVerificationEmail(
+      newAffiliate.email,
+      verifyUrl,
+      "signup",
+      organizationId
+    )
     return {
       ok: true,
       toast: "Verification email sent",

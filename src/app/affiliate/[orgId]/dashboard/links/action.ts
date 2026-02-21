@@ -1,15 +1,10 @@
 "use server"
 import { getAffiliateOrganization } from "@/lib/server/affiliate/GetAffiliateOrganization"
-import { revalidatePath } from "next/cache"
-import { ActionResult, MutationData } from "@/lib/types/organization/response"
-import { AffiliateLinkWithStats } from "@/lib/types/affiliate/affiliateLinkWithStats"
-import { getAffiliateLinksWithStatsAction } from "@/lib/server/affiliate/getAffiliateLinksWithStats"
+import { MutationData } from "@/lib/types/organization/response"
 import { createFullUrl } from "@/lib/server/affiliate/createFullUrl"
 import { getBaseUrl } from "@/lib/server/affiliate/getBaseUrl"
 import { buildAffiliateUrl } from "@/util/Url"
 import { handleAction } from "@/lib/handleAction"
-import { getOrgCurrencyAffiliate } from "@/lib/server/internal/getOrgCurrencyAffiliate"
-import { ExchangeRate } from "@/util/ExchangeRate"
 
 export const createAffiliateLink = async (
   orgId: string

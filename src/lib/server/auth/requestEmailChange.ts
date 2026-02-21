@@ -100,9 +100,14 @@ export async function requestEmailChange({
       )
       verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email-change?organizationToken=${token}`
     }
-
+    const brandingOrgId = isAffiliate ? orgId : undefined
     // 🧠 Step 3: Send email
-    await sendVerificationEmail(newEmail, verifyUrl, "email-change")
+    await sendVerificationEmail(
+      newEmail,
+      verifyUrl,
+      "email-change",
+      brandingOrgId
+    )
 
     return {
       ok: true,

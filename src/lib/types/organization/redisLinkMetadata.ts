@@ -7,6 +7,7 @@ export type RedisLinkMetadata = {
   name: string
   websiteUrl: string
   referralParam: string
+  supportEmail: string
   cookieLifetimeValue: string
   cookieLifetimeUnit: string
   commissionType: string

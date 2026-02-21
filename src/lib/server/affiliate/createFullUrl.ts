@@ -58,6 +58,7 @@ export const createFullUrl = async (decoded: { id: string; orgId: string }) => {
     name: org.name,
     websiteUrl: domain,
     referralParam: org.referralParam || "ref",
+    supportEmail: org.supportEmail || "",
     cookieLifetimeValue: String(org.cookieLifetimeValue),
     cookieLifetimeUnit: org.cookieLifetimeUnit || "day",
     commissionType: org.commissionType || "percentage",

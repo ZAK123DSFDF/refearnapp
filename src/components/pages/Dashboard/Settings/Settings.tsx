@@ -70,6 +70,7 @@ export default function Settings({
       "day",
     currency:
       (orgData?.currency as "USD" | "EUR" | "GBP" | "CAD" | "AUD") ?? "USD",
+    supportEmail: orgData?.supportEmail ?? "",
     attributionModel:
       (orgData?.attributionModel as "FIRST_CLICK" | "LAST_CLICK") ??
       "LAST_CLICK",
@@ -147,6 +148,15 @@ export default function Settings({
                   label="Website URL"
                   placeholder="Enter your Domain"
                   type="text"
+                  icon={Globe}
+                  affiliate={false}
+                />
+                <InputField
+                  control={form.control}
+                  name="supportEmail"
+                  label="Support Email"
+                  placeholder="support@company.com"
+                  type="email"
                   icon={Globe}
                   affiliate={false}
                 />

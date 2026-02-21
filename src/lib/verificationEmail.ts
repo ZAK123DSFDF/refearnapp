@@ -1,5 +1,8 @@
+import { db } from "@/db/drizzle"
 import { sendEmail } from "@/lib/sendEmail"
 import { escapeHtml } from "@/util/escapeHtml"
+import { eq } from "drizzle-orm"
+import { organization } from "@/db/schema"
 
 export type EmailType =
   | "login"
@@ -97,13 +100,32 @@ export const sendVerificationEmail = async (
   to: string,
   link: string,
   type: EmailType,
+  orgId?: string,
   extra?: { title?: string; description?: string }
 ) => {
   const { subject, heading, button, description } = EMAIL_CONTENT[type](extra)
   const html = buildEmailTemplate(heading, description ?? null, button, link)
+  let fromName = "RefearnApp"
+  let replyTo = "support@refearnapp.com"
+  if (orgId) {
+    const org = await db.query.organization.findFirst({
+      where: eq(organization.id, orgId),
+      columns: {
+        name: true,
+        supportEmail: true,
+      },
+    })
+
+    if (org) {
+      if (org.name) fromName = org.name
+      if (org.supportEmail) replyTo = org.supportEmail
+    }
+  }
   return sendEmail({
     to,
     subject,
+    fromName,
     html,
+    replyTo,
   })
 }

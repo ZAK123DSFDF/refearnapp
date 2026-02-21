@@ -7,6 +7,11 @@ export const orgSettingsSchema = z.object({
   logoUrl: z.string().nullable(),
   description: z.string().max(500).nullable(),
   openGraphUrl: z.string().nullable(),
+  supportEmail: z
+    .string()
+    .email("Invalid email address")
+    .optional()
+    .or(z.literal("")),
   referralParam: z.enum(["ref", "via", "aff"]),
   cookieLifetimeValue: z.string().regex(/^\d+(\.\d{1,2})?$/, "Invalid amount"),
   cookieLifetimeUnit: z.enum(["day", "week", "month", "year"]),

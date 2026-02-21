@@ -65,7 +65,8 @@ export const ForgotPasswordAffiliateServer = async ({
     await sendVerificationEmail(
       existingAffiliate.email,
       resetUrl,
-      "reset-password"
+      "reset-password",
+      organizationId
     )
     return { ok: true, toast: "Reset link sent to your email", redirectUrl }
   })
