@@ -8,7 +8,7 @@ export default {
 	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
-		const PAGES_URL = 'https://refearnapp-landing-astro.pages.dev';
+		const PAGES_URL = 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = 'www.refearnapp.com';
 
