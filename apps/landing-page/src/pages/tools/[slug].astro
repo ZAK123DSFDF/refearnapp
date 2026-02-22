@@ -1,0 +1,148 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { freeTools } from '../../data/tools';
+// Import the Vue component
+import CommissionCalculator from '../../components/tools/CommissionCalculator.vue';
+import ROICalculator from '../../components/tools/ROICalculator.vue';
+import LinkGenerator from '../../components/tools/LinkGenerator.vue';
+import MarketingCalculator from '../../components/tools/MarketingCalculator.vue';
+import AgreementTemplate from '../../components/tools/AgreementTemplate.vue';
+import EmailTemplates from '../../components/tools/EmailTemplates.vue';
+import MRRCalculator from '../../components/tools/MRRCalculator.vue';
+import ARRCalculator from '../../components/tools/ARRCalculator.vue';
+import ValuationCalculator from '../../components/tools/ValuationCalculator.vue';
+import ReferralCalculator from '../../components/tools/ReferralCalculator.vue';
+import LTVCalculator from '../../components/tools/LTVCalculator.vue';
+import LTVCACCAlculator from '../../components/tools/LTVCACCalculator.vue';
+import StripeFeeCalculator from '../../components/tools/StripeFeeCalculator.vue';
+import RuleOf40Calculator from '../../components/tools/RuleOf40Calculator.vue';
+import ChurnCalculator from '../../components/tools/ChurnCalculator.vue';
+import TieredCommissionCalculator from '../../components/tools/TieredCommissionCalculator.vue';
+import GrowthCalculator from '../../components/tools/GrowthCalculator.vue';
+export async function getStaticPaths() {
+  return freeTools.map((tool) => ({
+    params: { slug: tool.slug },
+    props: { tool },
+  }));
+}
+
+const { tool } = Astro.props;
+---
+
+<Layout
+  title={`${tool.title} | RefearnApp Free Tools`}
+  description={tool.description}
+>
+  <Header />
+  <main class="mx-auto min-h-[60vh] max-w-4xl px-6 py-24">
+    <div class="mb-16 text-center">
+      <nav class="mb-6 flex justify-center text-sm text-slate-400">
+        <div class="flex items-center gap-2">
+          <nav class="mb-4 text-sm text-slate-400">
+            <a href="/" class="hover:text-primary">Home</a> /
+            <span class="font-medium text-slate-600">Tools</span>
+          </nav>
+        </div>
+      </nav>
+
+      <h1
+        class="mb-6 text-4xl font-extrabold tracking-tight text-slate-900 md:text-6xl"
+      >
+        <span class="text-blue-600">{tool.title.split(' ')[0]}</span>
+        {tool.title.split(' ').slice(1).join(' ')}
+      </h1>
+
+      <p class="mx-auto max-w-2xl text-xl leading-relaxed text-slate-600">
+        {tool.description}
+      </p>
+    </div>
+
+    <div class="flex justify-center">
+      {
+        tool.slug === 'affiliate-commission-calculator' ? (
+          <CommissionCalculator client:load />
+        ) : tool.slug === 'referral-program-roi-calculator' ? (
+          <ROICalculator client:load />
+        ) : tool.slug === 'affiliate-link-generator' ? (
+          <LinkGenerator client:load />
+        ) : tool.slug === 'affiliate-link-generator' ? (
+          <LinkGenerator client:load />
+        ) : tool.slug === 'affiliate-marketing-calculator' ? (
+          <MarketingCalculator client:load />
+        ) : tool.slug === 'affiliate-agreement-template' ? (
+          <AgreementTemplate client:load />
+        ) : tool.slug === 'referral-email-templates' ? (
+          <EmailTemplates client:load />
+        ) : tool.slug === 'mrr-calculator' ? (
+          <MRRCalculator client:load />
+        ) : tool.slug === 'arr-calculator' ? (
+          <ARRCalculator client:load />
+        ) : tool.slug === 'saas-valuation-calculator' ? (
+          <ValuationCalculator client:load />
+        ) : tool.slug === 'referral-calculator' ? (
+          <ReferralCalculator client:load />
+        ) : tool.slug === 'ltv-calculator-saas' ? (
+          <LTVCalculator client:load />
+        ) : tool.slug === 'ltv-cac-calculator' ? (
+          <LTVCACCAlculator client:load />
+        ) : tool.slug === 'stripe-fee-calculator' ? (
+          <StripeFeeCalculator client:load />
+        ) : tool.slug === 'rule-of-40-saas-calculator' ? (
+          <RuleOf40Calculator client:load />
+        ) : tool.slug === 'churn-rate-calculator' ? (
+          <ChurnCalculator client:load />
+        ) : tool.slug === 'tiered-commission-calculator' ? (
+          <TieredCommissionCalculator client:load />
+        ) : tool.slug === 'saas-growth-calculator' ? (
+          <GrowthCalculator client:load />
+        ) : (
+          /* Coming Soon Placeholder */
+          <div class="flex w-full flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 bg-slate-50 p-12 text-center">
+            <div class="mb-4 rounded-full bg-white p-4 shadow-sm">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-10 w-10 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                />
+              </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900">Tool Coming Soon</h2>
+            <p class="mt-2 max-w-sm text-slate-500">
+              I am building the logic for {tool.title}. Check back in a few
+              hours!
+            </p>
+          </div>
+        )
+      }
+    </div>
+
+    <div
+      class="mt-20 rounded-3xl bg-slate-900 p-10 text-center text-white shadow-xl"
+    >
+      <h3 class="mb-3 text-2xl font-bold md:text-3xl">
+        Tired of manual calculations?
+      </h3>
+      <p class="mx-auto mb-8 max-w-md text-lg text-slate-400">
+        RefearnApp automates your entire affiliate program so you can focus on
+        building your SaaS.
+      </p>
+      <a
+        href="/#pricing"
+        class="inline-block rounded-xl bg-white px-8 py-4 font-bold text-slate-900 transition-all hover:scale-105 active:scale-95"
+      >
+        Get Started for $35/mo
+      </a>
+    </div>
+  </main>
+  <Footer />
+</Layout>

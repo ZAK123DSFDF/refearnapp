@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Features from '../components/Features.astro';
+import HowItWorks from '../components/HowItWorks.vue';
+import Testimonials from '../components/Testimonials.astro';
+import Pricing from '../components/Pricing.vue';
+import Faq from '../components/Faq.vue';
+import Footer from '../components/Footer.astro';
+
+// You can define page-specific metadata here
+const pageTitle = 'RefearnApp | Launch Your Affiliate Program in Minutes';
+const pageDescription =
+  'RefearnApp gives SaaS founders a simple, powerful way to run affiliate programs. Track referrals, understand performance, and grow revenue.';
+---
+
+<Layout
+  title={pageTitle}
+  description={pageDescription}
+  image="/opengraph-update.png"
+  indexable={true}
+>
+  <Header />
+
+  <main id="main-content" class="grow">
+    <Hero />
+    <Features />
+    <HowItWorks client:load />
+    <Testimonials />
+    <Pricing client:load />
+    <Faq client:load />
+  </main>
+
+  <Footer />
+</Layout>

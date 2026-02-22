@@ -1,0 +1,28 @@
+---
+// src/components/Logo.astro
+interface Props {
+  sizeClass?: string;
+}
+
+const { sizeClass = 'h-9' } = Astro.props;
+---
+
+<div
+  id="logo-root"
+  class="flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-90"
+>
+  <img src="/refearnapp.svg" alt="RefearnApp" class={`${sizeClass} w-auto`} />
+  <span class="text-2xl font-bold tracking-tight">
+    <span class="text-foreground">Refearn</span><span class="text-primary"
+      >App</span
+    >
+  </span>
+</div>
+
+<script>
+  // Scoped script to handle the smooth scroll
+  const logo = document.getElementById('logo-root');
+  logo?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>

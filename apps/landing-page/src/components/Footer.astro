@@ -1,0 +1,173 @@
+---
+import Logo from './Logo.astro';
+import { competitors } from '../data/competitors.ts';
+import { freeTools } from '../data/tools.ts';
+const currentYear = new Date().getFullYear();
+
+const links = [
+  { name: 'Features', href: '#features' },
+  { name: 'How It Works', href: '#how-it-works' },
+  { name: 'Testimonials', href: '#testimonials' },
+  { name: 'Pricing', href: '#pricing' },
+  {
+    name: 'Support',
+    href: 'mailto:support@refearnapp.com?subject=Support%20Request%20-%20RefearnApp',
+  },
+];
+
+const legalLinks = [
+  { name: 'Terms of Service', href: '/terms' },
+  { name: 'Privacy Policy', href: '/privacy-policy' },
+  { name: 'Refund Policy', href: '/refund-policy' },
+];
+
+const socials = [
+  {
+    name: 'X (Twitter)',
+    href: 'https://x.com/zekariyasberih4',
+    icon: 'M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.494h2.039L6.486 3.24H4.298l13.311 17.407z',
+  },
+  {
+    name: 'LinkedIn',
+    href: 'https://www.linkedin.com/company/refearnapp',
+    icon: 'M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z',
+  },
+];
+---
+
+<footer class="bg-secondary/50 border-border border-t px-3 py-16">
+  <div class="mx-auto max-w-7xl px-4">
+    <div
+      class="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5"
+    >
+      <div class="space-y-4 lg:col-span-2">
+        <div class="flex items-center gap-2">
+          <Logo sizeClass="h-10" />
+        </div>
+        <p class="max-w-xs leading-relaxed text-slate-500">
+          The most elegant way to build your affiliate marketing program for
+          your SaaS business.
+        </p>
+        <div class="flex items-center gap-4">
+          {
+            socials.map((social) => (
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-primary text-slate-400 transition-colors"
+                aria-label={social.name}
+              >
+                <svg
+                  class="h-5 w-5 fill-current"
+                  role="img"
+                  viewBox="0 0 24 24"
+                >
+                  <path d={social.icon} />
+                </svg>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div>
+        <h4 class="mb-4 font-bold text-slate-900">Explore</h4>
+        <ul class="space-y-2 text-sm">
+          {
+            links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="hover:text-primary text-slate-500 transition-colors"
+                >
+                  {link.name}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="mb-4 font-bold text-slate-900">Alternatives</h4>
+        <ul
+          class="no-scrollbar max-h-60 space-y-2 overflow-y-auto pr-2 text-sm"
+        >
+          {
+            competitors.map((comp) => (
+              <li>
+                <a
+                  href={`/alternative/${comp.slug}`}
+                  class="hover:text-primary whitespace-nowrap text-slate-500 transition-colors"
+                >
+                  {comp.name} Alternative
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="mb-4 font-bold text-slate-900">Growth Tools</h4>
+        <ul
+          class="no-scrollbar max-h-60 space-y-2 overflow-y-auto pr-2 text-sm"
+        >
+          {
+            freeTools.map((tool) => (
+              <li>
+                <a
+                  href={`/tools/${tool.slug}`}
+                  class="hover:text-primary text-slate-500 transition-colors"
+                >
+                  {tool.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="border-border mt-16 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row"
+    >
+      <p class="text-sm text-slate-500">
+        &copy; {currentYear} RefearnApp. All rights reserved.
+      </p>
+
+      <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+        {
+          legalLinks.map((link) => (
+            <a
+              href={link.href}
+              class="hover:text-primary text-slate-500 transition-colors"
+            >
+              {link.name}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Custom Scrollbar Styling */
+  .no-scrollbar::-webkit-scrollbar {
+    width: 3px;
+  }
+  .no-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .no-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #e2e8f0 transparent;
+  }
+</style>

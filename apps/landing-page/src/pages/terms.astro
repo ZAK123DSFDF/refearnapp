@@ -1,0 +1,184 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// SEO Metadata
+const title = 'RefearnApp | Terms of Service Page';
+const description =
+  'Terms Of Service Page - Read our rules and guidelines for using the RefearnApp platform.';
+const url = 'https://refearnapp.com/terms';
+const image = '/opengraph-update.png';
+const lastUpdated = new Date().toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<Layout title={title} description={description} ogImage={image} canonical={url}>
+  <div class="mx-auto max-w-3xl px-6 py-20 text-slate-900">
+    <h1 class="mb-6 text-4xl font-black">Terms of Service</h1>
+    <p class="mb-12 font-medium text-slate-400">
+      Last Updated: {lastUpdated}
+    </p>
+
+    <div class="space-y-8 leading-relaxed text-slate-600">
+      <section>
+        <p>
+          Welcome to <strong class="text-slate-900">Refearnapp</strong>,
+          operated by{' '}
+          <strong class="text-slate-900">Zak</strong> (“Zak”, “Company”, “we”, “our”,
+          or “us”). These Terms of Service (“Terms”) govern your access to and use
+          of our website, products, and services (collectively, the “Service”). By
+          using the Service, you agree to be bound by these Terms.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">1. Eligibility</h2>
+        <p>
+          You must be at least 18 years old and legally capable of forming a
+          binding agreement to use the Service.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">
+          2. Account Registration
+        </h2>
+        <p>
+          You agree to provide accurate account information, safeguard your
+          login credentials, and accept responsibility for all activity under
+          your account.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">
+          3. Use of the Service
+        </h2>
+        <p>
+          You agree not to misuse the Service, attempt to reverse-engineer it,
+          disrupt its functionality, or engage in unlawful behavior.
+        </p>
+      </section>
+
+      <section class="rounded-3xl border border-slate-100 bg-slate-50 p-8">
+        <h2 class="mb-4 text-xl font-bold text-slate-900">
+          4. Subscription, Billing & Payments
+        </h2>
+        <p class="mb-4">
+          Our paid services are processed by <strong class="text-slate-900"
+            >Paddle</strong
+          >, our Merchant of Record. By making a purchase, you agree to Paddle’s
+          Terms and Privacy Policy in addition to these Terms.
+        </p>
+
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800">4.1 Payments</h3>
+            <p class="text-sm">
+              All payments are securely handled through Paddle on behalf of <strong
+                class="text-slate-900">Zak</strong
+              >.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-slate-800">4.2 Billing</h3>
+            <p class="text-sm">
+              Subscriptions renew automatically unless cancelled. If a payment
+              fails, access to the Service may be limited or suspended.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-slate-800">4.3 Cancellation</h3>
+            <p class="text-sm">
+              You may cancel anytime. Access remains active until the end of the
+              current billing period.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">5. Refunds</h2>
+        <p>
+          Refunds are handled through Paddle and must comply with our separate{
+            ' '
+          }
+          <a
+            href="/refund-policy"
+            class="font-bold text-blue-600 underline decoration-blue-200 underline-offset-4"
+            >Refund Policy</a
+          >. Refund approval is determined based on usage and circumstances.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">
+          6. Intellectual Property
+        </h2>
+        <p>
+          All content, code, designs, and assets are the property of{' '}
+          <strong class="text-slate-900">Zak</strong>. You may not copy,
+          distribute, or reuse any portion of the Service without written
+          permission.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">
+          7. Third-Party Services
+        </h2>
+        <p>
+          The Service may integrate with third-party platforms (such as Paddle).
+          We are not responsible for their terms, policies, or practices.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">8. Termination</h2>
+        <p>
+          Zak reserves the right to suspend or terminate accounts that violate
+          these Terms or create security or technical risks.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">
+          9. Limitation of Liability
+        </h2>
+        <p>
+          To the fullest extent allowed by law, <strong class="text-slate-900"
+            >Zak</strong
+          > is not liable for indirect damages, loss of data, downtime, or security
+          incidents resulting from use of the Service.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-3 text-xl font-bold text-slate-900">
+          10. Changes to These Terms
+        </h2>
+        <p>
+          We may modify these Terms at any time. Significant updates may be
+          communicated by email or notification within the Service.
+        </p>
+      </section>
+
+      <section class="border-t border-slate-100 pt-8">
+        <h2 class="mb-3 text-xl font-bold text-slate-900">11. Contact Us</h2>
+        <p class="mb-2">
+          For questions about these Terms or your account, contact <strong
+            class="text-slate-900">Zak</strong
+          > at:
+        </p>
+        <a
+          href="mailto:support@refearnapp.com"
+          class="text-lg font-bold text-blue-600">support@refearnapp.com</a
+        >
+      </section>
+    </div>
+  </div>
+</Layout>

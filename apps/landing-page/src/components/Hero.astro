@@ -1,0 +1,134 @@
+---
+// src/components/Hero.astro
+import SupademoButton from './SupademoButton.vue';
+---
+
+<section
+  id="hero"
+  class="relative overflow-hidden px-6 pt-24 pb-16 md:pt-32 md:pb-28"
+>
+  <div class="absolute inset-0 -z-10">
+    <div
+      class="from-secondary/80 to-background/20 absolute inset-0 bg-linear-to-b"
+    >
+    </div>
+    <div
+      class="bg-primary/10 animate-float absolute top-1/4 left-1/4 h-64 w-64 rounded-full opacity-70 blur-3xl filter"
+    >
+    </div>
+    <div
+      class="animate-float animation-delay-300 absolute top-1/3 right-1/4 h-96 w-96 rounded-full bg-blue-400/10 opacity-70 blur-3xl filter"
+    >
+    </div>
+  </div>
+
+  <div class="container mx-auto max-w-5xl">
+    <div class="animate-fade-in space-y-8 text-center">
+      <h1
+        class="text-4xl leading-[1.1] font-extrabold tracking-tight text-balance text-slate-900 md:text-7xl"
+      >
+        Launch Your <span class="text-primary">Affiliate Program</span> in Minutes
+      </h1>
+
+      <p
+        class="mx-auto max-w-2xl text-lg leading-relaxed font-medium text-balance text-slate-500 md:text-xl"
+      >
+        A simple, powerful platform to track referrals and grow your SaaS
+        revenue without the technical headache.
+      </p>
+
+      <div class="flex flex-col items-center justify-center pt-4 md:pt-8">
+        <div class="flex flex-col items-center gap-6 sm:flex-row sm:gap-6">
+          <div class="group relative w-full sm:w-auto">
+            <div
+              class="absolute -top-5 left-1/2 z-20 -translate-x-1/2 sm:left-0 sm:translate-x-[-20%]"
+            >
+              <span
+                class="animate-bounce-subtle inline-block -rotate-6 transform rounded-lg border-2 border-white bg-yellow-400 px-3 py-1 text-[10px] font-black tracking-wider text-black uppercase shadow-md md:text-xs"
+              >
+                Limited Offer
+              </span>
+            </div>
+            <a
+              href="#pricing"
+              class="relative inline-flex w-full items-center justify-center overflow-hidden rounded-full bg-linear-to-r from-[#ec4899] via-[#a855f7] to-[#6366f1] px-10 py-4 font-bold text-white shadow-[0_10px_40px_rgba(236,72,153,0.3)] transition-all duration-300 hover:scale-105 active:scale-95 sm:w-auto md:px-14 md:py-6"
+            >
+              <span class="text-xl font-bold tracking-tight md:text-2xl"
+                >Get Lifetime Access</span
+              >
+            </a>
+          </div>
+
+          <SupademoButton client:load demoId="cmkzepxa83tnitw9f3tr94u27" />
+        </div>
+
+        <div class="mt-12 flex flex-col items-center gap-4">
+          <div
+            class="flex items-center gap-2 rounded-full border border-slate-100 bg-slate-50/50 px-4 py-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-emerald-500"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-sm font-bold text-slate-700"
+              >30-day money-back guarantee</span
+            >
+          </div>
+
+          <span
+            class="max-w-70 text-center text-[10px] font-light tracking-[0.15em] text-slate-400 uppercase md:max-w-none md:text-[11px]"
+          >
+            One-time payment <span class="mx-2 text-slate-200">|</span> Lifetime updates
+            <span class="mx-2 text-slate-200">|</span> No subscriptions
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes bounce-subtle {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-6deg) translateX(-50%);
+    }
+    50% {
+      transform: translateY(-4px) rotate(-6deg) translateX(-50%);
+    }
+  }
+  @media (min-width: 640px) {
+    @keyframes bounce-subtle {
+      0%,
+      100% {
+        transform: translateY(0) rotate(-6deg);
+      }
+      50% {
+        transform: translateY(-4px) rotate(-6deg);
+      }
+    }
+  }
+  .animate-bounce-subtle {
+    animation: bounce-subtle 3s infinite ease-in-out;
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+const testimonialsData = [
+  {
+    quote:
+      'RefearnApp transformed our Affiliate program. What used to take hours of manual work each week now happens automatically. Our affiliate revenue has increased by 215% in just 6 months.',
+    author: 'Sarah Johnson',
+    role: 'CMO',
+    company: 'TechFlow SaaS',
+  },
+  {
+    quote:
+      "The elegant design and intuitive interface make managing our affiliates a breeze. It's the perfect blend of simplicity and powerful features.",
+    author: 'Michael Chen',
+    role: 'Head of Growth',
+    company: 'AnalyticsPro',
+  },
+  {
+    quote:
+      "As someone who's tried every affiliate platform out there, I can confidently say this is the best solution for SaaS companies. Integration was smooth and our affiliates love the dashboard.",
+    author: 'Emma Williams',
+    role: 'Partnership Lead',
+    company: 'CloudSecurity',
+  },
+  {
+    quote:
+      'Switching to RefearnApp was the best decision we made this year. The tracking system saves us dozens of hours every month.',
+    author: 'David Miller',
+    role: 'Founder',
+    company: 'ScaleOps',
+  },
+];
+---
+
+<section id="testimonials" class="px-6 py-20">
+  <div class="mx-auto max-w-5xl px-4">
+    <div class="animate-fade-in mb-16 text-center">
+      <h2 class="text-foreground mb-4 text-3xl font-bold md:text-4xl">
+        Loved by SaaS Companies
+      </h2>
+      <p class="mx-auto max-w-3xl text-xl text-slate-500">
+        Hear from businesses that have transformed their growth with our
+        affiliate platform.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+      {
+        testimonialsData.map((t, index) => (
+          <div class={`animate-fade-in animation-delay-${(index + 1) * 200}`}>
+            <div class="glass-card border-border flex h-full flex-col justify-between rounded-2xl border p-8">
+              <div>
+                <div class="mb-4 flex gap-1">
+                  {[...Array(5)].map(() => (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      class="text-yellow-500"
+                    >
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
+                  ))}
+                </div>
+                <p class="mb-6 text-lg text-slate-500 italic">"{t.quote}"</p>
+              </div>
+              <div>
+                <p class="text-foreground font-bold">{t.author}</p>
+                <p class="text-sm text-slate-500">
+                  {t.role}, {t.company}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>

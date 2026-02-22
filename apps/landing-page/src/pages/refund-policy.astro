@@ -1,0 +1,120 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// SEO Metadata
+const title = 'RefearnApp | Refund Policy Page';
+const description =
+  'Refund Policy Page - Learn about our 14-day refund window and cancellation process.';
+const url = 'https://refearnapp.com/refund-policy';
+const image = '/opengraph-update.png';
+const currentYear = new Date().getFullYear();
+---
+
+<Layout title={title} description={description} ogImage={image} canonical={url}>
+  <div class="mx-auto max-w-5xl px-4 py-20 text-slate-900">
+    <h1 class="mb-8 text-4xl font-black">Refund Policy</h1>
+
+    <p class="mb-4 font-medium text-slate-500">
+      Effective Date: {currentYear}-01-01
+    </p>
+
+    <p class="mb-6 text-lg leading-relaxed text-slate-600">
+      At RefearnApp, we aim to provide high-quality software and services that
+      meet your expectations. This Refund Policy outlines our approach to
+      refunds and subscription cancellations for our SaaS platform.
+    </p>
+
+    <div class="mt-12 grid gap-8 md:grid-cols-2">
+      <div class="rounded-3xl border border-blue-100 bg-blue-50 p-8">
+        <h2 class="mb-4 text-2xl font-bold text-blue-900">
+          1. Subscription Refunds
+        </h2>
+        <p class="leading-relaxed text-blue-800">
+          All payments are processed through <strong class="text-blue-950"
+            >Paddle</strong
+          >. We offer refunds for purchases made within
+          <span
+            class="rounded bg-blue-200 px-2 py-0.5 text-sm font-bold text-blue-950"
+            >14 DAYS</span
+          >
+          of the original payment date.
+        </p>
+        <p class="mt-4 text-sm text-blue-700 italic">
+          Refunds requested after this window will not be accepted.
+        </p>
+      </div>
+
+      <div class="rounded-3xl border border-slate-200 bg-slate-50 p-8">
+        <h2 class="mb-4 text-2xl font-bold">2. How to Request</h2>
+        <p class="mb-4 text-slate-600">
+          Contact <a
+            href="mailto:support@refearnapp.com"
+            class="font-bold text-blue-600">support@refearnapp.com</a
+          > with:
+        </p>
+        <ul class="space-y-2 text-sm font-medium text-slate-600">
+          <li class="flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+            Account email & details
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+            Reason for the request
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+            Relevant order/payment info
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-16 max-w-3xl space-y-12">
+      <section>
+        <h2 class="mb-4 text-2xl font-bold">3. Paddle Refunds</h2>
+        <p class="leading-relaxed text-slate-600">
+          If your refund is approved, it will be processed through <strong
+            >Paddle</strong
+          > using the same payment method used for the original purchase. Refund processing
+          times typically take <strong>5–10 business days</strong>.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-4 text-2xl font-bold">4. Cancellation of Subscription</h2>
+        <p class="leading-relaxed text-slate-600">
+          You may cancel your subscription at any time through your account
+          settings. Your subscription will remain active until the end of your
+          current billing cycle. No additional charges will be applied after
+          cancellation.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="mb-4 text-2xl font-bold text-red-600">
+          5. No Refunds for Partial Use
+        </h2>
+        <p class="leading-relaxed text-slate-600">
+          We do not offer refunds for partially used subscription periods,
+          downgraded plans, or unused features outside the 14-day refund window.
+        </p>
+      </section>
+
+      <section class="border-t border-slate-100 pt-8">
+        <h2 class="mb-4 text-2xl font-bold">6. Contact Us</h2>
+        <p class="mb-4 text-slate-600">
+          If you have any questions about this Refund Policy, please contact our
+          support team at:
+        </p>
+        <a
+          href="mailto:support@refearnapp.com"
+          class="text-xl font-black text-blue-600">support@refearnapp.com</a
+        >
+      </section>
+    </div>
+
+    <p class="mt-20 text-sm text-slate-400">
+      &copy; {currentYear} RefearnApp. All rights reserved.
+    </p>
+  </div>
+</Layout>

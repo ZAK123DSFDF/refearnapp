@@ -1,0 +1,168 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { competitors } from '../../data/competitors';
+
+export async function getStaticPaths() {
+  return competitors.map((c) => ({
+    params: { competitor: c.slug },
+    props: { info: c },
+  }));
+}
+
+const { info } = Astro.props;
+---
+
+<Layout
+  title={`${info.name} Alternative: Professional Affiliate Tracking for SaaS`}
+  description={`Switching from ${info.name}? Get advanced fraud detection, coupon tracking, and private programs starting at just $35/mo.`}
+>
+  <Header />
+
+  <main class="mx-auto max-w-5xl px-4 py-12 md:px-6 md:py-24">
+    <div class="mb-16 text-center">
+      <nav class="mb-4 text-sm text-slate-400">
+        <a href="/" class="hover:text-primary">Home</a> /
+        <span class="font-medium text-slate-600">Alternative</span>
+      </nav>
+      <h1
+        class="mt-4 mb-6 text-4xl font-extrabold tracking-tight text-slate-900 md:text-6xl"
+      >
+        The Best <span class="text-primary">{info.name} Alternative</span>
+      </h1>
+      <p class="mx-auto max-w-2xl text-xl leading-relaxed text-slate-600">
+        Stop paying <strong>{info.price}</strong> for legacy tracking. Switch to RefearnApp
+        for professional-grade tools starting at just <strong>$35/mo</strong>.
+      </p>
+    </div>
+
+    <div class="mb-20 grid gap-6 md:grid-cols-2 md:gap-8">
+      <div
+        class="rounded-2xl border border-red-100 bg-red-50 p-6 shadow-sm md:p-8"
+      >
+        <h3 class="mb-4 text-xl font-bold text-red-700">
+          The {info.name} Problem
+        </h3>
+        <ul class="space-y-4 text-red-900/80">
+          <li class="flex items-start gap-3">
+            <span class="font-bold">✕</span>
+            {info.weakness}
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="font-bold">✕</span> Revenue caps that charge you more as
+            your business grows.
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="font-bold">✕</span> No way to export your data if you want
+            to host it yourself.
+          </li>
+        </ul>
+      </div>
+
+      <div
+        class="rounded-2xl border border-blue-100 bg-blue-50 p-6 shadow-sm md:p-8"
+      >
+        <h3 class="mb-4 text-xl font-bold text-blue-700">
+          The RefearnApp Solution
+        </h3>
+        <ul class="space-y-4 text-blue-900/80">
+          <li class="flex items-start gap-3">
+            <span class="font-bold text-blue-600">✓</span>
+            Built-in fraud detection with IP matching and self-referral blocking.
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="font-bold text-blue-600">✓</span>
+            Transparent open-source code so you know exactly how your tracking works.
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="font-bold text-blue-600">✓</span>
+            Native support for Stripe and Paddle coupon attribution without tracking
+            links.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mb-20">
+      <div
+        class="overflow-x-auto rounded-3xl border border-slate-200 bg-white shadow-2xl"
+      >
+        <table
+          class="w-full min-w-[600px] border-collapse text-left text-sm md:text-base"
+        >
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50/50">
+              <th class="p-6 font-bold text-slate-900">Feature</th>
+              <th class="p-6 font-bold text-slate-400">{info.name}</th>
+              <th class="bg-primary/5 text-primary p-6 font-bold">RefearnApp</th
+              >
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr>
+              <td class="p-6 font-semibold">Pricing Structure</td>
+              <td class="p-6 text-slate-500">Subscription Only</td>
+              <td class="bg-primary/5 p-6 font-bold text-slate-900"
+                >Cloud or Self-Host</td
+              >
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold">Software Type</td>
+              <td class="p-6 text-slate-500">Closed Source</td>
+              <td class="bg-primary/5 p-6 font-bold text-green-600"
+                >Open Source (Free Code)</td
+              >
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold">Monthly Base Price</td>
+              <td class="p-6 text-red-500">{info.price}</td>
+              <td class="bg-primary/5 p-6 font-bold text-slate-900">$35/mo</td>
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold">Revenue Limits</td>
+              <td class="p-6 text-red-500">Commonly Capped</td>
+              <td class="bg-primary/5 p-6 font-bold text-green-600"
+                >Unlimited Growth</td
+              >
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold">Self-Host Export</td>
+              <td class="p-6 text-red-500">Impossible</td>
+              <td class="bg-primary/5 p-6 font-bold text-green-600"
+                >Included (Free)</td
+              >
+            </tr>
+            <tr>
+              <td class="p-6 font-semibold">White-labeling</td>
+              <td class="p-6 text-slate-500">Enterprise Only</td>
+              <td class="bg-primary/5 p-6 font-bold text-slate-900"
+                >Standard ($55/mo)</td
+              >
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="mt-4 text-center text-xs text-slate-400 italic md:hidden">
+        Swipe horizontally to compare features
+      </p>
+    </div>
+
+    <div class="rounded-3xl bg-slate-900 p-8 text-center text-white md:p-12">
+      <h2 class="mb-4 text-2xl font-bold md:text-3xl">
+        Stop overpaying for your affiliate stack
+      </h2>
+      <p class="mb-8 text-slate-400">
+        Join founders who prioritize data ownership and fair pricing.
+      </p>
+      <a
+        href="/#pricing"
+        class="inline-block rounded-xl bg-white px-8 py-4 text-lg font-bold text-slate-900 transition-all hover:scale-105 active:scale-95"
+      >
+        Get Started for $35/mo
+      </a>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

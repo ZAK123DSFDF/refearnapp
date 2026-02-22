@@ -1,0 +1,136 @@
+---
+import Logo from './Logo.astro';
+const supportEmail =
+  'mailto:support@refearnapp.com?subject=Support%20Request%20-%20RefearnApp';
+---
+
+<header
+  id="main-header"
+  class="fixed top-0 right-0 left-0 z-50 bg-transparent px-3 py-4 transition-all duration-300 ease-in-out"
+>
+  <div class="mx-auto flex max-w-5xl items-center justify-between px-4">
+    <a href="/" class="flex items-center">
+      <Logo sizeClass="h-10" />
+    </a>
+
+    <nav class="hidden items-center space-x-8 lg:flex">
+      <a
+        href="#features"
+        class="nav-link hover:text-primary font-medium text-slate-600 transition-all duration-200 ease-in-out hover:scale-105"
+        >Features</a
+      >
+      <a
+        href="#how-it-works"
+        class="nav-link hover:text-primary font-medium text-slate-600 transition-all duration-200 ease-in-out hover:scale-105"
+        >How It Works</a
+      >
+      <a
+        href="#testimonials"
+        class="nav-link hover:text-primary font-medium text-slate-600 transition-all duration-200 ease-in-out hover:scale-105"
+        >Testimonials</a
+      >
+      <a
+        href="#pricing"
+        class="nav-link hover:text-primary font-medium text-slate-600 transition-all duration-200 ease-in-out hover:scale-105"
+        >Pricing</a
+      >
+      <a
+        href={supportEmail}
+        class="nav-link hover:text-primary font-medium text-slate-600 transition-all duration-200 ease-in-out hover:scale-105"
+        >Support</a
+      >
+    </nav>
+
+    <button
+      id="menu-toggle"
+      class="hover:bg-muted rounded-md p-2 text-slate-900 focus:outline-none lg:hidden"
+    >
+      <svg
+        id="menu-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="4" y1="6" x2="20" y2="6"></line>
+        <line x1="4" y1="12" x2="20" y2="12"></line>
+        <line x1="4" y1="18" x2="20" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+
+  <div
+    id="mobile-menu"
+    class="animate-slide-down border-border mx-3 mt-3 hidden rounded-2xl border bg-white/95 px-6 py-8 shadow-lg backdrop-blur-md lg:hidden"
+  >
+    <nav class="flex flex-col space-y-6">
+      <a
+        href="#features"
+        class="mobile-link hover:text-primary text-lg font-medium text-slate-700 transition-all duration-200"
+        >Features</a
+      >
+      <a
+        href="#how-it-works"
+        class="mobile-link hover:text-primary text-lg font-medium text-slate-700 transition-all duration-200"
+        >How It Works</a
+      >
+      <a
+        href="#testimonials"
+        class="mobile-link hover:text-primary text-lg font-medium text-slate-700 transition-all duration-200"
+        >Testimonials</a
+      >
+      <a
+        href="#pricing"
+        class="mobile-link hover:text-primary text-lg font-medium text-slate-700 transition-all duration-200"
+        >Pricing</a
+      >
+      <a
+        href={supportEmail}
+        class="mobile-link hover:text-primary text-lg font-medium text-slate-700 transition-all"
+        >Support</a
+      >
+    </nav>
+  </div>
+</header>
+
+<script>
+  // Elements
+  const header = document.getElementById('main-header');
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+
+  // Scroll Logic: Adds white background and shadow when scrolling down
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+      header?.classList.add('bg-white/80', 'backdrop-blur-md', 'shadow-sm');
+      header?.classList.remove('bg-transparent');
+    } else {
+      header?.classList.remove('bg-white/80', 'backdrop-blur-md', 'shadow-sm');
+      header?.classList.add('bg-transparent');
+    }
+  });
+
+  // Mobile Menu Toggle Logic
+  menuToggle?.addEventListener('click', () => {
+    const isHidden = mobileMenu?.classList.toggle('hidden');
+    if (menuIcon) {
+      menuIcon.innerHTML = isHidden
+        ? `<line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line>`
+        : `<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>`;
+    }
+  });
+
+  // Close Mobile Menu on link click
+  document.querySelectorAll('.mobile-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      mobileMenu?.classList.add('hidden');
+      if (menuIcon) {
+        menuIcon.innerHTML = `<line x1="4" y1="6" x2="20" y2="6"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="18" x2="20" y2="18"></line>`;
+      }
+    });
+  });
+</script>

@@ -1,0 +1,19 @@
+# Allow all bots to see the landing page
+User-agent: *
+Allow: /
+
+# Block bots from hitting your tracking and API endpoints
+# This saves you Redis operations and prevents "fake" data
+Disallow: /track
+Disallow: /org
+Disallow: /health
+
+# Block bots from your app/dashboard routes if they live under certain paths
+# Replace these with your actual Vercel app paths
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /api/
+
+# Explicitly allow Twitterbot to see everything for link previews
+User-agent: Twitterbot
+Allow: /

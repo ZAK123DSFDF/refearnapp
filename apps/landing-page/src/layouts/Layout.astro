@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  indexable?: boolean;
+}
+
+const {
+  title = 'RefearnApp | Launch Your Affiliate Program in Minutes',
+  description = 'RefearnApp gives SaaS founders a simple, powerful way to run affiliate programs. Track referrals, understand performance, and grow revenue—without the technical overhead.',
+  image = '/opengraph-update.png',
+  indexable = true,
+} = Astro.props;
+
+const siteUrl = 'https://refearnapp.com'; // No trailing slash
+
+const cleanImagePath = image.startsWith('/') ? image.slice(1) : image; // Remove leading slash if it exists
+const socialImageURL = `${siteUrl}/${cleanImagePath}`; // Manually add exactly one slash
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="canonical" href={new URL(Astro.url.pathname, siteUrl).href} />
+    <script src="https://script.supademo.com/supademo.js" is:inline></script>
+    <script
+      async
+      is:inline
+      src="https://www.googletagmanager.com/gtag/js?id=G-WHQRG09NZ7"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-WHQRG09NZ7');
+    </script>
+    <meta name="description" content={description} />
+
+    <meta
+      name="robots"
+      content={indexable ? 'index, follow' : 'noindex, nofollow'}
+    />
+
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content={new URL(Astro.url.pathname, siteUrl).href}
+    />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:secure_url" content={socialImageURL} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:domain" content="refearnapp.com" />
+    <meta
+      name="twitter:url"
+      content={new URL(Astro.url.pathname, siteUrl).href}
+    />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+    <meta name="twitter:image:secure_url" content={socialImageURL} />
+    <meta name="twitter:image:src" content={socialImageURL} />
+    <meta name="twitter:image:width" content="1200" />
+    <meta name="twitter:image:height" content="630" />
+    <meta name="twitter:image:alt" content={title} />
+    <link rel="icon" href="/refearnapp.svg" type="image/svg+xml" />
+    <link rel="icon" type="image/x-icon" sizes="96x96" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body class="bg-white text-slate-900">
+    <slot />
+  </body>
+</html>

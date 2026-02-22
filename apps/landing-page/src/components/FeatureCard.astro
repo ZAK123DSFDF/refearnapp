@@ -1,0 +1,22 @@
+---
+// src/components/FeatureCard.astro
+interface Props {
+  title: string;
+  description: string;
+  index: number;
+}
+
+const { title, description, index } = Astro.props;
+---
+
+<div class={`animate-fade-in animation-delay-${index * 100}`}>
+  <div
+    class="glass-card border-border flex h-full flex-col items-start rounded-2xl border p-8 transition-all duration-300 hover:shadow-md"
+  >
+    <div class="bg-primary/10 mb-6 rounded-xl p-3">
+      <slot name="icon" />
+    </div>
+    <h3 class="mb-3 text-xl font-bold">{title}</h3>
+    <p class="leading-relaxed text-slate-500">{description}</p>
+  </div>
+</div>

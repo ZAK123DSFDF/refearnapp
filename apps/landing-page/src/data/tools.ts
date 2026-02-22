@@ -1,0 +1,111 @@
+export const freeTools = [
+  {
+    slug: 'affiliate-commission-calculator',
+    title: 'Affiliate Commission Calculator',
+    description: 'Calculate your affiliate payouts and margins.',
+    type: 'calculator',
+  },
+  {
+    slug: 'referral-program-roi-calculator',
+    title: 'Referral Program ROI Calculator',
+    description:
+      'See the potential return on your referral program investment.',
+    type: 'calculator',
+  },
+  {
+    slug: 'affiliate-link-generator',
+    title: 'Affiliate Link Generator',
+    description: 'Create custom tracking links for your partners.',
+    type: 'generator',
+  },
+  {
+    slug: 'affiliate-marketing-calculator',
+    title: 'Affiliate Marketing Calculator',
+    description: 'Forecast your affiliate channel growth.',
+    type: 'calculator',
+  },
+  {
+    slug: 'affiliate-agreement-template',
+    title: 'Affiliate Agreement Template',
+    description: 'Professional legal template for SaaS programs.',
+    type: 'template',
+  },
+  {
+    slug: 'referral-email-templates',
+    title: 'Referral Email Templates',
+    description: 'Ready-to-use copy for your referral outreach.',
+    type: 'template',
+  },
+  {
+    slug: 'mrr-calculator',
+    title: 'MRR Calculator',
+    description: 'Track your Monthly Recurring Revenue accurately.',
+    type: 'calculator',
+  },
+  {
+    slug: 'arr-calculator',
+    title: 'ARR Calculator',
+    description: 'Calculate your Annual Recurring Revenue.',
+    type: 'calculator',
+  },
+  {
+    slug: 'saas-valuation-calculator',
+    title: 'SaaS Valuation Calculator',
+    description: 'Estimate the market value of your SaaS.',
+    type: 'calculator',
+  },
+  {
+    slug: 'saas-commission-calculator',
+    title: 'SaaS Commission Calculator',
+    description: 'Structure your sales and affiliate commissions.',
+    type: 'calculator',
+  },
+  {
+    slug: 'referral-calculator',
+    title: 'Referral Calculator',
+    description: 'Analyze your referral loop performance.',
+    type: 'calculator',
+  },
+  {
+    slug: 'ltv-calculator-saas',
+    title: 'LTV Calculator SaaS',
+    description: 'Calculate the Lifetime Value of your customers.',
+    type: 'calculator',
+  },
+  {
+    slug: 'stripe-fee-calculator',
+    title: 'Stripe Fee Calculator',
+    description: 'Calculate exact Stripe processing fees.',
+    type: 'calculator',
+  },
+  {
+    slug: 'rule-of-40-saas-calculator',
+    title: 'Rule of 40 SaaS Calculator',
+    description: 'Check if your SaaS meets the Rule of 40 benchmark.',
+    type: 'calculator',
+  },
+  {
+    slug: 'churn-rate-calculator',
+    title: 'Churn Rate Calculator',
+    description: 'Measure your customer and revenue churn.',
+    type: 'calculator',
+  },
+  {
+    slug: 'tiered-commission-calculator',
+    title: 'Tiered Commission Calculator',
+    description: 'Calculate payouts for multi-level programs.',
+    type: 'calculator',
+  },
+  {
+    slug: 'ltv-cac-calculator',
+    title: 'LTV/CAC Calculator',
+    description: 'Check your unit economics and payback period.',
+    type: 'calculator',
+  },
+  {
+    slug: 'saas-growth-calculator',
+    title: 'SaaS Growth Calculator',
+    description: 'Predict your growth trajectory.',
+    type: 'calculator',
+  },
+];
