@@ -390,6 +390,9 @@ importers:
       '@paddle/paddle-js':
         specifier: ^1.6.1
         version: 1.6.2
+      '@paddle/paddle-node-sdk':
+        specifier: ^2.8.0
+        version: 2.8.0
       '@repo/paddle':
         specifier: workspace:*
         version: link:../../packages/paddle-config
