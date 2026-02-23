@@ -172,7 +172,7 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
         if (txnId) {
           await assignLifetimePurchase(appUser.id, txnId)
         } else {
-          if (process.env.NEXT_PUBLIC_IS_SELF_HOSTED !== "true") {
+          if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") {
             await assignFreeTrialSubscription(appUser.id)
           }
         }

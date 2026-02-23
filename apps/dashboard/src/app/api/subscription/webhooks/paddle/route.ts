@@ -5,7 +5,7 @@ import { db } from "@/db/drizzle"
 import { eq } from "drizzle-orm"
 import { decodeOrgFromCustomData } from "@/util/DecodeOrgFromCustomData"
 import { syncOrgDataToRedisLinks } from "@/lib/server/organization/syncOrgDataToRedisLinks"
-import { paddleConfig } from "@/util/PaddleConfig"
+import { paddleConfig } from "@repo/paddle"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
 

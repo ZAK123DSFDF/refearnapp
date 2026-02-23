@@ -343,7 +343,7 @@ export function ManageDomainsTable({
       >
         {actionDialog?.type === "verify-dns" && (
           <div className="space-y-3 text-sm">
-            {process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true" ? (
+            {process.env.NEXT_PUBLIC_SELF_HOSTED === "true" ? (
               /* ☁️ SELF-HOSTED: Cloudflare CNAME Logic */
               <div className="space-y-4">
                 <div className="p-2 bg-blue-50 border border-blue-100 rounded text-blue-800 text-[10px] leading-relaxed">
@@ -400,7 +400,7 @@ export function ManageDomainsTable({
 
             <p className="text-[10px] text-gray-500 italic">
               DNS changes may take a few minutes to propagate.
-              {process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true" &&
+              {process.env.NEXT_PUBLIC_SELF_HOSTED === "true" &&
                 " SSL verification can take up to 15 mins."}
             </p>
           </div>

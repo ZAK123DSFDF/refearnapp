@@ -11,7 +11,7 @@ function isSubscriptionValid(sub: typeof subscription.$inferSelect | null) {
 }
 
 export async function getUserPlan(): Promise<PlanInfo> {
-  if (process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true") {
+  if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true") {
     return {
       plan: "ULTIMATE",
       type: "PURCHASE",

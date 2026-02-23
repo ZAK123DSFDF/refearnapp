@@ -1,5 +1,5 @@
 import type { NextConfig } from "next"
-
+const isSelfHosted = process.env.SELF_HOSTED === "true"
 const nextConfig: NextConfig = {
   async redirects() {
     return [
@@ -16,14 +16,13 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  output: isSelfHosted ? "standalone" : undefined,
   trailingSlash: false,
   experimental: {
     serverActions: {
-      allowedOrigins: [
-        "refearnapp.com",
-        "www.refearnapp.com",
-        "origin.refearnapp.com",
-      ],
+      allowedOrigins: isSelfHosted
+        ? [process.env.NEXT_PUBLIC_BASE_URL || "localhost:3000"]
+        : ["refearnapp.com", "www.refearnapp.com", "origin.refearnapp.com"],
     },
   },
 }

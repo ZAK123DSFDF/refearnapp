@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { initializePaddle, Paddle } from "@paddle/paddle-js"
-import { paddleConfig } from "@/util/PaddleConfig"
+import { paddleConfig } from "@repo/paddle"
 import { PlanInfo } from "@/lib/types/organization/planInfo"
 import { getOrganizationToken } from "@/lib/server/organization/getOrganizationToken"
 import { decodeJwt } from "@/util/Jwt" // 👈 assuming you already have this type

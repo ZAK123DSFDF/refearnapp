@@ -6,8 +6,9 @@ services:
         # These pull from your .env.nextjs file to "bake" into the build
         - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
         - NEXT_PUBLIC_PAYPAL_CLIENT_ID=${NEXT_PUBLIC_PAYPAL_CLIENT_ID}
+        - NEXT_PUBLIC_SELF_HOSTED=${NEXT_PUBLIC_SELF_HOSTED}
     ports:
       - "3000:3000"
     env_file:
-      - .env.nextjs # This loads ALL secrets (Stripe, Google, etc.) at runtime
+      - .env
     restart: always

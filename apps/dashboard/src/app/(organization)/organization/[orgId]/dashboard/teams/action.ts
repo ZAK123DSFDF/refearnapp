@@ -36,7 +36,7 @@ export const inviteTeamMember = async ({
         },
       })
     }
-    const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true"
+    const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
     const plan = await getUserPlan()
 
     // 🟢 Enforce plan-based restrictions (Skip if Self-Hosted)

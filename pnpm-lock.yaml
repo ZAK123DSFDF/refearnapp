@@ -98,6 +98,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@repo/paddle':
+        specifier: workspace:*
+        version: link:../../packages/paddle-config
       '@tanstack/react-query':
         specifier: ^5.90.21
         version: 5.90.21(react@19.2.4)
@@ -387,6 +390,9 @@ importers:
       '@paddle/paddle-js':
         specifier: ^1.6.1
         version: 1.6.2
+      '@repo/paddle':
+        specifier: workspace:*
+        version: link:../../packages/paddle-config
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.2.0(vite@7.3.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
@@ -427,6 +433,8 @@ importers:
       wrangler:
         specifier: ^4.54.0
         version: 4.67.0(@cloudflare/workers-types@4.20260228.0)
+
+  packages/paddle-config: {}
 
 packages:
 

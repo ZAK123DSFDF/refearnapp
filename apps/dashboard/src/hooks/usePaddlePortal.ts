@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { paddleConfig } from "@/util/PaddleConfig"
+import { paddleConfig } from "@repo/paddle"
 
 export function usePaddlePortal(orgId?: string) {
   const router = useRouter()

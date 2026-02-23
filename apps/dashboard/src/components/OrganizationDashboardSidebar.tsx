@@ -54,7 +54,7 @@ const OrganizationDashboardSidebar = ({
   UserData,
 }: Props) => {
   const pathname = usePathname()
-  const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true"
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   useCloseSidebarOnNavigation()
   const { mutate: switchOrg, isPending } = useSwitchOrg()
   const items = [

@@ -4,7 +4,7 @@ import {
   Paddle,
   type Transaction as PaddleTransaction,
 } from "@paddle/paddle-node-sdk"
-import { paddleConfig } from "@/util/PaddleConfig"
+import { paddleConfig } from "@repo/paddle"
 
 const paddle = new Paddle(paddleConfig.server.apiToken, {
   environment: paddleConfig.env,
@@ -18,7 +18,7 @@ export async function assignLifetimePurchase(userId: string, txnId: string) {
     if (transaction.status !== "completed") return
 
     const totalPaid = parseFloat(transaction.details?.totals?.total || "0")
-    let tier: "PRO" | "ULTIMATE" = totalPaid >= 29900 ? "ULTIMATE" : "PRO"
+    const tier: "PRO" | "ULTIMATE" = totalPaid >= 29900 ? "ULTIMATE" : "PRO"
 
     // 🔍 Check current subscription status
     const currentSub = await db.query.subscription.findFirst({

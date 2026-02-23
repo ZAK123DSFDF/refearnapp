@@ -1,4 +1,4 @@
-import { paddleConfig } from "@/util/PaddleConfig"
+import { paddleConfig } from "@repo/paddle"
 import { Paddle } from "@paddle/paddle-node-sdk"
 import { db } from "@/db/drizzle"
 import { subscription } from "@/db/schema"
