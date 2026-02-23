@@ -13,6 +13,7 @@ COPY apps/landing-page/package.json ./apps/landing-page/
 COPY apps/tracking-worker/package.json ./apps/tracking-worker/
 # If you have a /packages folder, copy those too!
 # COPY packages/database/package.json ./packages/database/
+COPY packages/paddle-config/package.json ./packages/paddle-config/
 
 RUN npm ci
 
