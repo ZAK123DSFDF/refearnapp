@@ -1,0 +1,13 @@
+# Ignore everything at any depth
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/out
+**/build
+
+# Ignore root-level sensitive or unnecessary files
+.git
+.env
+.DS_Store
+*.log

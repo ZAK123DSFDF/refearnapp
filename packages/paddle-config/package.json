@@ -5,5 +5,8 @@
   "types": "./index.ts",
   "exports": {
     ".": "./index.ts"
+  },
+  "dependencies": {
+    "@paddle/paddle-node-sdk": "^2.8.0"
   }
 }

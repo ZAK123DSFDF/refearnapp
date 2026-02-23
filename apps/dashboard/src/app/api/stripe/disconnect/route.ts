@@ -5,11 +5,12 @@ import { eq } from "drizzle-orm"
 import { db } from "@/db/drizzle"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-})
 
 export const POST = handleRoute("Stripe Deauthorize", async (req) => {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-08-27.basil",
+  })
+
   const { orgId } = (await req.json()) as { orgId?: string }
   if (!orgId) {
     throw new AppError({

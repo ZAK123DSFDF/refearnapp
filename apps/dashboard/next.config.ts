@@ -1,5 +1,5 @@
 import type { NextConfig } from "next"
-const isSelfHosted = process.env.SELF_HOSTED === "true"
+const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
 const nextConfig: NextConfig = {
   async redirects() {
     return [

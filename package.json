@@ -6,7 +6,8 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "clean": "turbo run clean && rm -rf node_modules"
+    "clean": "turbo run clean && rm -rf node_modules",
+    "logs": "wrangler tail --filter @repo/tracking-worker"
   },
   "devDependencies": {
     "turbo": "latest"

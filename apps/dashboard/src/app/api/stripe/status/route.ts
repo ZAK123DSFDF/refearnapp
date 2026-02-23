@@ -5,11 +5,10 @@ import { eq } from "drizzle-orm"
 import { db } from "@/db/drizzle"
 import { handleRoute } from "@/lib/handleRoute"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-})
-
 export const POST = handleRoute("Get Stripe Status", async (req) => {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-08-27.basil",
+  })
   const { orgId } = (await req.json()) as { orgId?: string }
 
   // 1. Validation check

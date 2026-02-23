@@ -14,13 +14,12 @@ import { checkSubscriptionExpired } from "@/util/CheckSubscriptionExpired"
 import { handleRoute } from "@/lib/handleRoute"
 import { AppError } from "@/lib/exceptions"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-08-27.basil",
-})
-
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
-
 export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-08-27.basil",
+  })
+
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
   const sig = req.headers.get("stripe-signature")
   const body = await req.text()
 
