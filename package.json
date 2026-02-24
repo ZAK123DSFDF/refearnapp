@@ -9,6 +9,9 @@
     "clean": "turbo run clean && rm -rf node_modules",
     "logs": "wrangler tail --filter @repo/tracking-worker"
   },
+  "dependencies": {
+    "@repo/paddle": "workspace:*"
+  },
   "devDependencies": {
     "turbo": "latest"
   }
