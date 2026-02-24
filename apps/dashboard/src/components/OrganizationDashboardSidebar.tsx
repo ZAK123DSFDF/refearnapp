@@ -103,11 +103,15 @@ const OrganizationDashboardSidebar = ({
       url: `/organization/${orgId}/dashboard/manageDomains`,
       icon: Globe,
     },
-    {
-      title: "Support Email",
-      url: `/organization/${orgId}/dashboard/supportEmail`,
-      icon: MailQuestion,
-    },
+    ...(!isSelfHosted
+      ? [
+          {
+            title: "Support Email",
+            url: `/organization/${orgId}/dashboard/supportEmail`,
+            icon: MailQuestion,
+          },
+        ]
+      : []),
   ]
   if (plan.plan === "PRO" || plan.plan === "ULTIMATE") {
     items.push({

@@ -44,6 +44,7 @@ type Props = {
 }
 const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
   const pathname = usePathname()
+  const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   useCloseSidebarOnNavigation()
   const items = [
     {
@@ -91,11 +92,15 @@ const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
       url: `/organization/${orgId}/teams/dashboard/manageDomains`,
       icon: Globe,
     },
-    {
-      title: "Support Email",
-      url: `/organization/${orgId}/teams/dashboard/supportEmail`,
-      icon: MailQuestion,
-    },
+    ...(!isSelfHosted
+      ? [
+          {
+            title: "Support Email",
+            url: `/organization/${orgId}/dashboard/supportEmail`,
+            icon: MailQuestion,
+          },
+        ]
+      : []),
   ]
 
   return (
