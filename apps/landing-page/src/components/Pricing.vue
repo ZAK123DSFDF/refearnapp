@@ -13,8 +13,6 @@ onMounted(async () => {
   console.log('Env:', PADDLE_ENV);
   console.log('Pro ID:', PADDLE_IDS);
   console.log('----------------------------');
-
-  // ... rest of your code
 });
 
 const activePaddle = ref(null);
