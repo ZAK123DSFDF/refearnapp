@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "deploy:tracker": "pnpm --filter @repo/tracking-worker run deploy:self",
     "lint": "turbo run lint",
     "clean": "turbo run clean && rm -rf node_modules",
     "logs": "wrangler tail --filter @repo/tracking-worker"

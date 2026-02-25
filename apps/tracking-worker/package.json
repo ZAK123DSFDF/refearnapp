@@ -6,6 +6,7 @@
 		"deploy": "wrangler deploy",
 		"dev": "wrangler dev",
 		"start": "wrangler dev",
+		"deploy:self": "bun self-host.js",
 		"test": "vitest",
 		"cf-typegen": "wrangler types"
 	},

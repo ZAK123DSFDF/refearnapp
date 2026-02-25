@@ -9,7 +9,7 @@ export default {
 		const url = new URL(request.url);
 		const redis = Redis.fromEnv(env);
 		const PAGES_URL = env.PAGES_URL || 'https://refearnapp.pages.dev';
-		const VERCEL_ORIGIN = env.NEXT_APP_URL || 'https://origin.refearnapp.com';
+		const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = env.PRIMARY_HOST || 'www.refearnapp.com';
 		if (url.pathname === '/' && env.IS_SELF_HOSTED === 'true') {
 			return Response.redirect(`${url.origin}/signup`, 307);
