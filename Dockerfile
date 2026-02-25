@@ -64,12 +64,3 @@ COPY --from=builder /app/apps/landing-page/dist ./dist
 COPY --from=builder /app/apps/landing-page/package.json ./
 EXPOSE 4321
 CMD ["node", "./dist/server/entry.mjs"]
-
-# --- TARGET 3: Tracking Worker (Node.js) ---
-FROM node:20-alpine AS worker
-WORKDIR /app
-ENV NODE_ENV production
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/tracking-worker/package.json ./
-COPY --from=builder /app/apps/tracking-worker/dist ./dist
-CMD ["node", "dist/index.js"]
