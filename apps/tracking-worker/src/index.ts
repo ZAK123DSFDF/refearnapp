@@ -200,7 +200,7 @@ export default {
 			redirect: 'manual',
 		});
 
-		return fetch(newRequest);
+		return await fetch(newRequest);
 	},
 	async scheduled(event: any, env: any, ctx: any) {
 		ctx.waitUntil(handleScheduled(event, env, ctx));
