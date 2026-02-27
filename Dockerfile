@@ -36,21 +36,20 @@ ENV NEXT_PUBLIC_PAYPAL_CLIENT_ID=$NEXT_PUBLIC_PAYPAL_CLIENT_ID
 ENV NEXT_PUBLIC_SELF_HOSTED=$NEXT_PUBLIC_SELF_HOSTED
 ENV NEXT_PUBLIC_CNAME_TARGET=$NEXT_PUBLIC_CNAME_TARGET
 
-# 3. Build ONLY the dashboard
-# Turbo will automatically build paddle-config if dashboard depends on it
-RUN pnpm turbo run build --filter=dashboard
+# 3. Build ONLY the dashboard using the CORRECT package name
+# We use the full name from your package.json
+RUN pnpm turbo run build --filter="@repo/dashboard"
 
 # --- STAGE 3: Final Run ---
 FROM node:20-alpine AS dashboard
 WORKDIR /app
 ENV NODE_ENV=production
-# Next.js standalone expects PORT env
 ENV PORT=3000
 
 RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 
 # Copy Next.js standalone output
-#
+
 COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/.next/static ./apps/dashboard/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/dashboard/public ./apps/dashboard/public
