@@ -11,6 +11,10 @@ export default {
 		const PAGES_URL = env.PAGES_URL || 'https://refearnapp.pages.dev';
 		const VERCEL_ORIGIN = env.MAIN_APP_URL || 'https://origin.refearnapp.com';
 		const PRIMARY_HOST = env.PRIMARY_HOST || 'www.refearnapp.com';
+		function isEnabled(value: string | undefined): boolean {
+			return value?.toLowerCase() === 'true' || value === '1';
+		}
+		const isSelfHosted = isEnabled(env.IS_SELF_HOSTED);
 		// 1. SPECIFIC PUBLIC ASSETS (Strict Whitelist)
 		// These are the files you manually put in /public
 		const publicAssets = [
@@ -35,7 +39,9 @@ export default {
 		// Astro compiled files (JS/CSS) always live here.
 		// Your Vercel app likely doesn't use this specific folder name.
 		const isCompiledAsset = url.pathname.startsWith('/_astro/');
-		if (isExplicitAsset || isCompiledAsset || isHome || isLegalPage || isToolPage || isComparePage) {
+		const shouldServeAstro =
+			isExplicitAsset || isCompiledAsset || (!isSelfHosted && (isHome || isLegalPage || isToolPage || isComparePage));
+		if (shouldServeAstro) {
 			const resp = await fetch(`${PAGES_URL}${url.pathname}${url.search}`);
 			const newResp = new Response(resp.body, resp);
 			newResp.headers.set('Access-Control-Allow-Origin', '*');
@@ -124,7 +130,6 @@ export default {
 			if (!org || !org.orgId) {
 				return new Response(JSON.stringify({ success: false, reason: 'Invalid code' }), { status: 200, headers: corsHeaders });
 			}
-			const isSelfHosted = env.SELF_HOSTED === 'true';
 			const canTrack = shouldTrackRedis(org, isSelfHosted);
 
 			if (!canTrack) {
