@@ -55,7 +55,10 @@
         "PADDLE_WEBHOOK_PUBLIC_KEY",
         "LEMON_SQUEEZY_WEBHOOK_SECRET",
         "SECRET_KEY",
-        "CURRENCY_API_KEY"
+        "CURRENCY_API_KEY",
+        "NEXT_PUBLIC_RESERVED_SUBDOMAINS",
+        "NEXT_PUBLIC_SELF_HOSTED",
+        "REDIRECTION_URL"
       ]
     },
     "lint": {
