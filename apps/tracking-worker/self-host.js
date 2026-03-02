@@ -54,7 +54,7 @@ async function setup() {
 	try {
 		console.log(`\n📦 Step 1: Deploying Worker Code...`);
 
-		await $`npx wrangler deploy src/index.ts --name ${workerName} --compatibility-date 2024-04-01 --var PRIMARY_HOST:${domain} --var MAIN_APP_URL:${backendUrl} --var IS_SELF_HOSTED:true`;
+		await $`npx wrangler deploy src/index.ts --name ${workerName} --compatibility-date 2024-04-01 --var PRIMARY_HOST:${backendUrl} --var MAIN_APP_URL:${domain} --var IS_SELF_HOSTED:true`;
 
 		console.log(`\n🔒 Step 2: Uploading Secrets...`);
 
@@ -69,7 +69,7 @@ async function setup() {
 		await setSecret('UPSTASH_REDIS_REST_URL', redisUrl);
 		await setSecret('UPSTASH_REDIS_REST_TOKEN', redisToken);
 
-		console.log(`\n🎉 SUCCESS! Tracker live at https://${cleanDomain}`);
+		console.log(`\n🎉 SUCCESS! Tracker live at ${domain}`);
 		console.log(`🔗 Dashboard: https://dash.cloudflare.com/?to=/:account/workers/services/view/${workerName}/production`);
 	} catch (e) {
 		console.error('\n❌ Deployment failed.');
