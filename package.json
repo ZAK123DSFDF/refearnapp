@@ -6,6 +6,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "deploy:tracker": "pnpm --filter @repo/tracking-worker run deploy:self",
+    "db:setup": "pnpm --filter @repo/dashboard run db:setup",
     "lint": "turbo run lint",
     "lint:unused": "eslint . --config eslint.unused.config.mjs",
     "lint:unused:fix": "eslint . --config eslint.unused.config.mjs --fix",

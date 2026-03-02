@@ -13,6 +13,7 @@
     "db:reset": "bun src/db/reset.ts npx drizzle-kit generate && npx drizzle-kit migrate && bun src/db/currencySeed.ts && bun src/db/seeds/seedFun1.ts",
     "plan:upgrade": "bun src/db/userPlanSeed.ts",
     "simulate": "bun src/db/subscriptionCycle.ts",
+    "db:setup": "bun src/scripts/setup-db.js",
     "simulate:cancel": "bun src/db/subscriptionCancel.ts",
     "simulate:create:expire": "bun src/db/subscriptionCreateAndExpire.ts",
     "simulate:expire": "bun src/db/subscriptionExpire.ts",
