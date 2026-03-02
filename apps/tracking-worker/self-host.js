@@ -69,7 +69,7 @@ async function setup() {
 		await setSecret('UPSTASH_REDIS_REST_URL', redisUrl);
 		await setSecret('UPSTASH_REDIS_REST_TOKEN', redisToken);
 
-		console.log(`\n🎉 SUCCESS! Tracker live at https://${domain}`);
+		console.log(`\n🎉 SUCCESS! Tracker live at https://${cleanDomain}`);
 		console.log(`🔗 Dashboard: https://dash.cloudflare.com/?to=/:account/workers/services/view/${workerName}/production`);
 	} catch (e) {
 		console.error('\n❌ Deployment failed.');
