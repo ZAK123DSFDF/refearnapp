@@ -13,7 +13,7 @@ export type UpdateInfo = {
 
 export async function checkVersion(): Promise<ActionResult<UpdateInfo>> {
   return handleAction("Check GitHub Version", async () => {
-    const REPO = "your-username/your-repo"
+    const REPO = "ZAK123DSFDF/refearnapp"
 
     const res = await fetch(
       `https://api.github.com/repos/${REPO}/releases/latest`,
