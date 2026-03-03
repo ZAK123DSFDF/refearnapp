@@ -30,6 +30,8 @@ import Link from "next/link"
 import { TeamData } from "@/lib/types/organization/profileTypes"
 import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
+import { SidebarHelp } from "@/components/ui-custom/SidebarHelp"
+import { SystemUpdate } from "@/components/ui-custom/SystemUpdate"
 
 // Menu items for the sidebar
 
@@ -37,8 +39,14 @@ type Props = {
   orgId?: string
   TeamData: TeamData | null
   orgName?: string
+  updateInfo?: { isNewer: boolean; latestVersion: string; url: string } | null
 }
-const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
+const TeamDashboardSidebar = ({
+  orgId,
+  TeamData,
+  orgName,
+  updateInfo,
+}: Props) => {
   const pathname = usePathname()
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   useCloseSidebarOnNavigation()
@@ -130,6 +138,8 @@ const TeamDashboardSidebar = ({ orgId, TeamData, orgName }: Props) => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="p-4">
+        <SidebarHelp />
+        <SystemUpdate variant="badge" updateInfo={updateInfo} />
         <Link href={`/organization/${orgId}/teams/dashboard/profile`}>
           <div className="flex items-center space-x-3 p-2 rounded-md bg-primary/10 hover:bg-primary/15 transition-colors cursor-pointer">
             <div className="flex-1 min-w-0">

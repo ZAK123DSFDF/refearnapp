@@ -39,6 +39,7 @@ import { handlePlanRedirect } from "@/util/HandlePlanRedirect"
 import { OrgHeader } from "@/components/ui-custom/OrgHeader"
 import { useCloseSidebarOnNavigation } from "@/hooks/useCloseSidebarOnNavigation"
 import { SystemUpdate } from "@/components/ui-custom/SystemUpdate"
+import { SidebarHelp } from "@/components/ui-custom/SidebarHelp"
 
 // Menu items for the sidebar
 
@@ -271,6 +272,7 @@ const OrganizationDashboardSidebar = ({
       </SidebarContent>
 
       <SidebarFooter className="p-4 space-y-2">
+        <SidebarHelp />
         <SystemUpdate variant="badge" updateInfo={updateInfo} />
         {/* 🛡️ SELF-HOSTED: Show a "Pro License" badge instead of billing buttons */}
         {isSelfHosted ? (
