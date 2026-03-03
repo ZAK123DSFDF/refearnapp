@@ -1,0 +1,112 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DocsTabs from '../../components/DocsTable.vue';
+import { Book, Code, Terminal, Cpu } from 'lucide-react';
+---
+
+<Layout title="Documentation | Refearnapp">
+  <main
+    class="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-12 lg:grid-cols-[250px_1fr]"
+  >
+    <aside class="sticky top-24 hidden h-fit space-y-8 lg:block">
+      <div>
+        <h3
+          class="text-muted-foreground mb-4 text-xs font-bold tracking-widest uppercase"
+        >
+          Getting Started
+        </h3>
+        <ul class="space-y-3">
+          <li class="text-primary flex items-center gap-2 font-medium">
+            <Book size={16} /> Introduction
+          </li>
+          <li
+            class="hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
+          >
+            <Terminal size={16} /> Quick Start
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3
+          class="text-muted-foreground mb-4 text-xs font-bold tracking-widest uppercase"
+        >
+          Architecture
+        </h3>
+        <ul class="text-muted-foreground space-y-3">
+          <li
+            class="hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
+          >
+            <Cpu size={16} /> How it works
+          </li>
+          <li
+            class="hover:text-primary flex cursor-pointer items-center gap-2 transition-colors"
+          >
+            <Code size={16} /> API Reference
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <article class="prose prose-indigo max-w-none">
+      <header class="mb-10">
+        <div class="text-primary mb-2 font-mono text-sm">v0.1.0</div>
+        <h1 class="text-4xl font-extrabold tracking-tight">Introduction</h1>
+        <p class="text-muted-foreground mt-4 text-xl">
+          Learn how to integrate Refearn into your application and start
+          tracking referrals in minutes.
+        </p>
+      </header>
+
+      <section>
+        <h2 class="mb-4 text-2xl font-bold">Installation</h2>
+        <p>Choose your preferred environment to see the setup instructions:</p>
+
+        <DocsTabs
+          client:load
+          tabs={['Cloudflare Worker', 'Next.js', 'Manual API']}
+        >
+          <div slot="tab-0">
+            <h4 class="text-foreground mb-2 font-bold">
+              Cloudflare Worker Setup
+            </h4>
+            <p>
+              Paste this command into your terminal to deploy your tracking
+              proxy:
+            </p>
+            <pre
+              class="rounded-lg bg-black p-4 text-white"><code>npm install @refearn/worker</code></pre>
+          </div>
+          <div slot="tab-1">
+            <h4 class="text-foreground mb-2 font-bold">Next.js Integration</h4>
+            <p>
+              Add the following environment variables to your <code
+                >.env.local</code
+              >:
+            </p>
+            <pre
+              class="rounded-lg bg-black p-4 text-white"><code>REFEARN_KEY=your_key_here</code></pre>
+          </div>
+          <div slot="tab-2">
+            <h4 class="text-foreground mb-2 font-bold">Manual API Call</h4>
+            <p>
+              Send a POST request to <code>/track</code> with the user's referral
+              code.
+            </p>
+          </div>
+        </DocsTabs>
+      </section>
+
+      <section
+        class="mt-12 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 dark:border-indigo-900/50 dark:bg-indigo-950/20"
+      >
+        <h3 class="mb-2 font-bold text-indigo-900 dark:text-indigo-300">
+          Need help?
+        </h3>
+        <p class="text-sm text-indigo-700 dark:text-indigo-400">
+          Join our Discord community or reach out to support if you're having
+          trouble with the self-hosted setup.
+        </p>
+      </section>
+    </article>
+  </main>
+</Layout>
