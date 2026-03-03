@@ -30,14 +30,14 @@ export const SidebarHelp = ({ showLabel = true }: SidebarHelpProps) => {
               href={DOCS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-muted-foreground hover:text-primary"
+              className="flex items-center justify-center w-full text-muted-foreground hover:text-primary transition-colors"
             >
               <MailQuestion className="w-5 h-5 shrink-0" />
               {showLabel && (
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-sm font-medium">Help & Docs</span>
-                  <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity" />
-                </div>
+                <span className="text-sm font-medium">Help & Docs</span>
+              )}
+              {showLabel && (
+                <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-50 transition-opacity absolute right-4" />
               )}
             </a>
           </SidebarMenuButton>
