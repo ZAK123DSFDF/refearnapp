@@ -58,8 +58,8 @@ async function run() {
   try {
     // Note: Drizzle-kit usually reads from .env automatically,
     // but we run it via bun to ensure the env we just wrote is picked up.
-    await $`npx drizzle-kit migrate`
-    console.log("✅ Schema synchronization complete.")
+    await $`bun src/db/bootstrap.ts`
+    console.log("✅ Bootstrap synchronization complete.")
   } catch (err) {
     console.error("❌ Database push failed. Check your Connection String.")
     process.exit(1)
