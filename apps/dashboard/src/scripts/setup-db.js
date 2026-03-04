@@ -53,15 +53,15 @@ async function run() {
     console.log("✅ SUPABASE_DATABASE_URL found in .env")
   }
 
-  // --- STEP 2: DRIZZLE PUSH ---
-  console.log("\n🔄 Syncing schema to database (Drizzle Push)...")
+  // --- STEP 2: BOOTSTRAP ---
+  console.log("\n🔄 Syncing schema to database (Bootstrap)...")
   try {
-    // Note: Drizzle-kit usually reads from .env automatically,
-    // but we run it via bun to ensure the env we just wrote is picked up.
-    await $`bun src/db/bootstrap.ts`
+    // Adding .throws(true) ensures Bun throws an error if bootstrap fails
+    await $`bun src/db/bootstrap.ts`.throws(true)
     console.log("✅ Bootstrap synchronization complete.")
   } catch (err) {
-    console.error("❌ Database push failed. Check your Connection String.")
+    console.error("❌ Database bootstrap failed. Stopping setup.")
+    // This prevents the script from trying to seed a broken database
     process.exit(1)
   }
 
