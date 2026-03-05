@@ -215,7 +215,7 @@ export default {
 					headers: {
 						...credentialedCorsHeaders,
 						'Content-Type': 'application/json',
-						'Set-Cookie': `${cookieName}=${encodeURIComponent(JSON.stringify(updatedCookieData))}; Path=/; HttpOnly; Secure; SameSite=Lax`,
+						'Set-Cookie': `${cookieName}=${encodeURIComponent(JSON.stringify(updatedCookieData))}; Path=/; HttpOnly; Secure; SameSite=None`,
 					},
 				});
 			} catch (e) {
