@@ -156,7 +156,7 @@ export function AssignAffiliateForm({
       const email = rawEmail?.replace(")", "")
       setActiveAffiliate({ id: watchedAffiliateId, name, email })
     }
-  }, [watchedAffiliateId, options, initialAffiliate])
+  }, [watchedAffiliateId, options, initialAffiliate, settings?.affiliateId])
   // 6. Update Assignment Mutation
   const { mutate: updateAssignment, isPending: isSaving } = useAppMutation(
     (data) => {
