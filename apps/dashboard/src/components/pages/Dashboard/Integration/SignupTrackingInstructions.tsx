@@ -8,7 +8,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism"
 
 export default function SignupTrackingInstructions() {
-  const [value, setValue] = useState("JavaScript")
+  const [value, setValue] = useState("React / Next.js")
   const [origin, setOrigin] = useState("https://refearnapp.com")
 
   useEffect(() => {
@@ -20,39 +20,68 @@ export default function SignupTrackingInstructions() {
   const guides = useMemo(
     () => [
       {
-        name: "JavaScript",
-        description: "Initialize the SDK and track signups in plain JS.",
-        language: "javascript",
-        code: `// 1. Initialize with your tracking domain
-initRefearnapp("${origin}");
-
-// 2. Call this function when a user successfully signs up
-async function handleUserSignup(userEmail) {
-  const result = await trackSignup(userEmail);
-  if (result.success) {
-     console.log("Lead captured!");
-  }
-}`,
-      },
-      {
         name: "React / Next.js",
-        description: "Use inside your signup form component or a custom hook.",
+        description: "Install the SDK and use it in your signup components.",
         language: "tsx",
-        code: `"use client"
+        code: `// 1. Install the SDK
+// npm install @refearnapp/sdk
+
 import { initRefearnapp, trackSignup } from "@refearnapp/sdk";
 
-// Initialize once at the root or in a useEffect
+// 2. Initialize (Only once, e.g., in layout.tsx or _app.tsx)
 initRefearnapp("${origin}");
 
-export default function SignupForm() {
-  const onSignupSuccess = async (email: string) => {
-    await trackSignup(email);
-  };
+// 3. Track signup in your form handler
+const onSuccess = async (email: string) => {
+  await trackSignup(email);
+};`,
+      },
+      {
+        name: "Vue",
+        description: "Initialize in your main.js and use in your components.",
+        language: "javascript",
+        code: `// npm install @refearnapp/sdk
 
-  return (
-    // Your form logic...
-  );
-}`,
+import { initRefearnapp, trackSignup } from "@refearnapp/sdk";
+
+// Initialize in main.js
+initRefearnapp("${origin}");
+
+// In your component
+const handleSignup = async (email) => {
+  await trackSignup(email);
+};`,
+      },
+      {
+        name: "Svelte",
+        description: "Add tracking to your SvelteKit or Svelte app.",
+        language: "javascript",
+        code: `// npm install @refearnapp/sdk
+
+<script>
+  import { initRefearnapp, trackSignup } from "@refearnapp/sdk";
+  
+  initRefearnapp("${origin}");
+
+  async function onSignup(email) {
+    await trackSignup(email);
+  }
+</script>`,
+      },
+      {
+        name: "Plain JS",
+        description: "Access the SDK directly via the window object.",
+        language: "html",
+        code: `<script src="${origin}/affiliateTrackingJavascript.js"></script>
+
+<script>
+  // 2. Access via the global window object
+  window.refearnapp.initRefearnapp("${origin}");
+
+  async function handleSignup(email) {
+    await window.refearnapp.trackSignup(email);
+  }
+</script>`,
       },
     ],
     [origin]
@@ -63,13 +92,12 @@ export default function SignupForm() {
       <div className="space-y-2">
         <h4 className="text-lg font-semibold">Track Leads (Signups)</h4>
         <p className="text-muted-foreground">
-          Use the SDK to link a user&apos;s email address to the affiliate who
-          referred them. This is required for automated commission payouts.
+          {`Install our SDK to link a user's email address to the affiliate who referred them. This is required to calculate commissions when they eventually pay.`}
         </p>
       </div>
 
       <Tabs value={value} onValueChange={setValue} className="w-full">
-        <TabsList className="grid grid-cols-2 w-full max-w-md h-auto gap-3 p-2">
+        <TabsList className="grid grid-cols-2 lg:grid-cols-4 w-full h-auto gap-3 p-2">
           {guides.map((g) => (
             <TabsTrigger key={g.name} value={g.name}>
               {g.name}
