@@ -60,7 +60,10 @@ export default {
 			'Access-Control-Allow-Headers': 'Content-Type',
 			'Access-Control-Allow-Credentials': 'true',
 		};
-		if (request.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+		if (request.method === 'OPTIONS') {
+			const isCredentialed = url.pathname === '/track-signup';
+			return new Response(null, { headers: isCredentialed ? credentialedCorsHeaders : corsHeaders });
+		}
 		// --- GET ORG SETTINGS ---
 		if (url.pathname === '/org') {
 			const ua = request.headers.get('user-agent') || '';
