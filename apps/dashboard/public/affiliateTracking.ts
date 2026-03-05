@@ -45,7 +45,7 @@ async function storeRefCode(code: string) {
       org.cookieLifetimeValue,
       org.cookieLifetimeUnit
     )
-
+    const expiresAt = Date.now() + maxAge * 1000
     return {
       maxAge,
       affiliateData: {
@@ -55,6 +55,7 @@ async function storeRefCode(code: string) {
         commissionDurationValue: org.commissionDurationValue,
         commissionDurationUnit: org.commissionDurationUnit,
         attributionModel: org.attributionModel,
+        expiresAt,
       },
     }
   } catch (err) {
