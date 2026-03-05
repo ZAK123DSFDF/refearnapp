@@ -182,6 +182,11 @@ export default {
 		// --- TRACK SIGNUP (LEAD) ---
 		if (url.pathname === '/track-signup' && request.method === 'POST') {
 			const body = (await request.json()) as { email: string; manualCookieData?: string };
+			console.log('🚀 TRACK-SIGNUP HIT!', {
+				email: body.email,
+				hasManualCookie: !!body.manualCookieData,
+				cookieLength: body.manualCookieData?.length || 0,
+			});
 			const { email, manualCookieData } = body;
 			if (!email) return new Response('Missing email', { status: 400, headers: credentialedCorsHeaders });
 
