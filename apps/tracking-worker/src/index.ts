@@ -196,7 +196,7 @@ export default {
 
 				// 1. Get Org Settings from Redis (The ref:{code} object)
 				const org = await getOrgSettings(code, redis);
-				if (!org) return new Response('Org not found', { status: 404, headers: corsHeaders });
+				if (!org) return new Response('Org not found', { status: 404, headers: credentialedCorsHeaders });
 				const updatedCookieData = { ...affiliateData, email: email.toLowerCase() };
 
 				// 3. Update Stats & Usage (Clutter-free)
@@ -219,7 +219,7 @@ export default {
 					},
 				});
 			} catch (e) {
-				return new Response('Error', { status: 500, headers: corsHeaders });
+				return new Response('Error', { status: 500, headers: credentialedCorsHeaders });
 			}
 		}
 		if (url.pathname === '/health') {
