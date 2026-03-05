@@ -179,14 +179,14 @@ export default {
 		// --- TRACK SIGNUP (LEAD) ---
 		if (url.pathname === '/track-signup' && request.method === 'POST') {
 			const { email } = (await request.json()) as { email: string };
-			if (!email) return new Response('Missing email', { status: 400, headers: corsHeaders });
+			if (!email) return new Response('Missing email', { status: 400, headers: credentialedCorsHeaders });
 
 			const cookieHeader = request.headers.get('Cookie') || '';
 			const cookieName = 'refearnapp_affiliate_cookie';
 			const rawCookie = cookieHeader.split('; ').find((row) => row.trim().startsWith(`${cookieName}=`));
 
 			if (!rawCookie) {
-				return new Response(JSON.stringify({ success: false, reason: 'No cookie' }), { status: 200, headers: corsHeaders });
+				return new Response(JSON.stringify({ success: false, reason: 'No cookie' }), { status: 200, headers: credentialedCorsHeaders });
 			}
 
 			try {
