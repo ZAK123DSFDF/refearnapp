@@ -26,7 +26,6 @@ export async function trackSignup(email: string) {
   try {
     const cookieName = "refearnapp_affiliate_cookie";
     const rawData = getCookie(cookieName);
-    console.log("DEBUG [SDK]: Raw Cookie Data:", rawData);
     const affiliateData = rawData ? JSON.parse(rawData) : null;
     if (!affiliateData) return { success: false, error: "No affiliate data found" };
 
@@ -41,13 +40,11 @@ export async function trackSignup(email: string) {
 
     // 2. Add email to the data
     const updatedData = { ...affiliateData, email: email.toLowerCase() };
-    console.log("DEBUG [SDK]: Updated Data to write:", updatedData);
     const stringifiedData = JSON.stringify(updatedData);
 
     // 3. Overwrite the cookie LOCALLY with the original remaining time
     // We use SameSite=Lax for compatibility and apply the calculated maxAge
     document.cookie = `${cookieName}=${encodeURIComponent(stringifiedData)}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
-    console.log("DEBUG [SDK]: Cookie set. Current document.cookie:", document.cookie);
     // 4. Sync to Worker
     const res = await fetch(`${baseUrl}/track-signup`, {
       method: "POST",

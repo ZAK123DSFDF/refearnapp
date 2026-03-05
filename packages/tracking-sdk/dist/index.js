@@ -41,7 +41,6 @@ async function trackSignup(email) {
   try {
     const cookieName = "refearnapp_affiliate_cookie";
     const rawData = getCookie(cookieName);
-    console.log("DEBUG [SDK]: Raw Cookie Data:", rawData);
     const affiliateData = rawData ? JSON.parse(rawData) : null;
     if (!affiliateData) return { success: false, error: "No affiliate data found" };
     let maxAge = 2592e3;
@@ -51,10 +50,8 @@ async function trackSignup(email) {
       if (maxAge <= 0) return { success: false, error: "Cookie already expired" };
     }
     const updatedData = { ...affiliateData, email: email.toLowerCase() };
-    console.log("DEBUG [SDK]: Updated Data to write:", updatedData);
     const stringifiedData = JSON.stringify(updatedData);
     document.cookie = `${cookieName}=${encodeURIComponent(stringifiedData)}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
-    console.log("DEBUG [SDK]: Cookie set. Current document.cookie:", document.cookie);
     const res = await fetch(`${baseUrl}/track-signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

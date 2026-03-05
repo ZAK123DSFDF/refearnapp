@@ -182,9 +182,6 @@ export default {
 		// --- TRACK SIGNUP (LEAD) ---
 		if (url.pathname === '/track-signup' && request.method === 'POST') {
 			const body = (await request.json()) as { email: string; manualCookieData?: string };
-			// Log what the worker received from the SDK
-			console.log('DEBUG [Worker]: Received Email:', body.email);
-			console.log('DEBUG [Worker]: Received Cookie Data:', body.manualCookieData);
 			const { email, manualCookieData } = body;
 
 			if (!email || !manualCookieData) {
