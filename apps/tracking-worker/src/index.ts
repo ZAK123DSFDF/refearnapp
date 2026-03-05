@@ -182,48 +182,24 @@ export default {
 		// --- TRACK SIGNUP (LEAD) ---
 		if (url.pathname === '/track-signup' && request.method === 'POST') {
 			const body = (await request.json()) as { email: string; manualCookieData?: string };
-			console.log('🚀 TRACK-SIGNUP DATA:', {
-				email: body.email,
-				manualCookieData: body.manualCookieData,
-			});
 			const { email, manualCookieData } = body;
-			if (!email) return new Response('Missing email', { status: 400, headers: credentialedCorsHeaders });
 
-			const cookieHeader = request.headers.get('Cookie') || '';
-			const cookieName = 'refearnapp_affiliate_cookie';
-			const rawCookie = cookieHeader.split('; ').find((row) => row.trim().startsWith(`${cookieName}=`));
-
-			let affiliateData = null;
-
-			// 1. Extract the data from whichever source is available
-			if (rawCookie) {
-				const cookieValue = decodeURIComponent(rawCookie.split('=')[1]);
-				affiliateData = JSON.parse(cookieValue);
-			} else if (manualCookieData) {
-				affiliateData = JSON.parse(manualCookieData);
-			}
-
-			// 2. Check if we actually got something
-			if (!affiliateData) {
-				return new Response(JSON.stringify({ success: false, reason: 'No affiliate data' }), {
-					status: 200,
-					headers: credentialedCorsHeaders,
-				});
+			if (!email || !manualCookieData) {
+				return new Response('Missing data', { status: 400, headers: credentialedCorsHeaders });
 			}
 
 			try {
-				// 3. USE the affiliateData we already found above
+				const affiliateData = JSON.parse(manualCookieData);
 				const code = affiliateData.code;
 
+				// Verify org exists
 				const org = await getOrgSettings(code, redis);
 				if (!org) return new Response('Org not found', { status: 404, headers: credentialedCorsHeaders });
 
-				const updatedCookieData = { ...affiliateData, email: email.toLowerCase() };
+				const dateStr = new Date().toISOString().slice(0, 10);
+				const monthStr = new Date().toISOString().slice(0, 7);
 
-				const now = new Date();
-				const monthStr = now.toISOString().slice(0, 7);
-				const dateStr = now.toISOString().slice(0, 10);
-
+				// Save to Redis for the Sync Cron
 				ctx.waitUntil(
 					Promise.all([
 						redis.incr(`usage:total_signups:${org.ownerId}:${monthStr}`),
@@ -232,15 +208,12 @@ export default {
 					]),
 				);
 
+				// Just return success, no Set-Cookie header needed!
 				return new Response(JSON.stringify({ success: true }), {
-					headers: {
-						...credentialedCorsHeaders,
-						'Content-Type': 'application/json',
-						'Set-Cookie': `${cookieName}=${encodeURIComponent(JSON.stringify(updatedCookieData))}; Path=/; HttpOnly; Secure; SameSite=None`,
-					},
+					headers: { ...credentialedCorsHeaders, 'Content-Type': 'application/json' },
 				});
 			} catch (e) {
-				return new Response('Error processing signup', { status: 500, headers: credentialedCorsHeaders });
+				return new Response('Sync error', { status: 500, headers: credentialedCorsHeaders });
 			}
 		}
 		if (url.pathname === '/health') {

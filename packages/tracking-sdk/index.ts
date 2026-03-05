@@ -24,24 +24,39 @@ function getCookie(name: string): string | null {
 
 export async function trackSignup(email: string) {
   try {
-    // 1. Grab the affiliate data from the customer's domain
-    const cookieData = getCookie("refearnapp_affiliate_cookie");
+    const cookieName = "refearnapp_affiliate_cookie";
+    const rawData = getCookie(cookieName);
 
-    // 2. Pass it in the body so the Worker has it even if headers are blocked
+    const affiliateData = rawData ? JSON.parse(rawData) : null;
+    if (!affiliateData) return { success: false, error: "No affiliate data found" };
+
+    // 1. Calculate how much time is left on the original cookie
+    let maxAge = 2592000; // Default 30 days
+    if (affiliateData.expiresAt) {
+      const remainingMs = affiliateData.expiresAt - Date.now();
+      maxAge = Math.floor(remainingMs / 1000);
+
+      if (maxAge <= 0) return { success: false, error: "Cookie already expired" };
+    }
+
+    // 2. Add email to the data
+    const updatedData = { ...affiliateData, email: email.toLowerCase() };
+    const stringifiedData = JSON.stringify(updatedData);
+
+    // 3. Overwrite the cookie LOCALLY with the original remaining time
+    // We use SameSite=Lax for compatibility and apply the calculated maxAge
+    document.cookie = `${cookieName}=${encodeURIComponent(stringifiedData)}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+
+    // 4. Sync to Worker
     const res = await fetch(`${baseUrl}/track-signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        manualCookieData: cookieData
+        manualCookieData: stringifiedData
       }),
       credentials: "include",
     });
-
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      return { success: false, status: res.status, ...errorData };
-    }
 
     return await res.json();
   } catch (err) {

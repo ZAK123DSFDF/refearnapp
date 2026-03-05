@@ -15,20 +15,28 @@ function getCookie(name) {
 }
 async function trackSignup(email) {
   try {
-    const cookieData = getCookie("refearnapp_affiliate_cookie");
+    const cookieName = "refearnapp_affiliate_cookie";
+    const rawData = getCookie(cookieName);
+    const affiliateData = rawData ? JSON.parse(rawData) : null;
+    if (!affiliateData) return { success: false, error: "No affiliate data found" };
+    let maxAge = 2592e3;
+    if (affiliateData.expiresAt) {
+      const remainingMs = affiliateData.expiresAt - Date.now();
+      maxAge = Math.floor(remainingMs / 1e3);
+      if (maxAge <= 0) return { success: false, error: "Cookie already expired" };
+    }
+    const updatedData = { ...affiliateData, email: email.toLowerCase() };
+    const stringifiedData = JSON.stringify(updatedData);
+    document.cookie = `${cookieName}=${encodeURIComponent(stringifiedData)}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
     const res = await fetch(`${baseUrl}/track-signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        manualCookieData: cookieData
+        manualCookieData: stringifiedData
       }),
       credentials: "include"
     });
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      return { success: false, status: res.status, ...errorData };
-    }
     return await res.json();
   } catch (err) {
     console.error("Refearnapp Tracking Error:", err);
