@@ -9,6 +9,7 @@ import EmbedCheckout from "@/components/pages/Dashboard/Integration/Paddle/Embed
 import { Card } from "@/components/ui/card"
 import { PaddleImageProvider } from "@/provider/PaddleImageProvider"
 import { PaddleImageDialog } from "@/components/ui-custom/PaddleImageDialog"
+import SignupTrackingInstructions from "@/components/pages/Dashboard/Integration/SignupTrackingInstructions"
 
 export default function PaddleIntegration({
   orgId,
@@ -42,6 +43,7 @@ export default function PaddleIntegration({
             <TabsTrigger value="connect">Connect</TabsTrigger>
             <TabsTrigger value="disconnect">Disconnect</TabsTrigger>
             <TabsTrigger value="embedScript">Embed Script</TabsTrigger>
+            <TabsTrigger value="track-signup">Track Signup</TabsTrigger>
             <TabsTrigger value="embedCheckout">Embed Checkout</TabsTrigger>
           </TabsList>
 
@@ -73,7 +75,11 @@ export default function PaddleIntegration({
               <FrameworkInstructions />
             </Card>
           </TabsContent>
-
+          <TabsContent value="track-signup">
+            <Card className="p-6">
+              <SignupTrackingInstructions />
+            </Card>
+          </TabsContent>
           {/* EMBED CHECKOUT */}
           <TabsContent value="embedCheckout">
             <EmbedCheckout />

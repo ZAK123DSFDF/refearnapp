@@ -10,6 +10,7 @@ import EmbedStripeCheckout from "@/components/pages/Dashboard/Integration/Stripe
 import { useCustomToast } from "@/components/ui-custom/ShowCustomToast"
 import { Loader2 } from "lucide-react"
 import { AppResponse, useAppMutation } from "@/hooks/useAppMutation"
+import SignupTrackingInstructions from "@/components/pages/Dashboard/Integration/SignupTrackingInstructions"
 
 export default function StripeIntegration({ orgId }: { orgId: string }) {
   const queryClient = useQueryClient()
@@ -112,6 +113,7 @@ export default function StripeIntegration({ orgId }: { orgId: string }) {
           <TabsTrigger value="connect">Connect</TabsTrigger>
           <TabsTrigger value="disconnect">Disconnect</TabsTrigger>
           <TabsTrigger value="embed-script">Embed Script</TabsTrigger>
+          <TabsTrigger value="track-signup">Track Signup</TabsTrigger>
           <TabsTrigger value="embed-checkout">Embed Checkout</TabsTrigger>
         </TabsList>
 
@@ -180,7 +182,11 @@ export default function StripeIntegration({ orgId }: { orgId: string }) {
             <FrameworkInstructions />
           </Card>
         </TabsContent>
-
+        <TabsContent value="track-signup">
+          <Card className="p-6">
+            <SignupTrackingInstructions />
+          </Card>
+        </TabsContent>
         {/* EMBED CHECKOUT */}
         <TabsContent value="embed-checkout">
           <EmbedStripeCheckout />

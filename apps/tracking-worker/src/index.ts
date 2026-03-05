@@ -170,6 +170,52 @@ export default {
 				{ headers: corsHeaders },
 			);
 		}
+		// --- TRACK SIGNUP (LEAD) ---
+		if (url.pathname === '/track-signup' && request.method === 'POST') {
+			const { email } = (await request.json()) as { email: string };
+			if (!email) return new Response('Missing email', { status: 400, headers: corsHeaders });
+
+			const cookieHeader = request.headers.get('Cookie') || '';
+			const cookieName = 'refearnapp_affiliate_cookie';
+			const rawCookie = cookieHeader.split('; ').find((row) => row.trim().startsWith(`${cookieName}=`));
+
+			if (!rawCookie) {
+				return new Response(JSON.stringify({ success: false, reason: 'No cookie' }), { status: 200, headers: corsHeaders });
+			}
+
+			try {
+				const cookieValue = decodeURIComponent(rawCookie.split('=')[1]);
+				const affiliateData = JSON.parse(cookieValue);
+				const code = affiliateData.code;
+
+				// 1. Get Org Settings from Redis (The ref:{code} object)
+				const org = await getOrgSettings(code, redis);
+				if (!org) return new Response('Org not found', { status: 404, headers: corsHeaders });
+				const updatedCookieData = { ...affiliateData, email: email.toLowerCase() };
+
+				// 3. Update Stats & Usage (Clutter-free)
+				const now = new Date();
+				const monthStr = now.toISOString().slice(0, 7);
+				const dateStr = now.toISOString().slice(0, 10);
+
+				ctx.waitUntil(
+					Promise.all([
+						redis.incr(`usage:total_signups:${org.ownerId}:${monthStr}`),
+						redis.hincrby(`stats:${org.orgId}:${dateStr}`, 'signups', 1),
+						redis.sadd(`sync:leads:${org.orgId}:${dateStr}`, `${email.toLowerCase()}:::${code}`),
+					]),
+				);
+				return new Response(JSON.stringify({ success: true }), {
+					headers: {
+						...corsHeaders,
+						'Content-Type': 'application/json',
+						'Set-Cookie': `${cookieName}=${encodeURIComponent(JSON.stringify(updatedCookieData))}; Path=/; HttpOnly; Secure; SameSite=Lax`,
+					},
+				});
+			} catch (e) {
+				return new Response('Error', { status: 500, headers: corsHeaders });
+			}
+		}
 		if (url.pathname === '/health') {
 			const secret = request.headers.get('x-internal-secret');
 			if (secret !== env.INTERNAL_SECRET) {
