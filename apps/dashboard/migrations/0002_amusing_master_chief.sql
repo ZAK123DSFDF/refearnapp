@@ -1,0 +1,4 @@
+ALTER TABLE "affiliate_invoice" ADD COLUMN "promotion_code_id" uuid;--> statement-breakpoint
+ALTER TABLE "subscription_expiration" ADD COLUMN "promotion_code_id" uuid;--> statement-breakpoint
+ALTER TABLE "affiliate_invoice" ADD CONSTRAINT "affiliate_invoice_promotion_code_id_promotion_codes_id_fk" FOREIGN KEY ("promotion_code_id") REFERENCES "public"."promotion_codes"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "subscription_expiration" ADD CONSTRAINT "subscription_expiration_promotion_code_id_promotion_codes_id_fk" FOREIGN KEY ("promotion_code_id") REFERENCES "public"."promotion_codes"("id") ON DELETE set null ON UPDATE no action;

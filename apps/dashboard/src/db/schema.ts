@@ -551,6 +551,10 @@ export const affiliateInvoice = pgTable(
       () => affiliateLink.id,
       { onDelete: "cascade" }
     ),
+    promotionCodeId: uuid("promotion_code_id").references(
+      () => promotionCodes.id,
+      { onDelete: "set null" }
+    ),
     unpaidAmount: numeric("unpaid_amount", { precision: 10, scale: 2 })
       .default("0")
       .notNull(),
@@ -670,6 +674,10 @@ export const subscriptionExpiration = pgTable(
       .primaryKey()
       .$defaultFn(() => crypto.randomUUID()),
     subscriptionId: text("subscription_id").notNull().unique(),
+    promotionCodeId: uuid("promotion_code_id").references(
+      () => promotionCodes.id,
+      { onDelete: "set null" }
+    ),
     expirationDate: timestamp("expiration_date").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

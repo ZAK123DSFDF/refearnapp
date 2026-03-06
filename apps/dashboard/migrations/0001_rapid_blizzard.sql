@@ -1,1 +1,0 @@
-CREATE INDEX "referrals_email_link_idx" ON "referrals" USING btree ("signup_email","referral_link_id");

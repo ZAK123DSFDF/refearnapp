@@ -15,6 +15,13 @@
       "when": 1772812351680,
       "tag": "0001_rapid_blizzard",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772825343355,
+      "tag": "0002_amusing_master_chief",
+      "breakpoints": true
     }
   ]
 }

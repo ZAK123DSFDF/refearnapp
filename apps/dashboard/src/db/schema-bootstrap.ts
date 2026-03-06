@@ -115,6 +115,7 @@ export const BOOTSTRAP_QUERIES = [
         "commission" numeric(10, 2) NOT NULL,
         "paid_amount" numeric(10, 2) DEFAULT '0' NOT NULL,
         "affiliate_link_id" text,
+        "promotion_code_id" uuid,
         "unpaid_amount" numeric(10, 2) DEFAULT '0' NOT NULL,
         "reason" text DEFAULT 'one_time' NOT NULL,
         "refunded_at" timestamp,
@@ -297,6 +298,7 @@ export const BOOTSTRAP_QUERIES = [
         "id" text PRIMARY KEY NOT NULL,
         "subscription_id" text NOT NULL,
         "expiration_date" timestamp NOT NULL,
+        "promotion_code_id" uuid,
         "created_at" timestamp DEFAULT now() NOT NULL,
         "updated_at" timestamp DEFAULT now() NOT NULL,
         CONSTRAINT "subscription_expiration_subscription_id_unique" UNIQUE("subscription_id")
@@ -568,7 +570,13 @@ export const BOOTSTRAP_QUERIES = [
       IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'website_domain_org_id_organization_id_fk') THEN
         ALTER TABLE "website_domain" ADD CONSTRAINT "website_domain_org_id_organization_id_fk" FOREIGN KEY ("org_id") REFERENCES "organization"("id") ON DELETE cascade ON UPDATE no action;
       END IF;
-
+IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'affiliate_invoice_promotion_code_id_fk') THEN
+        ALTER TABLE "affiliate_invoice" ADD CONSTRAINT "affiliate_invoice_promotion_code_id_fk" FOREIGN KEY ("promotion_code_id") REFERENCES "promotion_codes"("id") ON DELETE set null ON UPDATE no action;
+      END IF;
+      
+      IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'affiliate_invoice_promotion_code_id_fk') THEN
+        ALTER TABLE "affiliate_invoice" ADD CONSTRAINT "affiliate_invoice_promotion_code_id_fk" FOREIGN KEY ("promotion_code_id") REFERENCES "promotion_codes"("id") ON DELETE set null ON UPDATE no action;
+      END IF;
     END $$;
   `,
   },
