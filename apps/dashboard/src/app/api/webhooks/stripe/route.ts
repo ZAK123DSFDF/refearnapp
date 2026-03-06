@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { db } from "@/db/drizzle"
 import { affiliateInvoice, promotionCodes } from "@/db/schema"
-import { eq, sql } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { convertToUSD } from "@/util/CurrencyConvert"
 import { getCurrencyDecimals } from "@/util/CurrencyDecimal"
 import { safeFormatAmount } from "@/util/SafeParse"
@@ -15,6 +15,7 @@ import { AppError } from "@/lib/exceptions"
 import { convertReferral } from "@/util/ConvertReferral"
 import { updatePromoStats } from "@/util/updatePromoStats"
 import { getSubscriptionExpiration } from "@/services/getSubscriptionExpiration"
+import { getOrgIdFromLink } from "@/util/getOrgFromLink"
 
 export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -239,9 +240,12 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
             ),
         })
 
-        if (!historicalRecord?.affiliateLinkId)
+        if (!historicalRecord?.affiliateLinkId && !promoRecord?.id) {
+          console.log(
+            "⚠️ No attribution found in history or expiration record."
+          )
           return NextResponse.json({ ok: true })
-
+        }
         const placeholder = await db.query.affiliateInvoice.findFirst({
           where: (table, { eq, and }) =>
             and(
@@ -251,19 +255,23 @@ export const POST = handleRoute("Stripe Affiliate Webhook", async (req) => {
           orderBy: (table, { desc }) => [desc(table.createdAt)],
         })
 
-        const affiliateLinkRecord = await db.query.affiliateLink.findFirst({
-          where: (link, { eq }) =>
-            eq(link.id, historicalRecord.affiliateLinkId!),
-        })
+        const resolvedOrgId =
+          promoRecord?.organizationId ??
+          (await getOrgIdFromLink(historicalRecord?.affiliateLinkId ?? null))
 
-        if (!affiliateLinkRecord) break
-        const organizationRecord = await getOrganizationById(
-          affiliateLinkRecord.organizationId
-        )
-        if (!organizationRecord) break
-        const affiliateLinkId = promoRecord
+        if (!resolvedOrgId) {
+          console.log("⚠️ No organization ID found, skipping.")
+          break
+        }
+
+        const organizationRecord = await getOrganizationById(resolvedOrgId)
+        if (!organizationRecord) {
+          console.log("⚠️ Organization not found, skipping.")
+          break
+        }
+        const affiliateLinkId: string | null = promoRecord
           ? null
-          : historicalRecord?.affiliateLinkId
+          : (historicalRecord?.affiliateLinkId ?? null)
         if (promoRecord) {
           await updatePromoStats(
             promoRecord.id,
