@@ -1,10 +1,11 @@
 import { db } from "@/db/drizzle"
-import { and, inArray, sql } from "drizzle-orm"
+import { inArray, or, sql } from "drizzle-orm"
 import { affiliateClick, affiliateInvoice, referrals } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
 
 export async function getTimeSeriesData<T>(
   linkIds: string[],
+  promoIds: string[],
   year?: number,
   month?: number,
   isAffiliate: boolean = true
@@ -12,7 +13,14 @@ export async function getTimeSeriesData<T>(
   const clickDay = sql<string>`(${affiliateClick.createdAt}::date)`
   const invoiceDay = sql<string>`(${affiliateInvoice.createdAt}::date)`
   const referralDay = sql<string>`(${referrals.createdAt}::date)`
-
+  const attribution = or(
+    linkIds.length > 0
+      ? inArray(affiliateInvoice.affiliateLinkId, linkIds)
+      : undefined,
+    promoIds.length > 0
+      ? inArray(affiliateInvoice.promotionCodeId, promoIds)
+      : undefined
+  )
   const [clicksAgg, salesAgg, referralsAgg] = await Promise.all([
     // 1. Clicks (Visitors)
     db
@@ -41,15 +49,12 @@ export async function getTimeSeriesData<T>(
       })
       .from(affiliateInvoice)
       .where(
-        and(
-          sql`${affiliateInvoice.refundedAt} IS NULL`,
-          buildWhereWithDate(
-            [inArray(affiliateInvoice.affiliateLinkId, linkIds)],
-            affiliateInvoice,
-            year,
-            month,
-            true
-          )
+        buildWhereWithDate(
+          [attribution, sql`${affiliateInvoice.refundedAt} IS NULL`],
+          affiliateInvoice,
+          year,
+          month,
+          true
         )
       )
       .groupBy(invoiceDay, affiliateInvoice.subscriptionId),

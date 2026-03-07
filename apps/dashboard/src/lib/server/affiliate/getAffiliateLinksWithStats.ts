@@ -1,13 +1,13 @@
 import { db } from "@/db/drizzle"
 import {
-  affiliate,
   affiliateClick,
   affiliateInvoice,
   affiliateLink,
   organization,
+  promotionCodes,
   referrals,
 } from "@/db/schema"
-import { and, eq, sql } from "drizzle-orm"
+import { and, eq, or, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
 
 export async function getAffiliateLinksWithStatsAction(
@@ -54,11 +54,28 @@ export async function getAffiliateLinksWithStatsAction(
     )
     .groupBy(referrals.affiliateLinkId)
     .as("referrals_sq")
-
+  const attributionSq = db
+    .select({
+      linkId: affiliateLink.id,
+      promoId: promotionCodes.id,
+    })
+    .from(affiliateLink)
+    .leftJoin(
+      promotionCodes,
+      eq(promotionCodes.affiliateId, affiliateLink.affiliateId)
+    )
+    .where(
+      and(
+        eq(affiliateLink.affiliateId, decoded.id),
+        eq(affiliateLink.organizationId, decoded.orgId)
+      )
+    )
+    .as("attr_sq")
   // 3. Invoices Subquery (Aggregated by Link)
   const invoicesSq = db
     .select({
-      linkId: affiliateInvoice.affiliateLinkId,
+      // We group by linkId to match the outer select's structure
+      linkId: attributionSq.linkId,
       salesCount:
         sql`count(case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then 1 end)`.as(
           "sales_count"
@@ -69,8 +86,15 @@ export async function getAffiliateLinksWithStatsAction(
         ),
     })
     .from(affiliateInvoice)
+    .leftJoin(
+      attributionSq,
+      or(
+        eq(affiliateInvoice.affiliateLinkId, attributionSq.linkId),
+        eq(affiliateInvoice.promotionCodeId, attributionSq.promoId)
+      )
+    )
     .where(and(...getDateFilters(affiliateInvoice)))
-    .groupBy(affiliateInvoice.affiliateLinkId)
+    .groupBy(attributionSq.linkId)
     .as("invoices_sq")
 
   // 4. Final Join returning data per link

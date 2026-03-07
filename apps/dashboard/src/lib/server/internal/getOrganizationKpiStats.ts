@@ -5,6 +5,7 @@ import {
   affiliateClick,
   affiliateInvoice,
   affiliateLink,
+  promotionCodes,
   referrals,
 } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
@@ -67,7 +68,12 @@ export async function getOrganizationKpiStatsAction(
   // 4. Aggregate Invoices by Affiliate (Date Filtered)
   const invoiceSq = db
     .select({
-      affiliateId: affiliateLink.affiliateId,
+      // Resolve the affiliateId regardless of the source
+      affiliateId:
+        sql<string>`COALESCE(${affiliateLink.affiliateId}, ${promotionCodes.affiliateId})`.as(
+          "affiliate_id"
+        ),
+
       salesCount:
         sql`count(case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then 1 end)`.as(
           "sales_count"
@@ -90,14 +96,20 @@ export async function getOrganizationKpiStatsAction(
         ),
     })
     .from(affiliateInvoice)
-    .innerJoin(
+    // Use Left Joins instead of Inner Joins
+    .leftJoin(
       affiliateLink,
-      eq(affiliateLink.id, affiliateInvoice.affiliateLinkId)
+      eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)
+    )
+    .leftJoin(
+      promotionCodes,
+      eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
     )
     .where(and(...getDateFilters(affiliateInvoice)))
-    .groupBy(affiliateLink.affiliateId)
+    .groupBy(
+      sql`COALESCE(${affiliateLink.affiliateId}, ${promotionCodes.affiliateId})`
+    )
     .as("inv_sq")
-
   // 5. Final Join
   return db
     .select({

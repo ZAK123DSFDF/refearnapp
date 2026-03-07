@@ -21,11 +21,11 @@ export const GET = handleRoute(
 
     const org = await getOrgAuth(orgId)
     const rate = await ExchangeRate(org.currency)
-    const { linkIds } = await getOrgAffiliateLinks(org, orgId)
+    const { linkIds, promoIds } = await getOrgAffiliateLinks(org, orgId)
 
     if (!linkIds.length) return NextResponse.json({ ok: true, data: [] })
 
-    const data = await getTimeSeriesData(linkIds, year, month, false)
+    const data = await getTimeSeriesData(linkIds, promoIds, year, month, false)
 
     const formattedData = data.map((item: any) => ({
       ...item,

@@ -18,25 +18,31 @@ export interface Transaction {
 // Bulk update invoices for given payout refs
 async function bulkUpdateInvoices(refIds: string[]) {
   if (refIds.length === 0) return { rowCount: 0 }
+
+  // We use a join that checks both paths for the payout association
   const result = await db
     .update(affiliateInvoice)
     .set({
       paidAmount: sql`${affiliateInvoice.paidAmount} + ${affiliateInvoice.unpaidAmount}`,
       unpaidAmount: sql`0`,
+      updatedAt: new Date(),
     })
-    .from(affiliateLink)
-    .innerJoin(
-      payoutReference,
-      sql`${payoutReference.affiliateId} = ${affiliateLink.affiliateId}`
-    )
+    .from(payoutReference)
+    // Join the payout reference period
     .leftJoin(
       payoutReferencePeriods,
       eq(payoutReference.refId, payoutReferencePeriods.refId)
     )
+    // Logic: The invoice must match the PayoutReference either via Link OR Promo Code
     .where(
       and(
-        eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
         inArray(payoutReference.refId, refIds),
+        // This condition bridges the invoice to the payout reference
+        or(
+          sql`${affiliateInvoice.affiliateLinkId} IS NOT NULL AND ${affiliateInvoice.affiliateLinkId} = (SELECT id FROM affiliate_link WHERE affiliate_id = ${payoutReference.affiliateId} LIMIT 1)`,
+          sql`${affiliateInvoice.promotionCodeId} IS NOT NULL AND ${affiliateInvoice.promotionCodeId} = (SELECT id FROM promotion_codes WHERE affiliate_id = ${payoutReference.affiliateId} LIMIT 1)`
+        ),
+        // Keep your existing date/period logic
         or(
           isNull(payoutReferencePeriods.refId),
           and(
@@ -60,6 +66,7 @@ async function bulkUpdateInvoices(refIds: string[]) {
       )
     )
     .returning({ id: affiliateInvoice.id })
+
   return { rowCount: result.length }
 }
 

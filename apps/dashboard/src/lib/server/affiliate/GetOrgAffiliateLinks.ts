@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle"
-import { affiliate, affiliateLink } from "@/db/schema"
+import { affiliate, affiliateLink, promotionCodes } from "@/db/schema"
 import { and, eq, inArray } from "drizzle-orm"
 import { OrgAuthResult } from "@/lib/types/organization/orgAuth"
 
@@ -10,7 +10,7 @@ export async function getOrgAffiliateLinks(org: OrgAuthResult, orgId: string) {
     .where(eq(affiliate.organizationId, orgId))
 
   if (!affRows.length) {
-    return { linkIds: [], affRows: [], linksByAffiliate: {} }
+    return { linkIds: [], promoIds: [], affRows: [], linksByAffiliate: {} }
   }
 
   const affIds = affRows.map((a) => a.id)
@@ -24,15 +24,18 @@ export async function getOrgAffiliateLinks(org: OrgAuthResult, orgId: string) {
         inArray(affiliateLink.affiliateId, affIds)
       )
     )
-
+  const allPromos = await db
+    .select({ id: promotionCodes.id, affId: promotionCodes.affiliateId })
+    .from(promotionCodes)
+    .where(inArray(promotionCodes.affiliateId, affIds))
   const linksByAffiliate: Record<string, string[]> = {}
   const linkIds: string[] = []
-
+  const promoIds = allPromos.map((p) => p.id)
   allLinks.forEach((l) => {
     const url = `https://${org.domain}/?${org.param}=${l.id}`
     ;(linksByAffiliate[l.affId] ||= []).push(url)
     linkIds.push(l.id)
   })
 
-  return { linkIds, affRows, linksByAffiliate }
+  return { linkIds, promoIds, affRows, linksByAffiliate }
 }

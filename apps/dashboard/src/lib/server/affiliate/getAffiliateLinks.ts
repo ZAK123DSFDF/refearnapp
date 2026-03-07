@@ -1,5 +1,5 @@
 import { db } from "@/db/drizzle"
-import { affiliate, affiliateLink } from "@/db/schema"
+import { affiliate, affiliateLink, promotionCodes } from "@/db/schema"
 import { and, eq } from "drizzle-orm"
 
 export async function getAffiliateLinks(decoded: {
@@ -20,7 +20,7 @@ export async function getAffiliateLinks(decoded: {
       )
     )
 
-  if (!affiliates.length) return { affiliates: [], linkIds: [] }
+  if (!affiliates.length) return { affiliates: [], linkIds: [], promoIds: [] }
 
   const affiliateId = affiliates[0].affiliateId
 
@@ -33,6 +33,14 @@ export async function getAffiliateLinks(decoded: {
         eq(affiliateLink.organizationId, decoded.orgId)
       )
     )
-
-  return { affiliates, linkIds: links.map((l) => l.id), links }
+  const promos = await db
+    .select({ id: promotionCodes.id })
+    .from(promotionCodes)
+    .where(eq(promotionCodes.affiliateId, affiliateId))
+  return {
+    affiliates,
+    linkIds: links.map((l) => l.id),
+    promoIds: promos.map((p) => p.id),
+    links,
+  }
 }

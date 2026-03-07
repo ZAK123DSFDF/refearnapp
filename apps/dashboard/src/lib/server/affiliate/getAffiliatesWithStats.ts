@@ -7,8 +7,9 @@ import {
   organization,
   affiliatePayoutMethod,
   referrals,
+  promotionCodes,
 } from "@/db/schema"
-import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm"
+import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
 import { AffiliateStatsField } from "@/util/AffiliateStatFields"
 import {
@@ -95,21 +96,37 @@ export async function getAffiliatesWithStatsAction(
     .where(eq(affiliate.organizationId, orgId))
     .groupBy(affiliate.id)
     .as("ref_sq")
-
-  // 2. Isolated Sales & Commission Aggregation
-  const salesSqBase = db
+  const attributionSq = db
     .select({
       affiliateId: affiliate.id,
-      salesCount: sql`count(distinct ${affiliateInvoice.id})`.as("sales_count"),
-      totalComm: sql`sum(${affiliateInvoice.commission})`.as("total_comm"),
+      linkId: affiliateLink.id,
+      promoId: promotionCodes.id,
     })
     .from(affiliate)
     .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
+    .as("attr_sq")
+  // 2. Isolated Sales & Commission Aggregation
+  // 2. Isolated Sales & Commission Aggregation
+  const salesSqBase = db
+    .select({
+      affiliateId: attributionSq.affiliateId,
+      salesCount: sql<number>`count(distinct ${affiliateInvoice.id})`.as(
+        "sales_count"
+      ),
+      totalComm: sql<number>`sum(${affiliateInvoice.commission})`.as(
+        "total_comm"
+      ),
+    })
+    .from(attributionSq)
     .leftJoin(
       affiliateInvoice,
       buildWhereWithDate(
         [
-          eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+          or(
+            eq(affiliateInvoice.affiliateLinkId, attributionSq.linkId),
+            eq(affiliateInvoice.promotionCodeId, attributionSq.promoId)
+          ),
           isNull(affiliateInvoice.refundedAt),
           sql`${affiliateInvoice.reason} in ('subscription_create', 'one_time')`,
         ],
@@ -120,8 +137,8 @@ export async function getAffiliatesWithStatsAction(
         months
       )
     )
-    .where(eq(affiliate.organizationId, orgId))
-    .groupBy(affiliate.id)
+    .where(eq(attributionSq.affiliateId, orgId))
+    .groupBy(attributionSq.affiliateId)
     .as("sales_sq")
 
   // 3. Isolated PAID Amount Aggregation

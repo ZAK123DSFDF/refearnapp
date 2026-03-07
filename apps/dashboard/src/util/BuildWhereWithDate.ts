@@ -1,13 +1,13 @@
-import { and, or, SQL } from "drizzle-orm"
+import { and, or, sql, SQL } from "drizzle-orm"
 import { resolveDateCondition, WithCreatedAtColumn } from "@/util/DateFilter"
 
 export function buildWhereWithDate(
-  baseConditions: SQL[],
+  baseConditions: (SQL<unknown> | undefined)[],
   value: WithCreatedAtColumn,
-  year?: number,
-  month?: number,
+  year?: number | undefined,
+  month?: number | undefined,
   capLast = false,
-  months?: { year: number; month: number }[]
+  months?: { month: number; year: number }[] | undefined
 ): SQL {
   let dateCondition: SQL | undefined
 
@@ -23,5 +23,5 @@ export function buildWhereWithDate(
   const conditions = [...baseConditions]
   if (dateCondition) conditions.push(dateCondition)
 
-  return and(...conditions) as SQL
+  return conditions.length > 0 ? (and(...conditions) as SQL) : sql`1=1`
 }

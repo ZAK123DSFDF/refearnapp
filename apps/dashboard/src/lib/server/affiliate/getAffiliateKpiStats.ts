@@ -1,11 +1,12 @@
 // @/lib/server/affiliate/getAffiliateKpiStatsAction.ts
 import { db } from "@/db/drizzle"
-import { and, eq, sql } from "drizzle-orm"
+import { and, eq, or, sql } from "drizzle-orm"
 import {
   affiliate,
   affiliateClick,
   affiliateInvoice,
   affiliateLink,
+  promotionCodes,
   referrals,
 } from "@/db/schema"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
@@ -65,37 +66,44 @@ export async function getAffiliateKpiStatsAction(
     .groupBy(affiliate.id)
     .as("ref_sq")
 
-  // 3. Aggregate Invoices for this specific affiliate
+  // 3. Aggregate Invoices for this specific affiliate (Fixed)
   const invoiceSq = db
     .select({
       affiliateId: affiliate.id,
       salesCount:
-        sql`count(distinct case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.id} end)`.as(
+        sql<number>`count(distinct case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.id} end)`.as(
           "sales_count"
         ),
       totalComm:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission} else 0 end)`.as(
           "total_comm"
         ),
       totalPaid:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.paidAmount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.paidAmount} else 0 end)`.as(
           "total_paid"
         ),
       totalUnpaid:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.unpaidAmount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.unpaidAmount} else 0 end)`.as(
           "total_unpaid"
         ),
       totalAmt:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.amount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.amount} else 0 end)`.as(
           "total_amt"
         ),
     })
     .from(affiliate)
+    // Join Links AND Promo Codes
     .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
     .leftJoin(
       affiliateInvoice,
       buildWhereWithDate(
-        [eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)],
+        [
+          or(
+            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
+          ),
+        ],
         affiliateInvoice,
         year,
         month

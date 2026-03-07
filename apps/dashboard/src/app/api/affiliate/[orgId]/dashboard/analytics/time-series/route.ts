@@ -21,10 +21,16 @@ export const GET = handleRoute(
     const currency = await getOrgCurrencyAffiliate(orgId)
     const rate = await ExchangeRate(currency)
 
-    const { linkIds } = await getAffiliateLinks(decoded)
+    const { linkIds, promoIds } = await getAffiliateLinks(decoded)
     if (!linkIds.length) return NextResponse.json({ ok: true, data: [] })
 
-    const rawData = await getTimeSeriesData(linkIds, year, month, true)
+    const rawData = await getTimeSeriesData(
+      linkIds,
+      promoIds,
+      year,
+      month,
+      true
+    )
     const data = rawData.map((item: any) => ({
       ...item,
       amount: item.amount * rate,
