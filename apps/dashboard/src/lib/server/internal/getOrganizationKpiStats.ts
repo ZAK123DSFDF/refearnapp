@@ -68,35 +68,33 @@ export async function getOrganizationKpiStatsAction(
   // 4. Aggregate Invoices by Affiliate (Date Filtered)
   const invoiceSq = db
     .select({
-      // Resolve the affiliateId regardless of the source
+      // We name this specifically so the final join can find "affiliateId"
       affiliateId:
         sql<string>`COALESCE(${affiliateLink.affiliateId}, ${promotionCodes.affiliateId})`.as(
-          "affiliate_id"
+          "sub_aff_id"
         ),
-
       salesCount:
-        sql`count(case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then 1 end)`.as(
+        sql<number>`count(case when ${affiliateInvoice.reason} in ('subscription_create', 'one_time') and ${affiliateInvoice.refundedAt} is null then 1 end)`.as(
           "sales_count"
         ),
       totalComm:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission} else 0 end)`.as(
           "total_comm"
         ),
       totalPaid:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.paidAmount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.paidAmount} else 0 end)`.as(
           "total_paid"
         ),
       totalUnpaid:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.unpaidAmount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.unpaidAmount} else 0 end)`.as(
           "total_unpaid"
         ),
       totalAmt:
-        sql`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.amount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.amount} else 0 end)`.as(
           "total_amt"
         ),
     })
     .from(affiliateInvoice)
-    // Use Left Joins instead of Inner Joins
     .leftJoin(
       affiliateLink,
       eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)
@@ -106,9 +104,7 @@ export async function getOrganizationKpiStatsAction(
       eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
     )
     .where(and(...getDateFilters(affiliateInvoice)))
-    .groupBy(
-      sql`COALESCE(${affiliateLink.affiliateId}, ${promotionCodes.affiliateId})`
-    )
+    .groupBy(affiliateLink.affiliateId, promotionCodes.affiliateId) // Group by the actual columns to avoid COALESCE ambiguity
     .as("inv_sq")
   // 5. Final Join
   return db
@@ -128,14 +124,12 @@ export async function getOrganizationKpiStatsAction(
       totalLinks: sql<number>`coalesce(max(${linkSq.linkCount}), 0)`.mapWith(
         Number
       ),
-
       clickToSignupRate: sql<number>`
         coalesce(round(((sum(${referralSq.signups})::float / nullif(sum(${clickSq.clicks}), 0)::float) * 100)::numeric, 2), 0)
       `.mapWith(Number),
       signupToPaidRate: sql<number>`
         coalesce(round(((sum(${referralSq.paidReferrals})::float / nullif(sum(${referralSq.signups}), 0)::float) * 100)::numeric, 2), 0)
       `.mapWith(Number),
-
       sales: sql<number>`coalesce(sum(${invoiceSq.salesCount}), 0)`.mapWith(
         Number
       ),

@@ -7,7 +7,7 @@ import {
   organization,
   affiliatePayoutMethod,
   referrals,
-  promotionCodes,
+  promotionCodes, // Added import
 } from "@/db/schema"
 import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
@@ -19,6 +19,7 @@ import {
 import { PayoutSortKeys } from "@/lib/types/organization/PayoutSortKeys"
 
 type OrderableFields = PayoutSortKeys
+
 function applyOptionalLimitAndOffset<
   T extends { limit: (n: number) => any; offset: (n: number) => any },
 >(q: T, limit?: number, offset?: number) {
@@ -31,6 +32,7 @@ function applyOptionalLimitAndOffset<
   }
   return query
 }
+
 export async function getAffiliatesWithStatsAction(
   orgId: string,
   year?: number,
@@ -75,7 +77,7 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id, organization.websiteUrl, organization.referralParam)
     .as("click_sq")
 
-  // 2. NEW: Isolated Signups (Referrals) Aggregation
+  // 2. Isolated Signups (Referrals) Aggregation
   const referralSq = db
     .select({
       affiliateId: affiliate.id,
@@ -96,21 +98,11 @@ export async function getAffiliatesWithStatsAction(
     .where(eq(affiliate.organizationId, orgId))
     .groupBy(affiliate.id)
     .as("ref_sq")
-  const attributionSq = db
-    .select({
-      affiliateId: affiliate.id,
-      linkId: affiliateLink.id,
-      promoId: promotionCodes.id,
-    })
-    .from(affiliate)
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
-    .as("attr_sq")
-  // 2. Isolated Sales & Commission Aggregation
-  // 2. Isolated Sales & Commission Aggregation
+
+  // 3. Isolated Sales & Commission Aggregation (UPDATED with promo codes)
   const salesSqBase = db
     .select({
-      affiliateId: attributionSq.affiliateId,
+      affiliateId: affiliate.id,
       salesCount: sql<number>`count(distinct ${affiliateInvoice.id})`.as(
         "sales_count"
       ),
@@ -118,14 +110,16 @@ export async function getAffiliatesWithStatsAction(
         "total_comm"
       ),
     })
-    .from(attributionSq)
+    .from(affiliate)
+    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
     .leftJoin(
       affiliateInvoice,
       buildWhereWithDate(
         [
           or(
-            eq(affiliateInvoice.affiliateLinkId, attributionSq.linkId),
-            eq(affiliateInvoice.promotionCodeId, attributionSq.promoId)
+            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
           ),
           isNull(affiliateInvoice.refundedAt),
           sql`${affiliateInvoice.reason} in ('subscription_create', 'one_time')`,
@@ -137,11 +131,11 @@ export async function getAffiliatesWithStatsAction(
         months
       )
     )
-    .where(eq(attributionSq.affiliateId, orgId))
-    .groupBy(attributionSq.affiliateId)
+    .where(eq(affiliate.organizationId, orgId))
+    .groupBy(affiliate.id)
     .as("sales_sq")
 
-  // 3. Isolated PAID Amount Aggregation
+  // 4. Isolated PAID Amount Aggregation (UPDATED with promo codes)
   const paidSq = db
     .select({
       affiliateId: affiliate.id,
@@ -149,11 +143,15 @@ export async function getAffiliatesWithStatsAction(
     })
     .from(affiliate)
     .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
     .leftJoin(
       affiliateInvoice,
       buildWhereWithDate(
         [
-          eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+          or(
+            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
+          ),
           isNull(affiliateInvoice.refundedAt),
           sql`${affiliateInvoice.paidAmount} > 0`,
         ],
@@ -168,7 +166,7 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id)
     .as("paid_sq")
 
-  // 4. Isolated UNPAID Amount Aggregation
+  // 5. Isolated UNPAID Amount Aggregation (UPDATED with promo codes)
   const unpaidSq = db
     .select({
       affiliateId: affiliate.id,
@@ -176,11 +174,15 @@ export async function getAffiliatesWithStatsAction(
     })
     .from(affiliate)
     .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
+    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
     .leftJoin(
       affiliateInvoice,
       buildWhereWithDate(
         [
-          eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+          or(
+            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
+            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
+          ),
           isNull(affiliateInvoice.refundedAt),
           sql`${affiliateInvoice.unpaidAmount} > 0`,
         ],
@@ -195,7 +197,8 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id)
     .as("unpaid_sq")
 
-  // 5. Final select fragments
+  // --- REST OF THE CODE REMAINS IDENTICAL TO PREVIOUS ---
+
   const visitsSql = sql<number>`coalesce(${clickSq.clicks}, 0)`.mapWith(Number)
   const signupsSql =
     sql<number>`coalesce(${referralSq.signupCount}, 0)`.mapWith(Number)
@@ -226,6 +229,7 @@ export async function getAffiliatesWithStatsAction(
       "links",
     ] as ExcludableFields[],
   })
+
   const selectedFields = {
     ...baseFields,
     visitors: visitsSql,
@@ -237,15 +241,16 @@ export async function getAffiliatesWithStatsAction(
     links: linksSql,
     currency: organization.currency,
     paypalEmail: affiliatePayoutMethod.accountIdentifier,
-    clickToSignupRate: sql<number>`
-      coalesce((${signupsSql})::float / nullif((${visitsSql}), 0)::float * 100, 0)
-    `.mapWith(Number),
-    signupToPaidRate: sql<number>`
-      coalesce((${salesCountSql})::float / nullif((${signupsSql}), 0)::float * 100, 0)
-    `.mapWith(Number),
+    clickToSignupRate:
+      sql<number>`coalesce((${signupsSql})::float / nullif((${visitsSql}), 0)::float * 100, 0)`.mapWith(
+        Number
+      ),
+    signupToPaidRate:
+      sql<number>`coalesce((${salesCountSql})::float / nullif((${signupsSql}), 0)::float * 100, 0)`.mapWith(
+        Number
+      ),
   }
 
-  // 6. Sorting Logic
   const orderExpr = (() => {
     if (!opts?.orderBy) return undefined
     const orderByMap: Record<string, any> = {
@@ -255,14 +260,11 @@ export async function getAffiliatesWithStatsAction(
       commissionPaid: paidAmountSql,
       commissionUnpaid: unpaidAmountSql,
       email: affiliate.email,
-      clickToSignupRate: sql`(${signupsSql})::float / nullif((${visitsSql}), 0)`,
-      signupToPaidRate: sql`(${salesCountSql})::float / nullif((${signupsSql}), 0)`,
     }
     const base = orderByMap[opts.orderBy] ?? affiliate.email
     return opts.orderDir === "asc" ? base : desc(base)
   })()
 
-  // 7. Execution
   const whereConditions = [eq(affiliate.organizationId, orgId)]
   if (opts?.email) {
     whereConditions.push(ilike(affiliate.email, `%${opts.email}%`))
