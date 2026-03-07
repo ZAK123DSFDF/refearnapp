@@ -1,7 +1,6 @@
 import { db } from "@/db/drizzle"
 import { eq, sql, and, or } from "drizzle-orm"
 import {
-  affiliate,
   affiliateClick,
   affiliateInvoice,
   affiliateLink,
@@ -21,14 +20,11 @@ export async function getAffiliateKpiStatsAction(
     return Array.isArray(filters) ? filters : [filters]
   }
 
-  // 1. Total Links count (Scoped by orgId and affiliateId)
+  // 1. Total Links count
   const totalLinks = await db
     .select({ count: sql<number>`count(*)` })
     .from(affiliateLink)
-    .innerJoin(affiliate, eq(affiliate.id, affiliateLink.affiliateId))
-    .where(
-      and(eq(affiliate.id, affiliateId), eq(affiliate.organizationId, orgId))
-    )
+    .where(eq(affiliateLink.affiliateId, affiliateId))
     .then((res) => res[0]?.count ?? 0)
 
   // 2. Clicks (Scoped)
@@ -41,11 +37,9 @@ export async function getAffiliateKpiStatsAction(
       affiliateLink,
       eq(affiliateLink.id, affiliateClick.affiliateLinkId)
     )
-    .innerJoin(affiliate, eq(affiliate.id, affiliateLink.affiliateId))
     .where(
       and(
-        eq(affiliate.id, affiliateId),
-        eq(affiliate.organizationId, orgId),
+        eq(affiliateLink.affiliateId, affiliateId),
         ...getDateFilters(affiliateClick)
       )
     )
@@ -73,7 +67,7 @@ export async function getAffiliateKpiStatsAction(
     )
     .as("ref_sq")
 
-  // 4. Invoices (Scoped and Fan-out proof)
+  // 4. Invoices (Scoped to Org/Affiliate via links or promo codes)
   const invoiceSq = db
     .select({
       salesCount:
@@ -81,19 +75,19 @@ export async function getAffiliateKpiStatsAction(
           "sales_count"
         ),
       totalComm:
-        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.commission}::numeric else 0 end)`.as(
           "total_comm"
         ),
       totalPaid:
-        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.paidAmount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.paidAmount}::numeric else 0 end)`.as(
           "total_paid"
         ),
       totalUnpaid:
-        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.unpaidAmount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.unpaidAmount}::numeric else 0 end)`.as(
           "total_unpaid"
         ),
       totalAmt:
-        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.amount} else 0 end)`.as(
+        sql<number>`sum(case when ${affiliateInvoice.refundedAt} is null then ${affiliateInvoice.amount}::numeric else 0 end)`.as(
           "total_amt"
         ),
     })
@@ -106,21 +100,18 @@ export async function getAffiliateKpiStatsAction(
       promotionCodes,
       eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
     )
-    // Scope the invoice by checking the affiliate's org
-    .leftJoin(affiliate, eq(affiliate.id, affiliateId))
     .where(
       and(
         or(
           eq(affiliateLink.affiliateId, affiliateId),
           eq(promotionCodes.affiliateId, affiliateId)
         ),
-        eq(affiliate.organizationId, orgId),
         ...getDateFilters(affiliateInvoice)
       )
     )
     .as("inv_sq")
 
-  // 5. Final Join
+  // 5. Final Join with Numeric Casting
   return db
     .select({
       totalLinks: sql`${totalLinks}`.mapWith(Number),
@@ -141,12 +132,14 @@ export async function getAffiliateKpiStatsAction(
         Number
       ),
       amount: sql<number>`coalesce(${invoiceSq.totalAmt}, 0)`.mapWith(Number),
+
+      // Fixed: Cast to numeric BEFORE rounding
       clickToSignupRate:
-        sql<number>`coalesce(round(((${referralSq.signups})::float / nullif(${clickSq.clicks}, 0)::float) * 100, 2), 0)`.mapWith(
+        sql<number>`coalesce(round(((coalesce(${referralSq.signups}, 0)::numeric / nullif(coalesce(${clickSq.clicks}, 0), 0)::numeric) * 100), 2), 0)`.mapWith(
           Number
         ),
       signupToPaidRate:
-        sql<number>`coalesce(round(((${referralSq.paidReferrals})::float / nullif(${referralSq.signups}, 0)::float) * 100, 2), 0)`.mapWith(
+        sql<number>`coalesce(round(((coalesce(${referralSq.paidReferrals}, 0)::numeric / nullif(coalesce(${referralSq.signups}, 0), 0)::numeric) * 100), 2), 0)`.mapWith(
           Number
         ),
     })
