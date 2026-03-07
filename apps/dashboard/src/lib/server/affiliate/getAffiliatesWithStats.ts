@@ -9,7 +9,7 @@ import {
   referrals,
   promotionCodes, // Added import
 } from "@/db/schema"
-import { and, desc, eq, ilike, isNull, or, sql } from "drizzle-orm"
+import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm"
 import { buildWhereWithDate } from "@/util/BuildWhereWithDate"
 import { AffiliateStatsField } from "@/util/AffiliateStatFields"
 import {
@@ -48,7 +48,7 @@ export async function getAffiliatesWithStatsAction(
     email?: string
   }
 ) {
-  // 1. Isolated Click & Link Aggregation
+  // 1. Clicks & Links (This part was mostly fine, but we'll keep it isolated)
   const clickSq = db
     .select({
       affiliateId: affiliate.id,
@@ -77,7 +77,7 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id, organization.websiteUrl, organization.referralParam)
     .as("click_sq")
 
-  // 2. Isolated Signups (Referrals) Aggregation
+  // 2. Signups
   const referralSq = db
     .select({
       affiliateId: affiliate.id,
@@ -99,32 +99,56 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id)
     .as("ref_sq")
 
-  // 3. Isolated Sales & Commission Aggregation (UPDATED with promo codes)
+  /** * NEW STEP: The "Invoice Owner" Mapping
+   * This identifies exactly which affiliate owns which invoice.
+   * It prevents the "Fan-out" multiplication error.
+   */
+  const invoiceOwnerSq = db
+    .select({
+      invoiceId: affiliateInvoice.id,
+      ownerAffiliateId:
+        sql`COALESCE(${affiliateLink.affiliateId}, ${promotionCodes.affiliateId})`.as(
+          "owner_id"
+        ),
+      commission: affiliateInvoice.commission,
+      paidAmount: affiliateInvoice.paidAmount,
+      unpaidAmount: affiliateInvoice.unpaidAmount,
+      refundedAt: affiliateInvoice.refundedAt,
+      reason: affiliateInvoice.reason,
+      createdAt: affiliateInvoice.createdAt, // Needed for date filtering
+    })
+    .from(affiliateInvoice)
+    .leftJoin(
+      affiliateLink,
+      eq(affiliateInvoice.affiliateLinkId, affiliateLink.id)
+    )
+    .leftJoin(
+      promotionCodes,
+      eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
+    )
+    .as("inv_owner")
+
+  // 3. Sales & Commission Aggregation (Using the mapping above)
   const salesSqBase = db
     .select({
       affiliateId: affiliate.id,
-      salesCount: sql<number>`count(distinct ${affiliateInvoice.id})`.as(
+      salesCount: sql<number>`count(distinct ${invoiceOwnerSq.invoiceId})`.as(
         "sales_count"
       ),
-      totalComm: sql<number>`sum(${affiliateInvoice.commission})`.as(
+      totalComm: sql<number>`sum(${invoiceOwnerSq.commission})`.as(
         "total_comm"
       ),
     })
     .from(affiliate)
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
     .leftJoin(
-      affiliateInvoice,
+      invoiceOwnerSq,
       buildWhereWithDate(
         [
-          or(
-            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
-            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
-          ),
-          isNull(affiliateInvoice.refundedAt),
-          sql`${affiliateInvoice.reason} in ('subscription_create', 'one_time')`,
+          eq(invoiceOwnerSq.ownerAffiliateId, affiliate.id),
+          isNull(invoiceOwnerSq.refundedAt),
+          sql`${invoiceOwnerSq.reason} in ('subscription_create', 'one_time')`,
         ],
-        affiliateInvoice,
+        invoiceOwnerSq,
         year,
         month,
         false,
@@ -135,27 +159,22 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id)
     .as("sales_sq")
 
-  // 4. Isolated PAID Amount Aggregation (UPDATED with promo codes)
+  // 4. Isolated PAID Amount Aggregation
   const paidSq = db
     .select({
       affiliateId: affiliate.id,
-      amount: sql`sum(${affiliateInvoice.paidAmount})`.as("paid_amount"),
+      amount: sql`sum(${invoiceOwnerSq.paidAmount})`.as("paid_amount"),
     })
     .from(affiliate)
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
     .leftJoin(
-      affiliateInvoice,
+      invoiceOwnerSq,
       buildWhereWithDate(
         [
-          or(
-            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
-            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
-          ),
-          isNull(affiliateInvoice.refundedAt),
-          sql`${affiliateInvoice.paidAmount} > 0`,
+          eq(invoiceOwnerSq.ownerAffiliateId, affiliate.id),
+          isNull(invoiceOwnerSq.refundedAt),
+          sql`${invoiceOwnerSq.paidAmount} > 0`,
         ],
-        affiliateInvoice,
+        invoiceOwnerSq,
         year,
         month,
         false,
@@ -166,27 +185,22 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id)
     .as("paid_sq")
 
-  // 5. Isolated UNPAID Amount Aggregation (UPDATED with promo codes)
+  // 5. Isolated UNPAID Amount Aggregation
   const unpaidSq = db
     .select({
       affiliateId: affiliate.id,
-      amount: sql`sum(${affiliateInvoice.unpaidAmount})`.as("unpaid_amount"),
+      amount: sql`sum(${invoiceOwnerSq.unpaidAmount})`.as("unpaid_amount"),
     })
     .from(affiliate)
-    .leftJoin(affiliateLink, eq(affiliateLink.affiliateId, affiliate.id))
-    .leftJoin(promotionCodes, eq(promotionCodes.affiliateId, affiliate.id))
     .leftJoin(
-      affiliateInvoice,
+      invoiceOwnerSq,
       buildWhereWithDate(
         [
-          or(
-            eq(affiliateInvoice.affiliateLinkId, affiliateLink.id),
-            eq(affiliateInvoice.promotionCodeId, promotionCodes.id)
-          ),
-          isNull(affiliateInvoice.refundedAt),
-          sql`${affiliateInvoice.unpaidAmount} > 0`,
+          eq(invoiceOwnerSq.ownerAffiliateId, affiliate.id), // Move join condition here
+          isNull(invoiceOwnerSq.refundedAt),
+          sql`${invoiceOwnerSq.unpaidAmount} > 0`,
         ],
-        affiliateInvoice,
+        invoiceOwnerSq,
         year,
         month,
         false,
@@ -197,7 +211,7 @@ export async function getAffiliatesWithStatsAction(
     .groupBy(affiliate.id)
     .as("unpaid_sq")
 
-  // --- REST OF THE CODE REMAINS IDENTICAL TO PREVIOUS ---
+  // --- REST OF YOUR CODE (Final select and execution) IS CORRECT ---
 
   const visitsSql = sql<number>`coalesce(${clickSq.clicks}, 0)`.mapWith(Number)
   const signupsSql =
