@@ -13,7 +13,6 @@ import { dashboardThemeCustomizationAtom } from "@/store/DashboardCustomizationA
 import { MissingPaypalEmailCard } from "@/components/ui-custom/MissingPayoutEmailCard"
 import { DomainHeader } from "@/components/ui-custom/DomainHeader"
 import AffiliateReferralsTable from "@/components/pages/AffiliateDashboard/referrals/AffiliateReferralTable"
-import { UserLicense } from "@/lib/server/organization/getLicense"
 import AffiliateCouponsTable from "@/components/pages/AffiliateDashboard/AffiliateCoupon/affiliateCouponTable"
 
 export function DashboardCustomization({
@@ -21,13 +20,11 @@ export function DashboardCustomization({
   domain,
   selectedPage,
   setSelectedPage,
-  license,
 }: {
   orgId: string
   domain?: string
   selectedPage: string
   setSelectedPage: (selectedPage: string) => void
-  license: UserLicense | null
 }) {
   const { mainBackgroundColor } = useAtomValue(dashboardThemeCustomizationAtom)
   if (!orgId) {
@@ -55,7 +52,6 @@ export function DashboardCustomization({
               isPreview
               currentPage={selectedPage}
               onSelectPage={(page: any) => setSelectedPage(page)}
-              license={license}
             />
             <div
               className="flex-1 p-6 overflow-y-auto"

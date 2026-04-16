@@ -40,9 +40,9 @@
 
 ---
 
-## ⚖️ Open Source vs. Pro & Ultimate
+## ⚖️ Self-Hosted vs. Managed Cloud
 
-**Self-host and track your affiliates on your own platform.** RefearnApp allows you to manage all your transactions and payouts directly, without relying on third-party tracking tools. While the core engine is 100% free under **AGPL-3.0**, our Pro and Ultimate tiers offer one-time license keys for advanced features.
+**Self-host and track your affiliates on your own platform.** RefearnApp allows you to manage all your transactions and payouts directly, without relying on third-party tracking tools. RefearnApp is 100% open-source under **AGPL-3.0**, and all features are free for self-hosted users.
 
 > [!IMPORTANT]
 > ### 🚀 Launch Special: RefearnApp Managed Cloud
@@ -57,17 +57,17 @@
 > 👉 **[Claim your Lifetime Cloud Seat — refearnapp.com](https://refearnapp.com/#pricing)**
 ---
 
-| Feature | Community (Free) | Pro ($199) | Ultimate ($299) | Managed Cloud |
-| :--- | :---: | :---: | :---: | :---: |
-| **Hosting** | Self-Hosted | Self-Hosted | Self-Hosted | **Zero Maintenance** |
-| **Payment Model** | Free | **One-time** | **One-time** | **Subscription** |
-| **Full Source Code Access** | ✅ | ✅ | ✅ | ✅ |
-| **Stripe & Paddle Integration** | ✅ | ✅ | ✅ | ✅ |
-| **PayPal Mass Payouts** | ✅ | ✅ | ✅ | ✅ |
-| **Advanced Analytics** | ❌ | ✅ | ✅ | ✅ |
-| **Affiliate Portal Customization** | ❌ | ✅ | ✅ | ✅ |
-| **Coupon Code Tracking** | ❌ | ❌ | ✅ | ✅ |
-| **Team Management** | ❌ | ❌ | ✅ | ✅ |
+| Feature | Self-Hosted (Free) | Managed Cloud |
+| :--- | :---: | :---: |
+| **Hosting** | Self-Hosted | **Zero Maintenance** |
+| **Payment Model** | **Free** | **Subscription** |
+| **Full Source Code Access** | ✅ | ✅ |
+| **Stripe & Paddle Integration** | ✅ | ✅ |
+| **PayPal Mass Payouts** | ✅ | ✅ |
+| **Advanced Analytics** | ✅ | ✅ |
+| **Affiliate Portal Customization** | ✅ | ✅ |
+| **Coupon Code Tracking** | ✅ | ✅ |
+| **Team Management** | ✅ | ✅ |
 
 ---
 ## 🛠 Tech Stack
@@ -137,7 +137,7 @@ RefearnApp is an open-source, high-performance platform designed to help you bui
 
 Hi, I'm **Zekariyas Berihun**. I built RefearnApp because I believe founders should have full control over their growth infrastructure without the burden of high monthly subscriptions and scaling overhead.
 
-I am committed to RefearnApp for the long haul. My goal is to build the most stable, performant, and transparent affiliate tracking tool for the indie hacker community. By purchasing a Pro or Ultimate license, you aren't just unlocking advanced features—you are directly supporting the independent development of this open-source ecosystem.
+I am committed to RefearnApp for the long haul. My goal is to build the most stable, performant, and transparent affiliate tracking tool for the indie hacker community.
 
 * **Follow the Journey:** [Connect on X (Twitter)](https://x.com/zekariyasberih4)
 * **Get Support:** [Join our Discord Community](https://discord.gg/fHw9j7P3w9)

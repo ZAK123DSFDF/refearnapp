@@ -11,12 +11,11 @@ const polar = new Polar({
 
 export const POST = handleRoute("ValidateLicense", async (req: NextRequest) => {
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
-  const isDev = process.env.NODE_ENV === "development"
-  if (isSelfHosted && !isDev) {
-    throw new AppError({
-      status: 403,
-      error: "FORBIDDEN",
-      toast: "Access denied",
+  if (isSelfHosted) {
+    return NextResponse.json({
+      status: "granted",
+      tier: "ULTIMATE",
+      activation: { label: "all-users" }
     })
   }
 

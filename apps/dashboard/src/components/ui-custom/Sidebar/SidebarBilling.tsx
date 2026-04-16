@@ -31,59 +31,21 @@ export const SidebarBilling = ({
 }: SidebarBillingProps) => {
   if (isSelfHosted) {
     return (
-      <div className="space-y-2">
-        {license?.isCommunity && (
-          <>
-            <Button asChild className="w-full h-9 text-xs">
-              <Link href={`/organization/${orgId}/dashboard/pricing`}>
-                Get License Key
-              </Link>
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full text-[10px] h-6 opacity-60"
-              onClick={onOpenLicenseModal}
-            >
-              Activate existing key
-            </Button>
-          </>
-        )}
-
-        {(license?.isPro || license?.isUltimate) && (
-          <>
-            <Button
-              variant="outline"
-              className="w-full h-8 text-xs"
-              onClick={() =>
-                window.open(polarConfig.customerPortalUrl, "_blank")
-              }
-            >
-              Manage Licenses
-            </Button>
-            {license.activationId ? (
-              <Button
-                variant="destructive"
-                className="w-full h-8 text-xs"
-                disabled={isDeactivating}
-                onClick={onDeactivateLicense}
-              >
-                {isDeactivating ? "..." : `Deactivate ${license.tier}`}
-              </Button>
-            ) : (
-              <Button
-                variant="secondary"
-                className="w-full h-8 text-xs"
-                onClick={onOpenLicenseModal}
-              >
-                Activate Key
-              </Button>
-            )}
-          </>
-        )}
+      <div className="rounded-lg bg-primary/5 border border-primary/10 p-3">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] uppercase font-bold text-muted-foreground">
+            License
+          </span>
+          <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+            ULTIMATE
+          </span>
+        </div>
+        <p className="text-[11px] text-muted-foreground leading-tight">
+          Self-hosted instance with full premium access enabled.
+        </p>
       </div>
     )
   }
-
   // Cloud Billing Logic
   return (
     <div className="space-y-2">

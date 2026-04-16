@@ -9,12 +9,11 @@ const polar = new Polar({
 })
 export const POST = handleRoute("CheckoutCreation", async (req) => {
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
-  const isDev = process.env.NODE_ENV === "development"
-  if (isSelfHosted && !isDev) {
+  if (isSelfHosted) {
     throw new AppError({
       status: 403,
-      error: "FORBIDDEN",
-      toast: "Access denied",
+      error: "DISABLED",
+      toast: "Billing is disabled in self-hosted mode.",
     })
   }
   const { targetPlan, upgrade } = await req.json()

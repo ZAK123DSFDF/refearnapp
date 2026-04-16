@@ -30,12 +30,10 @@ export default function CustomizationPage({
   orgId,
   isTeam = false,
   plan,
-  license,
 }: {
   orgId: string
   isTeam?: boolean
   plan: "FREE" | "PRO" | "ULTIMATE"
-  license: UserLicense | null
 }) {
   const [mainTab, setMainTab] = useState("sidebar")
   const [selectedPage, setSelectedPage] = useState("dashboard")
@@ -344,7 +342,6 @@ export default function CustomizationPage({
                   domain={domainName}
                   selectedPage={selectedPage}
                   setSelectedPage={setSelectedPage}
-                  license={license}
                 />
               </div>
             </SidebarProvider>

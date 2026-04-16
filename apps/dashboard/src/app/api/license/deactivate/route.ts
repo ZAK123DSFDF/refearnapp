@@ -12,6 +12,10 @@ const polar = new Polar({
 export const POST = handleRoute(
   "DeactivatePolarAPI",
   async (req: NextRequest) => {
+    if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true") {
+      return NextResponse.json({ ok: true })
+    }
+
     const { activationId, key } = await req.json()
 
     if (!activationId || !key) {

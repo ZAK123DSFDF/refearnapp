@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { Form } from "@/components/ui/form"
 import {
@@ -81,15 +81,16 @@ const OrganizationDashboardSidebar = ({
     resolver: zodResolver(licenseSchema),
     defaultValues: { licenseKey: "" },
   })
-  const { canAccessPro, canAccessUltimate } = useAccess(license)
-  const isLocked = (itemTitle: string) => {
+  const { canAccessPro, canAccessUltimate } = useAccess()
+
+  const checkLockedStatus = (title: string) => {
     if (isSelfHosted) {
-      if (["Teams", "Coupons"].includes(itemTitle)) return !canAccessUltimate
-      if (["Customization", "Dashboard"].includes(itemTitle))
-        return !canAccessPro
+      if (["Teams", "Coupons"].includes(title)) return !canAccessUltimate
+      if (["Customization", "Dashboard"].includes(title)) return !canAccessPro
     }
     return false
   }
+
   const isPremium = isSelfHosted
     ? !!((license?.isPro || license?.isUltimate) && !!license?.activationId)
     : plan.plan === "PRO" || plan.plan === "ULTIMATE"
@@ -98,93 +99,98 @@ const OrganizationDashboardSidebar = ({
     ? !!(license?.isUltimate && !!license?.activationId)
     : plan.plan === "ULTIMATE"
   const { mutate: switchOrg, isPending } = useSwitchOrg()
-  const navigationGroups = [
-    {
-      label: "Activity",
-      items: [
-        {
-          title: "Dashboard",
-          url: `/organization/${orgId}/dashboard/analytics`,
-          icon: BarChart3,
-        },
-        {
-          title: "Affiliates",
-          url: `/organization/${orgId}/dashboard/affiliates`,
-          icon: LinkIcon,
-        },
-        {
-          title: "Payout",
-          url: `/organization/${orgId}/dashboard/payout`,
-          icon: Users,
-        },
-      ],
-    },
-    {
-      label: "Promotion",
-      items: [
-        {
-          title: "Coupons",
-          url: `/organization/${orgId}/dashboard/coupons`,
-          icon: TicketPercent,
-        },
-        {
-          title: "Referrals",
-          url: `/organization/${orgId}/dashboard/referrals`,
-          icon: MousePointerClick,
-        },
-      ],
-    },
-    // 👥 NEW: Collaboration Section (Only shows if they have access)
-    ...(plan.plan === "PRO" || plan.plan === "ULTIMATE"
-      ? [
-          {
-            label: "Organization",
-            items: [
-              {
-                title: "Teams",
-                url: `/organization/${orgId}/dashboard/teams`,
-                icon: Users,
-              },
-            ],
-          },
-        ]
-      : []),
-    {
-      label: "Configuration",
-      items: [
-        {
-          title: "Integration",
-          url: `/organization/${orgId}/dashboard/integration`,
-          icon: Layers,
-        },
 
-        {
-          title: "Customization",
-          url: `/organization/${orgId}/dashboard/customization`,
-          icon: CreditCard,
-        },
-        {
-          title: "Manage Domains",
-          url: `/organization/${orgId}/dashboard/manageDomains`,
-          icon: Globe,
-        },
-        {
-          title: "Settings",
-          url: `/organization/${orgId}/dashboard/settings`,
-          icon: Settings,
-        },
-        ...(!isSelfHosted
-          ? [
-              {
-                title: "Support Email",
-                url: `/organization/${orgId}/dashboard/supportEmail`,
-                icon: MailQuestion,
-              },
-            ]
-          : []),
-      ],
-    },
-  ]
+  const navigationGroups = useMemo(
+    () => [
+      {
+        label: "Activity",
+        items: [
+          {
+            title: "Dashboard",
+            url: `/organization/${orgId}/dashboard/analytics`,
+            icon: BarChart3,
+          },
+          {
+            title: "Affiliates",
+            url: `/organization/${orgId}/dashboard/affiliates`,
+            icon: LinkIcon,
+          },
+          {
+            title: "Payout",
+            url: `/organization/${orgId}/dashboard/payout`,
+            icon: Users,
+          },
+        ],
+      },
+      {
+        label: "Promotion",
+        items: [
+          {
+            title: "Coupons",
+            url: `/organization/${orgId}/dashboard/coupons`,
+            icon: TicketPercent,
+          },
+          {
+            title: "Referrals",
+            url: `/organization/${orgId}/dashboard/referrals`,
+            icon: MousePointerClick,
+          },
+        ],
+      },
+      // 👥 NEW: Collaboration Section (Only shows if they have access)
+      ...(plan.plan === "PRO" || plan.plan === "ULTIMATE"
+        ? [
+            {
+              label: "Organization",
+              items: [
+                {
+                  title: "Teams",
+                  url: `/organization/${orgId}/dashboard/teams`,
+                  icon: Users,
+                },
+              ],
+            },
+          ]
+        : []),
+      {
+        label: "Configuration",
+        items: [
+          {
+            title: "Integration",
+            url: `/organization/${orgId}/dashboard/integration`,
+            icon: Layers,
+          },
+
+          {
+            title: "Customization",
+            url: `/organization/${orgId}/dashboard/customization`,
+            icon: CreditCard,
+          },
+          {
+            title: "Manage Domains",
+            url: `/organization/${orgId}/dashboard/manageDomains`,
+            icon: Globe,
+          },
+          {
+            title: "Settings",
+            url: `/organization/${orgId}/dashboard/settings`,
+            icon: Settings,
+          },
+          ...(!isSelfHosted
+            ? [
+                {
+                  title: "Support Email",
+                  url: `/organization/${orgId}/dashboard/supportEmail`,
+                  icon: MailQuestion,
+                },
+              ]
+            : []),
+        ],
+      },
+    ],
+    [orgId, plan.plan, isSelfHosted]
+  )
+
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
   const [licenseModalOpen, setLicenseModalOpen] = useState(false)
@@ -339,7 +345,7 @@ const OrganizationDashboardSidebar = ({
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => {
-                  const locked = isLocked(item.title)
+                  const locked = checkLockedStatus(item.title)
                   return (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
