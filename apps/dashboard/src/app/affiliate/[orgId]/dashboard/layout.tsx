@@ -44,6 +44,7 @@ export default async function DashboardLayout({
           orgId={orgId}
           AffiliateData={affiliate}
           unseenCouponsCount={unseenCouponsCount}
+          license={licenseData}
         />
         <SidebarInset
           affiliate

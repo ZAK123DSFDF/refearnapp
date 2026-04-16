@@ -52,13 +52,7 @@ export async function createSelfHostedCheckoutAction({
         toast: "This action is only available for self-hosted instances.",
       })
     }
-    if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true") {
-      return {
-        ok: true,
-        toast: "You already have full access in self-hosted mode!",
-        redirectUrl: "/dashboard",
-      }
-    }
+
     // 2. API Call
     const response = await fetch(`${CENTRAL_API_URL}/api/license/checkout`, {
       method: "POST",

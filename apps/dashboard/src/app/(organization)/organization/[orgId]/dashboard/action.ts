@@ -12,8 +12,8 @@ import { getUserPlan } from "@/lib/server/organization/getUserPlan"
 
 export async function activateLicense(orgId: string, key: string) {
   return await handleAction("ActivateLicense", async () => {
-    if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true") {
-      return { ok: true, toast: "License activated successfully!" }
+    if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") {
+      return { ok: true, data: "Not self-hosted, skipping sync" }
     }
 
     // 1. Resolve ownerId
@@ -86,10 +86,6 @@ export async function activateLicense(orgId: string, key: string) {
 }
 export async function deactivateLicense(orgId: string, activationId: string) {
   return await handleAction("DeactivateLicense", async () => {
-    if (process.env.NEXT_PUBLIC_SELF_HOSTED === "true") {
-      return { ok: true, toast: "Device deactivated successfully" }
-    }
-
     const ownerId = await getOrgOwnerId(orgId)
     if (!ownerId) {
       throw new AppError({

@@ -42,6 +42,7 @@ type Props = {
   affiliate: boolean
   AffiliateData?: AffiliateData | null
   unseenCouponsCount?: number
+  license: UserLicense | null
 }
 
 const AffiliateDashboardSidebar = ({
@@ -52,11 +53,12 @@ const AffiliateDashboardSidebar = ({
   affiliate,
   AffiliateData,
   unseenCouponsCount = 0,
+  license,
 }: Props) => {
   const pathname = usePathname()
   useCloseSidebarOnNavigation()
   const { getPath } = useAffiliatePath(orgId)
-  const { canAccessUltimate } = useAccess()
+  const { canAccessUltimate } = useAccess(license)
   const showNotification = useAtomValue(showNotificationAtom)
   const displayBadgeCount = isPreview
     ? showNotification
