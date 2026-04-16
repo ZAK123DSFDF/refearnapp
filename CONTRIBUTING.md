@@ -30,8 +30,6 @@ RefearnApp uses a modern monorepo stack: **Next.js**, **Cloudflare Workers**, **
 2. pnpm (Package Manager)
 3. Bun (Required for database scripts)
 4. PostgreSQL (Local or hosted)
-5. **Mailpit** (For capturing outgoing emails locally)
-6. **Caddy** (Required for routing the affiliate portal and subdomains)
 
 ---
 
@@ -63,29 +61,26 @@ Fill in all required variables (see docs for details).
 
 ### 3. Database Management
 
-The easiest way to set up your database is using the root scripts:
+#### Step 1: Navigate to dashboard
 
-1. **Setup & Sync:** `pnpm db:setup` (Initializes schema and core system data)
-2. **Seed Sandbox Data:** `pnpm db:seed` (Populates the DB with demo data to verify the dashboard)
+    cd apps/dashboard
 
----
+#### Step 2: Reset & Sync database
 
-#### Manual Database Steps (Optional)
+    bun src/db/reset.ts
 
-If you prefer manual control, navigate to `apps/dashboard`:
+    # If you reset, delete migrations folder to avoid conflicts
+    pnpm exec drizzle-kit generate
+    pnpm exec drizzle-kit migrate
 
-1. **Reset & Sync:**
-   ```bash
-   bun src/db/reset.ts
-   pnpm exec drizzle-kit generate
-   pnpm exec drizzle-kit migrate
-   ```
-2. **Initialize Core & Demo Data:**
-   ```bash
-   bun src/db/seedSystem.ts
-   bun src/db/currencySeed.ts
-   bun src/db/seeds/seedFun1.ts
-   ```
+#### Step 3: Initialize core data
+
+    bun src/db/seedSystem.ts
+    bun src/db/currencySeed.ts
+
+#### Step 4: Seed demo data
+
+    bun src/db/seeds/seedFun1.ts
 
 ---
 
@@ -113,22 +108,6 @@ If you prefer manual control, navigate to `apps/dashboard`:
 
     # Tracking Worker
     pnpm dev --filter @repo/tracking-worker
-
----
-
-### 5. Verification & Infrastructure
-
-#### Step 1: Check Sandbox Data
-Before configuring advanced infrastructure, run the application and ensure the dashboard is populated with the data from the `pnpm db:seed` step. This allows you to verify the UI and basic functionality immediately.
-
-#### Step 2: Local Infrastructure (Email & Portal)
-To fully test the application lifecycle, including emails and the affiliate-facing portal:
-
-1. **Mailpit:** Ensure Mailpit is running to capture all verification and notification emails.
-2. **Affiliate Portal Routing:** To handle local subdomains (e.g., to access the portal) and view the affiliate-facing side of the app, use Caddy:
-   ```bash
-   caddy run
-   ```
 
 ---
 
