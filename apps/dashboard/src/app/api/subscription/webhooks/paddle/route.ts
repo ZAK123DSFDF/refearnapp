@@ -53,7 +53,7 @@ export const POST = handleRoute("Paddle Webhook", async (req) => {
     const priceAmount = Number(priceInfo?.unitPrice?.amount || 0)
     const currency = data.currencyCode || "USD"
 
-    let planType: "PRO" | "ULTIMATE" =
+    const planType: "PRO" | "ULTIMATE" =
       priceDesc.includes("ULTIMATE-SUBSCRIPTION") ||
       priceDesc.includes("ULTIMATE-SUBSCRIPTION-YEAR") ||
       priceDesc.includes("ULTIMATE-ONE-TIME-UPGRADE") ||

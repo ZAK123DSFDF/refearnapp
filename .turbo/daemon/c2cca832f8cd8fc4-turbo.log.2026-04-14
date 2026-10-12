@@ -1,0 +1,14 @@
+2026-04-14T10:39:00.297079Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-14T10:39:01.070227Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-14T10:48:59.021118Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Integration\Stripe\EmbedStripeCheckout.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Integration\Stripe\EmbedStripeCheckout.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-04-14T11:01:05.358612Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Integration\Paddle\EmbedCheckout.tsx~: could not open 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Integration\Paddle\EmbedCheckout.tsx~': The process cannot access the file because it is being used by another process.
+; class=Os (2)
+2026-04-14T12:57:56.894082Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-14T12:57:57.056674Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-14T15:59:26.611875Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-14T15:59:26.808936Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-14T17:21:15.357237Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\astro.config.mjs~: could not find 'D:\code-files\apps\refearnapp\apps\landing-page\astro.config.mjs~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-04-14T18:24:07.634227Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-14T18:24:07.793924Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running

@@ -1,0 +1,12 @@
+2026-04-15T05:34:26.771343Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-15T05:34:26.845055Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-15T05:34:55.365451Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-15T05:34:55.569051Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-15T06:02:26.564117Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\src\pages\blog\[slug].astro~: could not find 'D:\code-files\apps\refearnapp\apps\landing-page\src\pages\blog\[slug].astro~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-04-15T06:22:07.711656Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-15T06:22:07.873706Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-15T07:01:39.017853Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\src\components\blog\TableOfContents.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\landing-page\src\components\blog\TableOfContents.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-04-15T09:03:33.106661Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-15T09:03:33.268747Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running

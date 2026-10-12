@@ -55,6 +55,7 @@ import {
 import { InputField } from "@/components/Auth/FormFields"
 import { SidebarBilling } from "@/components/ui-custom/Sidebar/SidebarBilling"
 import { SidebarDiscord } from "@/components/ui-custom/Sidebar/SidebarDiscord"
+import { usePolarPortal } from "@/hooks/usePolarPortal"
 
 // Menu items for the sidebar
 
@@ -198,7 +199,9 @@ const OrganizationDashboardSidebar = ({
     "create" | "upgrade" | "expired"
   >("create")
   const router = useRouter()
-  const { openPortal } = usePaddlePortal(orgId)
+  const { openPortal: openPaddlePortal } = usePaddlePortal(orgId)
+  const { openPortal: openPolarPortal } = usePolarPortal(orgId)
+  const openPortal = plan.provider === "polar" ? openPolarPortal : openPaddlePortal
   const activateMutation = useAppMutation(
     (values: z.infer<typeof licenseSchema>) =>
       activateLicense(orgId!, values.licenseKey),

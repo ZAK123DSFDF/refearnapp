@@ -1,0 +1,8 @@
+2026-03-17T09:15:50.721480Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-17T09:15:50.884534Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-17T11:56:51.122068Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-17T11:56:51.304706Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-17T13:05:16.524555Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\db\schema-bootstrap.ts~: could not open 'D:\code-files\apps\refearnapp\apps\dashboard\src\db\schema-bootstrap.ts~': The process cannot access the file because it is being used by another process.
+; class=Os (2)
+2026-03-17T16:49:25.972220Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-17T16:49:26.134321Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running

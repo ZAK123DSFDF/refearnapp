@@ -1,0 +1,10 @@
+2026-04-28T10:07:02.424602Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-28T10:07:02.589742Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-28T10:18:07.845876Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-28T10:18:07.978031Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-28T10:31:55.855349Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-28T10:31:55.974202Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-28T13:19:35.006747Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\AffiliateOnboarding.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\AffiliateOnboarding.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-04-28T13:20:57.264585Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\AffiliateOnboarding.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\AffiliateOnboarding.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)

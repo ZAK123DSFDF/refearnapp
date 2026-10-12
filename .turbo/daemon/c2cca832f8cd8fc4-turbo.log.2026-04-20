@@ -1,0 +1,8 @@
+2026-04-20T11:14:31.203801Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-20T11:14:31.406282Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-20T12:02:06.789684Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-20T12:02:06.916516Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-20T17:01:32.167404Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-20T17:01:32.369532Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-20T17:03:36.787840Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Settings\Settings.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Settings\Settings.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)

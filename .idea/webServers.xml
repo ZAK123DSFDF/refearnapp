@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="09a0d6e7-b1a6-462c-b747-38565273efa2" name="refearnapp">
+        <fileTransfer rootFolder="/home/zekariyasberihun8/projects/self-hosted-refearnapp" accessType="SFTP" host="35.202.203.115" port="22" sshConfigId="271dd8b2-f3a1-4db4-b3f4-64324065f61c" sshConfig="zekariyasberihun8@35.202.203.115:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

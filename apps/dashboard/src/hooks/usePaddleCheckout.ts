@@ -25,13 +25,14 @@ type CheckoutParams =
       initial?: boolean
     }
 type ApplyingReason = "PURCHASE" | "CANCEL" | "UPGRADE"
-function usePaddleCheckout() {
+function usePaddleCheckout(enabled = true) {
   const [paddle, setPaddle] = useState<Paddle>()
   const [showApplyingDialog, setShowApplyingDialog] =
     useState<null | ApplyingReason>(null)
   const [checkoutClosed, setCheckoutClosed] = useState(false)
   const [initialCheckout, setInitialCheckout] = useState(false)
   useEffect(() => {
+    if (!enabled) return
     initializePaddle({
       environment: paddleConfig.client.checkoutEnvironment,
       token: paddleConfig.client.token,

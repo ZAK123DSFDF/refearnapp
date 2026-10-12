@@ -1,0 +1,8 @@
+2026-03-30T14:15:47.209484Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-30T14:15:47.365954Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-30T15:00:55.699106Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\src\pages\docs\index.astro~: could not find 'D:\code-files\apps\refearnapp\apps\landing-page\src\pages\docs\index.astro~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-30T17:44:16.002541Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-30T17:44:16.234715Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-30T17:47:21.360501Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\src\components\docs\sections\CoolifySetup.tsx~: could not open 'D:\code-files\apps\refearnapp\apps\landing-page\src\components\docs\sections\CoolifySetup.tsx~': The process cannot access the file because it is being used by another process.
+; class=Os (2)

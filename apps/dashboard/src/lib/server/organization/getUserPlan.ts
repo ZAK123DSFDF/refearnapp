@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm"
 import { getOrgAuthForPlan } from "@/lib/server/organization/getOrgAuthForPlan"
 import type { PlanInfo } from "@/lib/types/organization/planInfo"
 import { mapTierToPurchasePlan } from "@/util/appsumo"
+import { pickBillingProvider } from "@/lib/server/billing/resolveBillingProvider"
 
 // 1. Core Logic: The only place where the plan calculation lives
 async function getPlanByUserId(userId: string): Promise<PlanInfo> {
@@ -20,7 +21,7 @@ async function getPlanByUserId(userId: string): Promise<PlanInfo> {
 
   // Helper for validity
 
-  const base = { userId }
+  const base = { userId, provider: pickBillingProvider(userSub, userPurchase) }
   if (userSub) {
     const isValid = (sub: typeof subscription.$inferSelect | null) =>
       sub?.expiresAt && sub.expiresAt.getTime() >= Date.now()

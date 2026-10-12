@@ -1,25 +1,25 @@
-<script setup>
-import { ref, computed, onMounted } from 'vue';
-import { initializePaddle } from '@paddle/paddle-js';
-import { AVAILABLE_MODES, CURRENT_BILLING_MODE } from '../lib/pricing';
-const PADDLE_TOKEN = import.meta.env.PUBLIC_PADDLE_TOKEN;
-const PADDLE_ENV = import.meta.env.PUBLIC_PADDLE_ENV;
-const PADDLE_IDS = {
-  pro_one_time: import.meta.env.PUBLIC_PADDLE_PRO_ID,
-  ult_one_time: import.meta.env.PUBLIC_PADDLE_ULT_ID,
-};
+<script setup lang="ts">
+import { ref, computed, onMounted, shallowRef } from "vue";
+import { initializePaddle, type Paddle } from "@paddle/paddle-js";
+import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
+import { AVAILABLE_MODES, CURRENT_BILLING_MODE } from "../lib/pricing";
+import { getBillingConfig } from "../lib/billing";
+type BillingProvider = "polar" | "paddle";
+const BILLING_PROVIDER = "polar" as BillingProvider;
 
 const availableModes = AVAILABLE_MODES;
 const billingMode = ref(CURRENT_BILLING_MODE);
 
-const activePaddle = ref(null);
+const activePaddle = shallowRef<Paddle | null>(null);
 onMounted(async () => {
+  if (BILLING_PROVIDER !== "paddle") return;
+  const { paddle } = getBillingConfig();
   const paddleInstance = await initializePaddle({
-    token: PADDLE_TOKEN,
-    environment: PADDLE_ENV,
+    token: paddle.token,
+    environment: paddle.env,
     eventCallback: (event) => {
-      if (event.name === 'checkout.completed') {
-        const txnId = event.data.transaction_id;
+      if (event.name === "checkout.completed") {
+        const txnId = event.data?.transaction_id;
         window.location.href = `/signup?txn=${txnId}`;
       }
     },
@@ -30,78 +30,85 @@ onMounted(async () => {
   }
 });
 
-const handleAction = (plan) => {
-  if (billingMode.value === 'PURCHASE') {
+const handleAction = async (plan: "pro" | "ult") => {
+  const cfg = getBillingConfig();
+  if (billingMode.value === "PURCHASE") {
+    if (BILLING_PROVIDER === "polar") {
+      const link =
+        plan === "pro" ? cfg.polar.pro_one_time : cfg.polar.ult_one_time;
+      await PolarEmbedCheckout.create(link, { theme: "light" });
+      return;
+    }
     const priceId =
-      plan === 'pro' ? PADDLE_IDS.pro_one_time : PADDLE_IDS.ult_one_time;
+      plan === "pro" ? cfg.paddle.pro_one_time : cfg.paddle.ult_one_time;
 
     if (!activePaddle.value) {
-      console.error('Paddle is still loading...');
+      console.error("Paddle is still loading...");
       return;
     }
 
     activePaddle.value.Checkout.open({
       settings: {
-        displayMode: 'overlay',
-        theme: 'light',
+        displayMode: "overlay",
+        theme: "light",
       },
       items: [{ priceId: priceId, quantity: 1 }],
     });
   } else {
-    window.location.href = '/signup';
+    window.location.href = "/signup";
   }
 };
-const cycle = ref('MONTHLY');
+const cycle = ref<"MONTHLY" | "YEARLY">("MONTHLY");
 
 const featuresList = [
-  { name: 'Unlimited affiliates signup', pro: true, ultimate: true },
-  { name: 'Unlimited revenue from affiliate', pro: true, ultimate: true },
-  { name: 'PayPal mass payout', pro: true, ultimate: true },
-  { name: 'Custom domain', pro: true, ultimate: true },
-  { name: 'Affiliate page customization', pro: true, ultimate: true },
-  { name: 'Integrate with Stripe and Paddle', pro: true, ultimate: true },
-  { name: 'Cookie attribution customization', pro: true, ultimate: true },
-  { name: 'Set commission durations', pro: true, ultimate: true },
-  { name: 'Coupon code tracking', pro: true, ultimate: true },
-  { name: 'Advanced analytics & reports', pro: true, ultimate: true },
-  { name: 'Two-sided incentives', pro: true, ultimate: true },
-  { name: '1 organization', pro: true, ultimate: false },
-  { name: 'Unlimited organizations', pro: false, ultimate: true },
-  { name: 'Up to 3 team member invitations', pro: true, ultimate: false },
-  { name: 'Unlimited team member invitations', pro: false, ultimate: true },
+  { name: "Unlimited affiliates signup", pro: true, ultimate: true },
+  { name: "Unlimited revenue from affiliate", pro: true, ultimate: true },
+  { name: "PayPal mass payout", pro: true, ultimate: true },
+  { name: "Custom domain", pro: true, ultimate: true },
+  { name: "Affiliate page customization", pro: true, ultimate: true },
+  { name: "Integrate with Stripe and Paddle", pro: true, ultimate: true },
+  { name: "Cookie attribution customization", pro: true, ultimate: true },
+  { name: "Set commission durations", pro: true, ultimate: true },
+  { name: "Coupon code tracking", pro: true, ultimate: true },
+  { name: "Advanced analytics & reports", pro: true, ultimate: true },
+  { name: "Two-sided incentives", pro: true, ultimate: true },
+  { name: "1 organization", pro: true, ultimate: false },
+  { name: "Unlimited organizations", pro: false, ultimate: true },
+  { name: "Up to 3 team member invitations", pro: true, ultimate: false },
+  { name: "Unlimited team member invitations", pro: false, ultimate: true },
 ];
 const enterpriseFeatures = [
-  'Full-service data migration from existing platforms',
-  'White-glove VPS setup & technical deployment',
-  'Automated tax compliance & W-8 management for affiliate payouts',
-  'Priority maintenance, 24/7 support & emergency response',
-  'Custom integration & tailored API support',
-  'Dedicated account manager',
+  "Full-service data migration from existing platforms",
+  "White-glove VPS setup & technical deployment",
+  "Automated tax compliance & W-8 management for affiliate payouts",
+  "Priority maintenance, 24/7 support & emergency response",
+  "Custom integration & tailored API support",
+  "Dedicated account manager",
 ];
 const communityFeatures = [
-  'Unlimited affiliate tracking',
-  'Self-host on your own infrastructure',
-  'Unlimited affiliates',
-  'Unlimited revenue attribution',
-  'PayPal mass payout',
-  'Customizable commission durations',
-  'Cookie attribution settings',
-  'Stripe and Paddle integration',
-  'Unlimited organizations',
-  'Public Discord community access',
-  'Open-source codebase',
+  "Unlimited affiliate tracking",
+  "Self-host on your own infrastructure",
+  "Unlimited affiliates",
+  "Unlimited revenue attribution",
+  "PayPal mass payout",
+  "Customizable commission durations",
+  "Cookie attribution settings",
+  "Stripe and Paddle integration",
+  "Unlimited organizations",
+  "Public Discord community access",
+  "Open-source codebase",
 ];
 const prices = computed(() => {
-  if (billingMode.value === 'PURCHASE') {
-    return { pro: '199', ult: '299', cycle: 'one-time', saved: null };
+  if (billingMode.value === "PURCHASE") {
+    return { pro: "199", ult: "299", cycle: "one-time", saved: null };
   }
-  if (cycle.value === 'MONTHLY') {
-    return { pro: '29', ult: '39', cycle: '/ month', saved: null };
+  if (cycle.value === "MONTHLY") {
+    return { pro: "29", ult: "39", cycle: "/ month", saved: null };
   }
   return {
-    pro: '24',
-    ult: '33',
-    cycle: '/ month',
+    pro: "24",
+    ult: "33",
+    cycle: "/ month",
     saved: { pro: 58, ult: 78 },
   };
 });
@@ -337,10 +344,10 @@ const prices = computed(() => {
               class="flex items-start gap-2 text-sm"
             >
               <span>{{
-                f.name.includes('1 organization') ||
-                f.name.includes('3 team member')
-                  ? '❌'
-                  : '✔️'
+                f.name.includes("1 organization") ||
+                f.name.includes("3 team member")
+                  ? "❌"
+                  : "✔️"
               }}</span>
               <span>{{ f.name }}</span>
             </li>
@@ -351,7 +358,7 @@ const prices = computed(() => {
             class="block w-full rounded-2xl bg-slate-900 py-4 text-center font-bold text-white transition-all hover:scale-[1.02] hover:bg-slate-800 active:scale-95"
           >
             {{
-              billingMode === 'PURCHASE' ? 'Buy Pro Plan' : 'Start 14-Day Trial'
+              billingMode === "PURCHASE" ? "Buy Pro Plan" : "Start 14-Day Trial"
             }}
           </a>
         </div>
@@ -432,9 +439,9 @@ const prices = computed(() => {
             class="bg-primary hover:bg-primary/90 shadow-primary/20 block w-full rounded-2xl py-4 text-center font-bold text-white shadow-lg transition-all active:scale-95"
           >
             {{
-              billingMode === 'PURCHASE'
-                ? 'Buy Ultimate Plan'
-                : 'Start 14-Day Trial'
+              billingMode === "PURCHASE"
+                ? "Buy Ultimate Plan"
+                : "Start 14-Day Trial"
             }}
           </a>
         </div>

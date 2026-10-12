@@ -4,6 +4,12 @@ import type { MutationData } from "@/lib/types/organization/response"
 import { updatePlan } from "@/lib/server/organization/updatePlan"
 import { AppError } from "@/lib/exceptions"
 import { CENTRAL_API_URL } from "@/lib/constants/centralDomain"
+import { updatePolarPlan } from "@/lib/server/organization/updatePolarPlan"
+import { db } from "@/db/drizzle"
+import { and, eq } from "drizzle-orm"
+import { subscription } from "@/db/schema"
+import { decodeOrgFromCustomData } from "@/util/DecodeOrgFromCustomData"
+import { getOrganizationToken } from "@/lib/server/organization/getOrganizationToken"
 
 export async function updateSubscriptionAction({
   subscriptionId,
@@ -22,18 +28,27 @@ export async function updateSubscriptionAction({
     if (!subscriptionId)
       throw new AppError({ status: 400, toast: "Invalid subscription" })
 
-    await updatePlan({
-      subscriptionId,
-      targetPlan,
-      targetCycle,
-      mode,
-      modeType,
+    const decoded = decodeOrgFromCustomData({
+      organizationToken: await getOrganizationToken(),
     })
+    if (!decoded)
+      throw new AppError({ status: 401, toast: "Please sign in again" })
+    const sub = await db.query.subscription.findFirst({
+      where: and(
+        eq(subscription.id, subscriptionId),
+        eq(subscription.userId, decoded.id)
+      ),
+    })
+    if (!sub || sub.plan === "FREE")
+      throw new AppError({ status: 404, toast: "Subscription not found" })
 
-    return {
-      ok: true,
-      toast: "Subscription updated successfully",
+    const args = { subscriptionId: sub.id, targetPlan, targetCycle, mode, modeType }
+    if ((sub.provider ?? "paddle") === "polar") {
+      await updatePolarPlan(args)
+    } else {
+      await updatePlan(args)
     }
+    return { ok: true, toast: "Subscription updated successfully" }
   })
 }
 export async function createSelfHostedCheckoutAction({

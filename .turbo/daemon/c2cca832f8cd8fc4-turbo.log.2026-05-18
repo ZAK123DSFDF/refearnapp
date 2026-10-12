@@ -1,0 +1,50 @@
+2026-05-18T11:15:45.224869Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T11:15:45.392429Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T11:44:09.697952Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T11:44:09.820205Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T11:51:05.024474Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\src\entrypoint.js~: could not find 'D:\code-files\apps\refearnapp\apps\landing-page\src\entrypoint.js~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-05-18T11:56:04.469345Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T11:56:04.688034Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T12:06:10.874588Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T12:06:11.065143Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T13:00:34.019435Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T13:00:34.201233Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T13:16:20.343213Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T13:16:20.347557Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T14:04:56.304213Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T14:04:56.683323Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T14:32:10.020523Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T14:32:10.202000Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T16:34:51.997814Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T16:34:52.177890Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T17:23:27.548863Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T17:23:27.730855Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T17:45:30.192054Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T17:45:30.405622Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T18:37:26.172532Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T18:37:26.387474Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T18:41:40.014017Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\src\content\blog\affiliate-program-nextjs.mdx~: could not find 'D:\code-files\apps\refearnapp\apps\landing-page\src\content\blog\affiliate-program-nextjs.mdx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-05-18T19:09:53.258306Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:09:53.457550Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:13:23.585227Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\landing-page") with resource error: Git error on D:\code-files\apps\refearnapp\apps\landing-page\src\content\blog\affiliate-program-nextjs.mdx~: could not find 'D:\code-files\apps\refearnapp\apps\landing-page\src\content\blog\affiliate-program-nextjs.mdx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-05-18T19:18:13.807922Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:18:13.872556Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:30:10.460926Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:30:10.631578Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:41:37.310625Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:41:37.493544Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:45:49.127616Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:45:49.335873Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:50:45.284996Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:50:45.542785Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:54:41.656373Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:54:41.967989Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:59:21.599599Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T19:59:21.726688Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T20:02:04.046126Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T20:02:04.268051Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T20:20:23.109220Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-05-18T20:20:23.352938Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running

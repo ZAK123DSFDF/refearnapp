@@ -33,10 +33,8 @@ const MODE_CONFIG = {
 
 // 5. Derive values from config
 const CURRENT_MODE_CONFIG = MODE_CONFIG[CURRENT_CONFIG_MODE];
-
-export const AVAILABLE_MODES = CURRENT_MODE_CONFIG.available;
-
-export const CURRENT_BILLING_MODE = CURRENT_MODE_CONFIG.default;
+export const CURRENT_BILLING_MODE: BillingMode = CURRENT_MODE_CONFIG.default;
+export const AVAILABLE_MODES: readonly BillingMode[] = CURRENT_MODE_CONFIG.available;
 
 // 6. Price Points (Centralized for reusability)
 export const PRICES = {

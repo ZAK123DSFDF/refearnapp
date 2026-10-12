@@ -25,7 +25,8 @@ export const SignupServer = async ({
   email,
   password,
   transactionId,
-}: CreateUserPayload & { transactionId?: string }): Promise<MutationData> => {
+  polarCheckoutId
+}: CreateUserPayload & { transactionId?: string; polarCheckoutId?: string }): Promise<MutationData> => {
   return handleAction("Signup Server", async () => {
     await restrictSelfHostedSignup(false)
     if (!email || !password || !name) {
@@ -86,6 +87,7 @@ export const SignupServer = async ({
           orgIds,
           activeOrgId: orgIds[0] || null,
           transactionId: transactionId || null,
+          polarCheckoutId: polarCheckoutId || null,
         },
         process.env.SECRET_KEY as string,
         { expiresIn: "15m" }
@@ -133,6 +135,7 @@ export const SignupServer = async ({
         role: newUser.role,
         type: newUser.type,
         transactionId: transactionId || null,
+        polarCheckoutId: polarCheckoutId || null,
       },
       process.env.SECRET_KEY as string,
       { expiresIn: "15m" }

@@ -56,6 +56,10 @@ export type Currency = (typeof CURRENCIES)[number]
 
 export const LICENSE_STATUSES = ["active", "expired", "revoked"] as const
 export type LicenseStatus = (typeof LICENSE_STATUSES)[number]
+
+export const BILLING_PROVIDERS = ["paddle", "polar"] as const
+export type BillingProvider = (typeof BILLING_PROVIDERS)[number]
+
 // --- 3. AFFILIATE SPECIFIC ---
 export const REFERRAL_PARAMS = ["ref", "via", "aff"] as const
 export type ReferralParam = (typeof REFERRAL_PARAMS)[number]
@@ -268,6 +272,7 @@ export const subscription = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
     plan: text("plan").$type<Plan>().notNull().default("FREE"),
     billingInterval: text("billing_interval").$type<BillingInterval>(),
+    provider: text("provider").$type<BillingProvider>(),
     currency: text("currency").default("USD"),
     price: numeric("price", { precision: 10, scale: 2 }),
     priceId: text("price_id"),
@@ -295,6 +300,8 @@ export const purchase = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    provider: text("provider").$type<BillingProvider>().notNull().default("polar"),
+    providerOrderId: text("provider_order_id"),
     tier: text("tier").$type<PurchaseTier>().notNull(),
     price: numeric("price", { precision: 10, scale: 2 }).notNull(),
     currency: text("currency").default("USD"),

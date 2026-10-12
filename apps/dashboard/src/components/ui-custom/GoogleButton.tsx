@@ -32,9 +32,11 @@ export function GoogleButton({
     googleIconColor,
   } = useAtomValue(googleButtonCustomizationAtom)
   const [txnId, setTxnId] = useState<string | null>(null)
+  const [polarCheckoutId, setPolarCheckoutId] = useState<string | null>(null)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     setTxnId(urlParams.get("txn"))
+    setPolarCheckoutId(urlParams.get("checkout_id"))
   }, [])
   const type = isTeam ? "team" : affiliate ? "affiliate" : "organization"
   const handleClick = () => {
@@ -42,7 +44,7 @@ export function GoogleButton({
     if (isPreview) {
       window.open("https://www.google.com", "_blank")
     } else {
-      window.location.href = `/api/auth/google?type=${type}&orgId=${orgId}&rememberMe=${rememberMe}&page=${page}&txn=${txnId || ""}&appsumoKey=${appsumoKey || ""}`
+      window.location.href = `/api/auth/google?type=${type}&orgId=${orgId}&rememberMe=${rememberMe}&page=${page}&txn=${txnId || ""}&checkoutId=${encodeURIComponent(polarCheckoutId || "")}&appsumoKey=${appsumoKey || ""}`
     }
   }
   const buttonStyles = affiliate

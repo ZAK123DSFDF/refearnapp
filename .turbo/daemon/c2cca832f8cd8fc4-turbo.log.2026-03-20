@@ -1,0 +1,12 @@
+2026-03-20T09:05:25.449755Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-20T09:05:25.685768Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-20T09:35:14.787858Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\lib\server\organization\getLicense.ts~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\lib\server\organization\getLicense.ts~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-20T09:46:07.941779Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\lib\server\organization\getLicense.ts~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\lib\server\organization\getLicense.ts~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-20T11:07:55.872932Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-20T11:07:56.099176Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-20T12:38:14.025620Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-20T12:38:14.209682Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-20T14:27:23.904809Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\OrganizationDashboardSidebar.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\OrganizationDashboardSidebar.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)

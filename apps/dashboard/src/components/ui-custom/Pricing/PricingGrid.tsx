@@ -19,6 +19,7 @@ import { Loader2 } from "lucide-react"
 import { PRICING_CONFIG } from "@/lib/types/organization/priceConfig"
 import { EnterpriseCard } from "@/components/ui-custom/EnterpriseCard"
 import { UserLicense } from "@/lib/server/organization/getLicense"
+import usePolarCheckout from "@/hooks/usePolarCheckout"
 
 export function PricingGrid({
   billingType,
@@ -38,7 +39,7 @@ export function PricingGrid({
   getButtonText: (p: PlanInfo["plan"], t: PlanInfo["type"]) => string
 }) {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [_, setIsUpgrading] = useState(false)
+  const [, setIsUpgrading] = useState(false)
   const isSelfHosted = process.env.NEXT_PUBLIC_SELF_HOSTED === "true"
   const [pendingUpgrade, setPendingUpgrade] = useState<null | {
     subscriptionId: string
@@ -56,8 +57,11 @@ export function PricingGrid({
     },
   })
   const isLoggedIn = !!plan
+  const provider = plan?.provider ?? "paddle"
+  const paddleCheckout = usePaddleCheckout(provider === "paddle")
+  const polarCheckout = usePolarCheckout()
   const { openCheckout, showApplyingDialog, setShowApplyingDialog } =
-    usePaddleCheckout()
+    provider === "polar" ? polarCheckout : paddleCheckout
   const mutation = useAppMutation(updateSubscriptionAction, {
     onSuccess: (_, variables) => {
       console.log("Mutation done:", variables)

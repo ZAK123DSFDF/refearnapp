@@ -9,4 +9,5 @@ export interface PlanInfo {
   userId?: string
   isAppSumo?: boolean
   appsumoTier?: number
+  provider?: "paddle" | "polar"
 }

@@ -18,6 +18,7 @@ import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/organization/assignFreeTrial"
 import { assignLifetimePurchase } from "@/lib/server/organization/assignLifetimePurchase"
 import { handleAction } from "@/lib/handleAction"
+import { assignPolarPurchase } from "@/lib/server/organization/assignPolarPurchase"
 
 type VerifyServerProps = {
   token: string
@@ -48,6 +49,7 @@ export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
     // Verification and Data Extraction
     const decoded = jwt.verify(token, process.env.SECRET_KEY!) as any
     const transactionId = decoded.transactionId
+    const polarCheckoutId = decoded.polarCheckoutId
     tokenType = (decoded.type as string).toLowerCase() as
       | "organization"
       | "affiliate"
@@ -110,6 +112,8 @@ export const VerifyServer = async ({ token, mode }: VerifyServerProps) => {
         }
         if (transactionId) {
           await assignLifetimePurchase(sessionPayload.id, transactionId)
+        } else if (polarCheckoutId) {
+          await assignPolarPurchase(sessionPayload.id, polarCheckoutId)
         } else {
           await assignFreeTrialSubscription(sessionPayload.id)
         }

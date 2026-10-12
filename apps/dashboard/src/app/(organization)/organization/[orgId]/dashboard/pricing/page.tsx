@@ -18,7 +18,7 @@ export async function generateMetadata({
   })
 }
 export default async function PricingPage({ params }: OrgIdProps) {
-  const orgId = await getValidatedOrgFromParams({ params })
+  await getValidatedOrgFromParams({ params })
   const licenseResult = await getLicense()
   const plan = await getUserPlan()
   const showSubscription = !(

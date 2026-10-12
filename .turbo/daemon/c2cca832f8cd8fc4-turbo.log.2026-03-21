@@ -1,0 +1,24 @@
+2026-03-21T05:54:52.084676Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T05:54:52.282561Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T06:08:14.533161Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T06:08:14.728364Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T06:09:45.400209Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T06:09:45.608758Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T07:15:34.959507Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-21T07:15:37.461556Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-21T07:17:59.260256Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-21T09:07:37.457580Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T09:07:37.624361Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T09:39:04.328282Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-21T09:39:44.889919Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Coupons\PromotionCodesTable.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-21T10:16:24.505015Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\ui-custom\AssignAffiliateForm.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\ui-custom\AssignAffiliateForm.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-21T14:36:31.078320Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T14:36:31.348584Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T18:37:38.389550Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-21T18:37:38.676302Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running

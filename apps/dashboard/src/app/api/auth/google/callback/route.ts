@@ -20,9 +20,10 @@ import { buildAffiliateUrl } from "@/util/Url"
 import { assignFreeTrialSubscription } from "@/lib/server/organization/assignFreeTrial"
 import { assignLifetimePurchase } from "@/lib/server/organization/assignLifetimePurchase"
 import { handleRoute } from "@/lib/handleRoute"
-import { AppError } from "@/lib/exceptions" 
+import { AppError } from "@/lib/exceptions"
 import { restrictSelfHostedSignup } from "@/lib/server/organization/selfHostedGuards"
 import { mapTierToPurchasePlan } from "@/util/appsumo"
+import { assignPolarPurchase } from "@/lib/server/organization/assignPolarPurchase"
 
 export const GET = handleRoute("Google OAuth Callback", async (req) => {
   const CLIENT_ID = process.env.GOOGLE_CLIENT_ID!
@@ -34,6 +35,7 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
   const state = JSON.parse(decodeURIComponent(stateRaw || "{}"))
 
   const txnId = state.txn
+  const polarCheckoutId = state.polarCheckoutId as string | undefined
   const baseUrl = state.baseUrl || process.env.NEXT_PUBLIC_BASE_URL
   const page = state.page || "login"
   const rememberMe = !!state.rememberMe
@@ -172,6 +174,8 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
         })
         appUser = existingUserByEmail
         if (txnId) await assignLifetimePurchase(existingUserByEmail.id, txnId)
+        else if (polarCheckoutId)
+          await assignPolarPurchase(existingUserByEmail.id, polarCheckoutId)
       } else {
         await restrictSelfHostedSignup()
         let targetTier: "PRO" | "ULTIMATE" = "PRO"
@@ -226,6 +230,8 @@ export const GET = handleRoute("Google OAuth Callback", async (req) => {
           })
         } else if (txnId) {
           await assignLifetimePurchase(appUser.id, txnId)
+        } else if (polarCheckoutId) {
+          await assignPolarPurchase(appUser.id, polarCheckoutId)
         } else {
           if (process.env.NEXT_PUBLIC_SELF_HOSTED !== "true") {
             await assignFreeTrialSubscription(appUser.id)

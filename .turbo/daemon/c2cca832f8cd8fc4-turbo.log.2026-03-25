@@ -1,0 +1,8 @@
+2026-03-25T02:15:54.416450Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-25T02:15:54.562856Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-25T05:46:12.249160Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\lib\polarConfig.ts~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\lib\polarConfig.ts~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-03-25T11:06:47.962706Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-25T11:06:48.156321Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-25T12:02:33.831686Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\TeamDashboardSidebar.tsx~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\TeamDashboardSidebar.tsx~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)

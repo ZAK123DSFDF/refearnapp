@@ -1,0 +1,17 @@
+2026-04-23T04:38:06.359485Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T04:38:06.536214Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T06:00:31.998029Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\app\(organization)\organization\[orgId]\dashboard\affiliates\action.ts~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\app\(organization)\organization\[orgId]\dashboard\affiliates\action.ts~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)
+2026-04-23T06:26:23.966624Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T06:26:24.312927Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T06:30:34.279567Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Affiliates\Affiliates.tsx~: could not open 'D:\code-files\apps\refearnapp\apps\dashboard\src\components\pages\Dashboard\Affiliates\Affiliates.tsx~': The process cannot access the file because it is being used by another process.
+; class=Os (2)
+2026-04-23T11:46:18.151593Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T11:46:18.151642Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T11:56:30.588562Z  WARN turborepo_filewatch: failed to remove cookie file failed to remove file `D:\code-files\apps\refearnapp\.turbo\cookies\.turbo-cookie`
+2026-04-23T11:56:30.854031Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T11:56:32.084121Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T17:19:01.956871Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T17:19:02.179432Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T17:21:57.045889Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-04-23T17:21:57.416134Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running

@@ -1,0 +1,4 @@
+2026-03-07T15:23:26.910912Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-07T15:23:27.110380Z  WARN daemon_server: turborepo_lib::commands::daemon: daemon already running
+2026-03-07T15:42:37.230301Z  WARN get_package_file_hashes{include_default_files=true telemetry=None}: turborepo_scm::package_deps: git hashing failed for AnchoredSystemPath("apps\\dashboard") with resource error: Git error on D:\code-files\apps\refearnapp\apps\dashboard\src\lib\server\internal\getOrganizationKpiStats.ts~: could not find 'D:\code-files\apps\refearnapp\apps\dashboard\src\lib\server\internal\getOrganizationKpiStats.ts~' to open: The system cannot find the file specified.
+; class=Os (2); code=NotFound (-3)

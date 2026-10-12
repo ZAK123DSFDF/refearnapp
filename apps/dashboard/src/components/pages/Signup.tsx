@@ -63,6 +63,7 @@ const Signup = ({
   const { customNotesSignup } = useAtomValue(notesCustomizationAtom)
   const urlParams = new URLSearchParams(window.location.search)
   const txnId = urlParams.get("txn")
+  const polarCheckoutId = urlParams.get("checkout_id")
   const activeAppSumoKey = appsumoKey || urlParams.get("key")
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
@@ -203,7 +204,7 @@ const Signup = ({
     } else {
       const email = data.email.trim().toLowerCase()
       if (emailCache.shouldSkip(email)) return
-      normalMutation.mutate({ ...data, transactionId: txnId })
+      normalMutation.mutate({ ...data, transactionId: txnId, polarCheckoutId })
     }
   }
   const { showBranding, isLoading: brandingLoading } = useBrandingPreference(
