@@ -136,20 +136,32 @@ export const POST = handleRoute("Paddle Webhook", async (req) => {
 
   // 🔄 Subscription updated
   if (eventType === EventName.SubscriptionUpdated) {
-    const decodedOrg = decodeOrgFromCustomData(data.customData)
-    if (!decodedOrg) return NextResponse.json({ ok: true })
-
-    const userId = decodedOrg.id
-    const scheduled = data.scheduledChange
     const existing = await db.query.subscription.findFirst({
-      where: eq(subscription.userId, userId),
+      where: eq(subscription.id, data.id),
     })
+    if (!existing) {
+      return NextResponse.json({ ok: true, skipped: "no subscription row found for " + data.id })
+    }
 
-    if (!existing) return NextResponse.json({ ok: true })
+    const userId = existing.userId
 
-    const nextBillRaw = data.currentBillingPeriod?.endsAt ?? null
-    const nextBill = nextBillRaw ? new Date(nextBillRaw) : null
-    const priceId = data.items?.[0]?.price?.id ?? null
+    // Prefer the token's activeOrgId if it's still valid, else fall back to the DB
+    const decodedOrg = decodeOrgFromCustomData(data.customData)
+    const org = decodedOrg
+      ? { id: decodedOrg.activeOrgId }
+      : await db.query.organization.findFirst({
+          where: eq(organization.userId, userId),
+        })
+    if (!org) {
+      return NextResponse.json({ ok: true, skipped: "no organization found" })
+    }
+
+    const nextBill = data.currentBillingPeriod?.endsAt
+      ? new Date(data.currentBillingPeriod.endsAt)
+      : null
+    const item = data.items?.[0]
+    const priceId = item?.price?.id ?? null
+    const scheduled = data.scheduledChange
 
     if (scheduled?.action === "cancel") {
       const effectiveAt = scheduled.effectiveAt
@@ -163,32 +175,39 @@ export const POST = handleRoute("Paddle Webhook", async (req) => {
           expiresAt: nextBill,
         })
         .where(eq(subscription.userId, userId))
-      await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
+      await syncOrgDataToRedisLinks(org.id, {
         expiresAt: nextBill?.toISOString() ?? null,
       })
-      return NextResponse.json({ ok: true })
+      return NextResponse.json({ ok: true, updated: "scheduled cancel" })
     }
 
-    if (
-      !scheduled &&
-      priceId === existing.priceId &&
-      existing.expiresAt &&
-      nextBill
-    ) {
-      const isSamePeriod = existing.expiresAt.getTime() === nextBill.getTime()
-      await db
-        .update(subscription)
-        .set({
-          subscriptionChangeAt: null,
-          updatedAt: new Date(),
-          ...(isSamePeriod ? {} : { expiresAt: nextBill }),
-        })
-        .where(eq(subscription.userId, userId))
-      await syncOrgDataToRedisLinks(decodedOrg.activeOrgId, {
-        ...(isSamePeriod ? {} : { expiresAt: nextBill.toISOString() }),
+    // renewal, resume, or plan change
+    const desc = item?.price?.description || ""
+    const planType: "PRO" | "ULTIMATE" = desc.includes("ULTIMATE") ? "ULTIMATE" : "PRO"
+    const interval =
+      item?.price?.billingCycle?.interval === "year" ? "YEARLY" : "MONTHLY"
+
+    await db
+      .update(subscription)
+      .set({
+        plan: planType,
+        billingInterval: interval,
+        priceId,
+        price: item?.price?.unitPrice?.amount ?? existing.price,
+        subscriptionChangeAt: null,
+        expiresAt: nextBill,
+        updatedAt: new Date(),
       })
-      return NextResponse.json({ ok: true })
-    }
+      .where(eq(subscription.userId, userId))
+
+    await syncOrgDataToRedisLinks(org.id, {
+      ownerId: userId,
+      planType,
+      paymentType: "SUBSCRIPTION",
+      expiresAt: nextBill?.toISOString() ?? null,
+    })
+
+    return NextResponse.json({ ok: true, updated: "subscription synced" })
   }
 
   // ❌ Subscription canceled
