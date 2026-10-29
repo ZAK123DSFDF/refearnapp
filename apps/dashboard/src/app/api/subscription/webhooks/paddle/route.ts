@@ -16,18 +16,26 @@ const paddle = new Paddle(paddleConfig.server.apiToken, {
 async function resolveOrgContext(subscriptionId: string | null | undefined, customData: any) {
   // 1. Token still valid: use it (needed for a first purchase, before the DB has the sub id)
   const decoded = decodeOrgFromCustomData(customData)
-  if (decoded) return decoded
+  if (decoded) {
+    return decoded
+  }
 
   // 2. Token expired or missing: find the user through the Paddle subscription id
-  if (!subscriptionId) return null
+  if (!subscriptionId) {
+    return null
+  }
   const sub = await db.query.subscription.findFirst({
     where: eq(subscription.id, subscriptionId),
   })
-  if (!sub) return null
+  if (!sub) {
+    return null
+  }
   const org = await db.query.organization.findFirst({
     where: eq(organization.userId, sub.userId),
   })
-  if (!org) return null
+  if (!org) {
+    return null
+  }
   return { id: sub.userId, activeOrgId: org.id }
 }
 
@@ -281,7 +289,9 @@ export const POST = handleRoute("Paddle Webhook", async (req) => {
       const existingPurchase = await db.query.purchase.findFirst({
         where: eq(purchase.id, transactionId),
       })
-      if (!existingPurchase) return NextResponse.json({ ok: true })
+      if (!existingPurchase) {
+        return NextResponse.json({ ok: true })
+      }
 
       const userId = existingPurchase.userId
       const userOrg = await db.query.organization.findFirst({

@@ -41,11 +41,15 @@ export type PolarProductInfo =
 export function resolvePolarProduct(
   productId: string | null | undefined
 ): PolarProductInfo | null {
-  if (!productId) return null
+  if (!productId) {
+    return null
+  }
   const { SUBSCRIPTION: s, PURCHASE: p } = polarConfig.productIds
   const known: Record<string, PolarProductInfo> = {}
   const add = (id: string | undefined, info: PolarProductInfo) => {
-    if (id) known[id] = info
+    if (id) {
+      known[id] = info
+    }
   }
   add(s.MONTHLY.PRO, { kind: "SUBSCRIPTION", plan: "PRO", interval: "MONTHLY" })
   add(s.MONTHLY.ULTIMATE, { kind: "SUBSCRIPTION", plan: "ULTIMATE", interval: "MONTHLY" })
