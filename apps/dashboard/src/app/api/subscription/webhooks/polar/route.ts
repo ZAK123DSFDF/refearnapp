@@ -9,7 +9,10 @@ import { AppError } from "@/lib/exceptions"
 import { polarConfig, resolvePolarProduct } from "@/lib/polarConfig"
 
 type PolarEvent = Awaited<ReturnType<typeof webhooks.validateEvent>>
-type DataOf<T extends PolarEvent["type"]> = Extract<PolarEvent, { type: T }>["data"]
+type DataOf<T extends PolarEvent["type"]> = Extract<
+  PolarEvent,
+  { type: T }
+>["data"]
 type SubscriptionData = DataOf<"subscription.active">
 type OrderData = DataOf<"order.paid">
 type Metadata = Record<string, string | number | boolean> | null | undefined
@@ -25,7 +28,9 @@ const metaString = (meta: Metadata, key: string): string | null => {
 // Metadata is set server-side in createPolarCheckoutAction; external_id is the fallback
 async function findOwnerId(meta: Metadata, externalId?: string | null) {
   const id = metaString(meta, "userId") ?? externalId ?? null
-  if (!id) return null
+  if (!id) {
+    return null
+  }
   const owner = await db.query.user.findFirst({
     where: eq(user.id, id),
     columns: { id: true },
@@ -35,7 +40,9 @@ async function findOwnerId(meta: Metadata, externalId?: string | null) {
 
 async function getOrgId(userId: string, meta: Metadata) {
   const fromMeta = metaString(meta, "activeOrgId")
-  if (fromMeta) return fromMeta
+  if (fromMeta) {
+    return fromMeta
+  }
   const org = await db.query.organization.findFirst({
     where: eq(organization.userId, userId),
     columns: { id: true },
@@ -44,25 +51,46 @@ async function getOrgId(userId: string, meta: Metadata) {
 }
 
 async function syncRedis(orgId: string | null, payload: RedisPayload) {
-  if (!orgId) return console.warn("⚠️ No organization to sync for Polar event")
+  if (!orgId) {
+    return console.warn("⚠️ No organization to sync for Polar event")
+  }
   await syncOrgDataToRedisLinks(orgId, payload)
+}
+
+const skip = (event: string, reason: string, id?: string | null) => {
+  console.warn(`⚠️ Polar ${event} skipped: ${reason}`, id ?? "")
 }
 
 /* ------------------- subscription.active (new / recovered) ------------------- */
 
 async function onSubscriptionActive(sub: SubscriptionData) {
   const product = resolvePolarProduct(sub.product_id)
-  if (product?.kind !== "SUBSCRIPTION") return
+  if (product?.kind !== "SUBSCRIPTION") {
+    return skip(
+      "subscription.active",
+      "unknown or non-subscription product",
+      sub.product_id
+    )
+  }
 
   const userId = await findOwnerId(sub.metadata, sub.customer.external_id)
-  if (!userId) return console.log("❌ Polar subscription without a known user", sub.id)
+  if (!userId) {
+    return console.log("❌ Polar subscription without a known user", sub.id)
+  }
 
   const existing = await db.query.subscription.findFirst({
     where: eq(subscription.userId, userId),
   })
   // Never overwrite a live Paddle subscription
-  if (existing && existing.plan !== "FREE" && (existing.provider ?? "paddle") === "paddle") {
-    return console.error("❌ Polar subscription for a user still on Paddle", userId)
+  if (
+    existing &&
+    existing.plan !== "FREE" &&
+    (existing.provider ?? "paddle") === "paddle"
+  ) {
+    return console.error(
+      "❌ Polar subscription for a user still on Paddle",
+      userId
+    )
   }
 
   const expiresAt = new Date(sub.current_period_end)
@@ -90,7 +118,9 @@ async function onSubscriptionActive(sub: SubscriptionData) {
     .where(eq(subscription.userId, userId))
     .returning({ id: subscription.id })
   if (updated.length === 0) {
-    await db.insert(subscription).values({ ...fields, id: sub.id, userId, provider: "polar" })
+    await db
+      .insert(subscription)
+      .values({ ...fields, id: sub.id, userId, provider: "polar" })
   }
 
   await syncRedis(await getOrgId(userId, sub.metadata), {
@@ -104,17 +134,23 @@ async function onSubscriptionActive(sub: SubscriptionData) {
 /* ------- subscription.updated / canceled / uncanceled (idempotent sync) ------- */
 
 async function onSubscriptionSync(sub: SubscriptionData) {
-  if (sub.status !== "active" && sub.status !== "trialing") return
+  if (sub.status !== "active" && sub.status !== "trialing") {
+    return skip("subscription.sync", `status is ${sub.status}`, sub.id)
+  }
 
   // Matching on the id ignores stale events from an older subscription
   const existing = await db.query.subscription.findFirst({
     where: eq(subscription.id, sub.id),
   })
-  if (!existing) return
+  if (!existing) {
+    return skip("subscription.sync", "no subscription row", sub.id)
+  }
 
   const product = resolvePolarProduct(sub.product_id)
   const newPlan =
-    product?.kind === "SUBSCRIPTION" && sub.product_id !== existing.priceId ? product : null
+    product?.kind === "SUBSCRIPTION" && sub.product_id !== existing.priceId
+      ? product
+      : null
 
   const expiresAt = new Date(sub.current_period_end)
   await db
@@ -150,7 +186,9 @@ async function onSubscriptionRevoked(sub: SubscriptionData) {
   const existing = await db.query.subscription.findFirst({
     where: eq(subscription.id, sub.id),
   })
-  if (!existing) return
+  if (!existing) {
+    return skip("subscription.revoked", "no subscription row", sub.id)
+  }
 
   const userId = existing.userId
   const orgId = await getOrgId(userId, sub.metadata)
@@ -160,7 +198,10 @@ async function onSubscriptionRevoked(sub: SubscriptionData) {
 
   if (pending && pending.isActive === false) {
     // ULTIMATE -> PRO bundle: the deferred one-time purchase takes over now
-    await db.update(purchase).set({ isActive: true }).where(eq(purchase.userId, userId))
+    await db
+      .update(purchase)
+      .set({ isActive: true })
+      .where(eq(purchase.userId, userId))
     await syncRedis(orgId, {
       ownerId: userId,
       planType: pending.tier,
@@ -194,17 +235,31 @@ async function onSubscriptionRevoked(sub: SubscriptionData) {
 
 async function onOrderPaid(order: OrderData) {
   // Subscription charges are handled by the subscription.* events
-  if (order.billing_reason !== "purchase") return
+  if (order.billing_reason !== "purchase") {
+    return
+  }
 
   const product = resolvePolarProduct(order.product_id)
-  if (product?.kind !== "PURCHASE") return
+  if (product?.kind !== "PURCHASE") {
+    return skip(
+      "order.paid",
+      "unknown or non-purchase product",
+      order.product_id
+    )
+  }
 
   const userId = await findOwnerId(order.metadata, order.customer.external_id)
-  if (!userId) return console.log("❌ Polar order without a known user", order.id)
+  if (!userId) {
+    return console.log("❌ Polar order without a known user", order.id)
+  }
 
   // Polar retries deliveries, so this must be idempotent
-  const already = await db.query.purchase.findFirst({ where: eq(purchase.id, order.id) })
-  if (already) return
+  const already = await db.query.purchase.findFirst({
+    where: eq(purchase.id, order.id),
+  })
+  if (already) {
+    return
+  }
 
   const values = {
     id: order.id,
@@ -240,26 +295,39 @@ async function onOrderPaid(order: OrderData) {
 /* --------------------------- order.refunded --------------------------- */
 
 async function onOrderRefunded(order: OrderData) {
-  if (order.status !== "refunded") return // partial refunds are ignored
+  if (order.status !== "refunded") {
+    return
+  } // partial refunds are ignored
 
   const existingPurchase = await db.query.purchase.findFirst({
     where: eq(purchase.id, order.id),
   })
-  if (!existingPurchase) return
+  if (!existingPurchase) {
+    return skip("order.refunded", "no purchase row", order.id)
+  }
 
   const userId = existingPurchase.userId
   await db.delete(purchase).where(eq(purchase.id, order.id))
-  if (!existingPurchase.isActive) return
+  if (!existingPurchase.isActive) {
+    return
+  }
 
   const remaining = await db.query.purchase.findFirst({
     where: eq(purchase.userId, userId),
     orderBy: (p, { desc }) => [desc(p.tier)],
   })
-  if (remaining) return
+  if (remaining) {
+    return
+  }
 
   await db
     .update(subscription)
-    .set({ plan: "FREE", price: null, expiresAt: new Date(), updatedAt: new Date() })
+    .set({
+      plan: "FREE",
+      price: null,
+      expiresAt: new Date(),
+      updatedAt: new Date(),
+    })
     .where(eq(subscription.userId, userId))
   await syncRedis(await getOrgId(userId, order.metadata), {
     ownerId: userId,
@@ -274,7 +342,11 @@ async function onOrderRefunded(order: OrderData) {
 export const POST = handleRoute("Polar Webhook", async (req) => {
   const rawBody = await req.text()
   if (!rawBody) {
-    throw new AppError({ error: "BAD_REQUEST", toast: "Missing body", status: 400 })
+    throw new AppError({
+      error: "BAD_REQUEST",
+      toast: "Missing body",
+      status: 400,
+    })
   }
 
   let event: PolarEvent
@@ -286,7 +358,11 @@ export const POST = handleRoute("Polar Webhook", async (req) => {
     )
   } catch (error) {
     if (error instanceof webhooks.PolarWebhookVerificationError) {
-      throw new AppError({ error: "FORBIDDEN", toast: "Invalid signature", status: 403 })
+      throw new AppError({
+        error: "FORBIDDEN",
+        toast: "Invalid signature",
+        status: 403,
+      })
     }
     // Valid signature but a type this SDK doesn't know, or a malformed payload:
     // retrying can't fix it, so acknowledge it
